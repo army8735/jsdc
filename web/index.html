@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="gbk"/>
+<title>jssc6</title>
+<style>
+body{font:12px/1.25 arail;background-color:#fff;line-height:1.25;}
+
+.jssc ol{font-family:Consolas,momospace,"宋体","Courier New";font-size:12px;}
+.jssc li:hover{background:#FF9;}
+.jssc .number{color:#088;}
+.jssc .keyword{color:#33f;}
+.jssc .comment{color:#393;}
+.jssc .string{color:#a33;}
+.jssc .template{color:#993;}
+.jssc .reg, .jssc .annot, .jssc .head, .jssc .declare{color:#999;}
+.jssc .annot{font-style:italic;}
+.jssc .attr{color:#909;}
+.jssc .tags, .jssc .cdata{color:#c96;}
+.jssc .namespace{color:#f00;}
+.jssc .depth{color:#fc0;}
+.jssc .java .keyword{color:#909;}
+
+.jssc{position:relative;}
+.jssc p{margin:10px 0;color:#79a;text-indent:2em;font-weight:700;font-family:"Verdana","\5b8b\4f53";}
+.jssc .error{color:#f33;}
+.jssc .copy{display:block;position:absolute;top:0;right:0;cursor:pointer;color:#39f;}
+.jssc ol{margin:0;padding:0;overflow:auto;border:1px solid #ccc;background-color:#eee;font-family:Consolas,momospace,"\5b8b\4f53","Courier New";font-size:13px;clear:both;}
+.jssc ol li{margin:0;padding-left:10px;border-left:1px solid #abc;background-color:#fff;color:#333;word-wrap:break-word;word-break:break-all;}
+.jssc ol li:hover{background-color:#ff9;}
+.jssc ol li.even{background-color:#eee;}
+.jssc ol li .error{background-color:#f33;}
+.jssc ol .fold{background:#eee;font-style:italic;}
+.jssc ol .fold:after{content:"...";}
+.jssc ol .hide{position:absolute;visibility:hidden;}
+</style>
+</head>
+<body>
+<h3>var前置至作用域顶部</h3>
+<pre>
+<code class="brush:js">//some code
+var a = 1;
+function f() {
+	/test/;
+	var a = 2,
+		b = 3;
+	if(true) {
+		var c = 4;
+	}
+	function f2() {
+		var d = 5;
+		//
+		var f = 6;
+		var e;
+	}
+}</code>
+</pre>
+<script src="Ai.js"></script>
+<script>
+require(['jsdc', 'jssc'], function(jsdc, jssc) {
+	var nodes = Array.prototype.slice.call(document.getElementsByTagName('code'), 0);
+	nodes.forEach(function(node) {
+		var res = jsdc.parse(node.textContent || node.innerText ||  node.firstChild.nodeValue),
+		code = document.createElement('code');
+		code.innerHTML = res;
+		code.className = node.className;
+		node.parentNode.insertBefore(code, node.nextSibling);
+	});
+	jssc.exec();
+});
+</script>
+</body>
+</html>
