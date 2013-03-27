@@ -526,7 +526,7 @@ var require,
 				isReg = parentheseStack.pop();
 			}
 			else {
-				isReg = true;
+				isReg = peek != ']';
 			}
 		}
 		return res;
