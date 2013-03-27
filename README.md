@@ -1,4 +1,4 @@
-temp and private
+transform es6sciprt to es5script
 
 ## License
 
