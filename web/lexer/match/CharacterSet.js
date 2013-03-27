@@ -37,8 +37,8 @@ define(function(require, exports, module) {
 		}
 		return res;
 	}
-	var CharacterSet = Match.extend(function(type, begins, bodies, setPReg) {
-		Match.call(this, type, setPReg);
+	var CharacterSet = Match.extend(function(type, begins, bodies, setPReg, special, parenthese) {
+		Match.call(this, type, setPReg, special, parenthese);
 		this.begins = begins;
 		this.bodies = bodies;
 	}).methods({

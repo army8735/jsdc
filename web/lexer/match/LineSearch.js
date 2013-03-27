@@ -4,7 +4,7 @@ define(function(require, exports, module) {
 		Token = require('../Token'),
 		character = require('../../util/character');
 	var LineSearch = Match.extend(function(type, begin, end, contain, setPReg) {
-		if(contain === undefined) {
+		if(character.isUndefined(contain)) {
 			contain = false;
 		}
 		Match.call(this, type, setPReg);

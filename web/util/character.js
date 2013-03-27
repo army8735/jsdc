@@ -42,4 +42,7 @@ define(function(require, exports) {
 		}
 		return count;
 	};
+	exports.isUndefined = function(s) {
+		return typeof s == 'undefined';
+	};
 });

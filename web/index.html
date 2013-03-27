@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="gbk"/>
-<title>jssc6</title>
+<title>jsdc</title>
 <style>
 body{font:12px/1.25 arail;background-color:#fff;line-height:1.25;}
 
@@ -61,10 +61,13 @@ require(['jsdc', 'jssc'], function(jsdc, jssc) {
 	var nodes = Array.prototype.slice.call(document.getElementsByTagName('code'), 0);
 	nodes.forEach(function(node) {
 		var res = jsdc.parse(node.textContent || node.innerText ||  node.firstChild.nodeValue),
-		code = document.createElement('code');
-		code.innerHTML = res;
-		code.className = node.className;
-		node.parentNode.insertBefore(code, node.nextSibling);
+			pre = node.parentNode,
+			ncode = document.createElement('code'),
+			npre = document.createElement('pre'); 
+		ncode.innerHTML = res;
+		ncode.className = node.className;
+		npre.appendChild(ncode);
+		pre.parentNode.insertBefore(npre, pre.nextSibling);
 	});
 	jssc.exec();
 });

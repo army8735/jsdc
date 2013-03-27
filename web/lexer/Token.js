@@ -1,16 +1,17 @@
 define(function(require, exports, module) {
 	var Class = require('../util/Class'),
+		character = require('../util/character'),
 		types,
 		Token = Class(function(type, content, val) {
 			this.t = type;
 			this.c = content;
-			if(val === undefined) {
+			if(character.isUndefined(val)) {
 				val = content;
 			}
 			this.v = val;
 		}).methods({
 			type: function(t) {
-				if(t !== undefined) {
+				if(!character.isUndefined(t)) {
 					this.t = t;
 				}
 				return this.t;
@@ -40,7 +41,7 @@ define(function(require, exports, module) {
 			HEAD: 12,
 			TEMPLATE: 13,
 			type: function(tag) {
-				if(types === undefined) {
+				if(character.isUndefined(types)) {
 					types = [];
 					Object.keys(Token).forEach(function(o) {
 						if(typeof Token[o] == 'number') {

@@ -4,7 +4,7 @@ define(function(require, exports, module) {
 		Token = require('../Token'),
 		character = require('../../util/character');
 	var LineParse = Match.extend(function(type, begin, end, mutiline, setPReg) {
-		if(mutiline === undefined) {
+		if(character.isUndefined(mutiline)) {
 			mutiline = false;
 		}
 		Match.call(this, type, setPReg);
