@@ -1,118 +1,98 @@
 define(function(require, exports) {
 	var Class = require('../util/Class'),
+		character = require('../util/character'),
 		Lexer = require('../lexer/Lexer'),
 		Token = require('../lexer/Token'),
 		Parser = Class(function(lexer) {
 			this.lexer = lexer;
 			this.look = null;
 			this.tokens = lexer.tokens();
+			this.count = 1;
+			this.index = 0;
 			if(this.tokens.length) {
 				this.move();
 			}
 		}).methods({
 			program: function() {
-				if(this.look) {
-					switch(this.look.val()) {
-						case '{':
-							this.block();
-							break;
-						default:
-							this.stmts();
-					}
+				this.selements();
+			},
+			selement: function() {
+				if(this.look.val() == 'function') {
+					this.fndecl();
+				}
+				else {
+					this.stmt();
 				}
 			},
-			block: function() {
-				 this.match('{');
-				 stmts();
-				 this.match('}');
-			},
-			stmts: function() {
-				switch(this.look.val()) {
-					case '}':
-						break;
-					case 'var':
-						this.move();
-						decls();
-						break;
-					case 'function':
-						this.func();
-						break;
-					default: 
-						this.stmt();
-						this.stmts();
+			selements: function() {
+				if(this.look) {
+					this.selement();
+					this.selements();
 				}
 			},
 			stmt: function() {
-			},
-			decls: function() {
-				outer:
-				switch(this.look.type()) {
-					case Token.ID:
-						decl();
-						break;
-					case Token.SIGN:
-						switch(this.look.val()) {
-							case ';':
-							case '\n':
-								this.move();
-								break outer;
-							default:
-								throw new Error('SyntaxError: missing variable name');
-						}
-						break;
-					default:
-						throw new Error('SyntaxError: missing variable name');
-				}
-			},
-			decl: function() {
-			},
-			declAssign: function() {
-				this.match('=');
-				while(this.look.type() == Token.LINE) {
-					this.move();
-				}
 				switch(this.look.val()) {
-					case Token.ID:
-						this.move();
-						break;
-					case Token.NUMBER:
-						this.move();
-						break;
+					case 'var':
+						this.varstmt();
+					break;
+					case '{':
+						this.block();
+					break;
 					default:
-						throw new Error('SyntaxError: missing ; before statement');
+						throw new Error('todo...');
 				}
-				switch(this.look.type()) {
-					case ';':
-						this.move();
-						break;
-					case '\n':
-						this.move();
-						break;
-					default:
-						throw new Error('SyntaxError: missing ; before statement');
+			},
+			stmts: function() {
+			},
+			block: function() {
+				this.match('{');
+				throw new Error('todo...');
+			},
+			condition: function() {
+				this.match('if');
+				this.match('(');
+			},
+			varstmt: function() {
+				this.match('var'); 
+				this.vardecl();
+				this.vardecls();
+				this.match(';');
+			},
+			vardecl: function() {
+				this.match(Token.ID);
+				if(this.look.val() == '=') {
+					this.assign();
+				}
+			},
+			vardecls: function() {
+				if(this.look.val() == ',') {
+					this.move();
+					this.vardecl();
+					this.vardecls();
 				}
 			},
 			assign: function() {
-			},
-			func: function() {
-			},
-			eof: function() {
+				this.match('=');
 				switch(this.look.type()) {
-					case ';':
-					case '\n':
+					case Token.ID:
+					case Token.NUMBER:
 						this.move();
-						break;
+					break;
 					default:
-						throw new Error('SyntaxError: missing ; before statement');
+						throw new Error('todo...');
 				}
 			},
-			match: function(type) {
+			func: function() {
+				this.match('function');
+				throw new Error('todo...');
+			},
+			match: function(type, msg) {
 				if(typeof type == 'string') {
 					if(this.look.val() == type) {
 						this.move();
 					}
 					else {
-						throw new Error('SyntaxError: expect a ' + type);
+						throw new Error('SyntaxError: missing ' + type + (msg ? ' ' + msg : ''));
 					}
 				}
 				else if(typeof type == 'number') {
@@ -120,19 +100,25 @@ define(function(require, exports) {
 						this.move();
 					}
 					else {
-						throw new Error('SyntaxError: expect a ' + Token.type(type));
+						throw new Error('SyntaxError: missing ' + Token.type(type) + (msg ? ' ' + msg : ''));
 					}
 				}
 			},
 			move: function() {
 				do {
-					this.look = tokens.shift();
-				} while(this.look.type() != Token.BLANK || this.look.type() != Token.TAB || this.look.type() != Token.COMMENT);
-			},
-			ignoreEnter: function() {
-				while(this.look.type() == Token.LINE) {
-					this.move();
-				}
+					if(this.tokens.length == 0) {
+						this.look = null;
+						break;
+					}
+					this.look = this.tokens.shift();
+					if(this.look.type() == Token.LINE) {
+						this.count++;
+					}
+					else if(this.look.type() == Token.COMMENT) {
+						this.count += character.count(Token.val(), character.LINE);
+					}
+					this.index++;
+				} while([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT].indexOf(this.look.type()) != -1)
 			}
 		});
 	return Parser;
