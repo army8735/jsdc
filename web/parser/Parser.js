@@ -82,9 +82,32 @@ define(function(require, exports) {
 						throw new Error('todo...');
 				}
 			},
-			func: function() {
+			fndecl: function() {
 				this.match('function');
-				throw new Error('todo...');
+				this.match(Token.ID);
+				this.match('(');
+				if(this.look.type() == Token.ID) {
+					this.fparams();
+				}
+				this.match(')');
+				this.match('{');
+				this.fnbody();
+				this.match('}');
+			},
+			fparams: function() {
+				if(this.look.type() == Token.ID) {
+					this.match(Token.ID);
+				}
+				else if(this.look.val() == ',') {
+					this.match(',');
+					this.match(Token.ID);
+				}
+				this.fparams();
+			},
+			fnbody: function() {
+				if(this.look.val() != '}') {
+					this.selements();
+				}
 			},
 			match: function(type, msg) {
 				if(typeof type == 'string') {
