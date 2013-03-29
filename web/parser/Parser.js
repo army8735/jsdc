@@ -41,6 +41,9 @@ define(function(require, exports, module) {
 			},
 			stmt: function() {
 				var node = new Node('stmt');
+				if(!this.look) {
+					throw new Error('SyntaxError: syntax error ' + this.line);
+				}
 				if(this.look.type() == Token.ID) {
 					node.add(this.labstmt());
 					return node;
@@ -144,7 +147,7 @@ define(function(require, exports, module) {
 			block: function() {
 				var node = new Node('block');
 				node.add(this.match('{'));
-				if(this.look.content() != '}') {
+				if(this.look && this.look.content() != '}') {
 					node.add(this.stmts());
 				}
 				node.add(this.match('}'));
@@ -164,7 +167,7 @@ define(function(require, exports, module) {
 					this.match(')'),
 					this.stmt()
 				);
-				if(this.look.content() == 'else') {
+				if(this.look && this.look.content() == 'else') {
 					node.add(
 						this.match('else'),
 						this.stmt()
@@ -429,7 +432,9 @@ define(function(require, exports, module) {
 				return node;
 			},
 			expr: function() {
-				throw new Error('todo...');
+				var node = new Node('expr');
+				node.add(this.match('true'));
+				return node;
 			},
 			match: function(type, line, msg) {
 				if(typeof line != 'boolean') {
@@ -437,7 +442,7 @@ define(function(require, exports, module) {
 					msg = line;
 				}
 				if(typeof type == 'string') {
-					if(this.look.content() == type) {
+					if(this.look && this.look.content() == type) {
 						var l = this.look;
 						this.move(line);
 						return new Node('Token', l);
@@ -447,7 +452,7 @@ define(function(require, exports, module) {
 					}
 				}
 				else if(typeof type == 'number') {
-					if(this.look.type() == type) {
+					if(this.look && this.look.type() == type) {
 						var l = this.look;
 						this.move(line);
 						return new Node('Token', l);
