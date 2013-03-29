@@ -46,7 +46,7 @@ define(function(require, exports, module) {
 			if(is(c, this.begins)) {
 				this.result = c;
 				var lastIndex = index;
-				while(index < code.length) {
+				while(index <= code.length) {
 					var res = is(code.charAt(index++), this.bodies);
 					if(!res) {
 						break;
