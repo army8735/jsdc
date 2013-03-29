@@ -432,6 +432,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			expr: function() {
+				throw new Error('todo...');
 			},
 			match: function(type, line, msg) {
 				if(typeof line != 'boolean') {
