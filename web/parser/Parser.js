@@ -35,7 +35,7 @@ define(function(require, exports, module) {
 			selements: function() {
 				var node = new Node('selements');
 				node.add(this.selement());
-				while(this.look && this.look.content() != '}') {
+				while(this.look && ['var', '{', ';', 'if', 'do', 'while', 'for', 'continue', 'break', 'return', 'with', 'switch', 'throw', 'try', 'debugger', 'function'].indexOf(this.look.content()) != -1) {
 					node.add(this.selement());
 				}
 				return node;
@@ -92,7 +92,7 @@ define(function(require, exports, module) {
 						node.add(this.debstmt());
 					break;
 					default:
-						throw new Error();
+						this.error();
 				}
 				return node;
 			},
@@ -448,7 +448,7 @@ define(function(require, exports, module) {
 			assignexpr: function() {
 				var node = new Node('assignexpr');
 				node.add(this.cndtexpr());
-				//cndtexpr todo
+				//lefthsexpr todo
 				node.add(this.lefthsexpr());
 				return node;
 			},
