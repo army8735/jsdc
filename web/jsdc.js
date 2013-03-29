@@ -3,13 +3,15 @@ define(function(require, exports) {
 		EcmascriptRule = require('./lexer/rule/EcmascriptRule'),
 		Token = require('./lexer/Token'),
 		Parser = require('./parser/Parser'),
+		Node = require('./parser/Node'),
 		character = require('./util/character');
 
 	exports.parse = function(code) {
 		var lexer = new Lexer(new EcmascriptRule());
 		lexer.parse(code);
-		var parser = new Parser(lexer);
-		parser.program();
+		var parser = new Parser(lexer),
+			node = parser.program();
+		console.log(node);
 		return '';
 	};
 });
