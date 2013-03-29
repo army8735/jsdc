@@ -15,6 +15,7 @@ define(function(require, exports) {
 			node = parser.program();
 			console.log(node);
 		} catch(e) {
+			console.log(e);
 			node = e.toString();
 		}
 		return node;

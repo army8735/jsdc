@@ -16,7 +16,9 @@ define(function(require, exports, module) {
 		}).methods({
 			program: function() {
 				var node = new Node('program');
-				node.add(this.selements());
+				if(this.look) {
+					node.add(this.selements());
+				}
 				return node;
 			},
 			selement: function() {
@@ -31,7 +33,8 @@ define(function(require, exports, module) {
 			},
 			selements: function() {
 				var node = new Node('selements');
-				while(this.look) {
+				node.add(this.selement());
+				while(this.look && this.look.content() != '}') {
 					node.add(this.selement());
 				}
 				return node;
@@ -83,6 +86,8 @@ define(function(require, exports, module) {
 					break;
 					case 'debugger':
 						node.add(this.debstmt());
+					break;
+					case '}':
 					break;
 					default:
 						throw new Error('SyntaxError');
