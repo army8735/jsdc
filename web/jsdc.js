@@ -10,8 +10,13 @@ define(function(require, exports) {
 		var lexer = new Lexer(new EcmascriptRule());
 		lexer.parse(code);
 		var parser = new Parser(lexer),
+			node;
+		try {
 			node = parser.program();
-		console.log(node);
-		return '';
+			console.log(node);
+		} catch(e) {
+			node = e.toString();
+		}
+		return node;
 	};
 });

@@ -33,6 +33,8 @@ body{font:12px/1.25 arail;background-color:#fff;line-height:1.25;}
 .jssc ol .fold{background:#eee;font-style:italic;}
 .jssc ol .fold:after{content:"...";}
 .jssc ol .hide{position:absolute;visibility:hidden;}
+
+.kineticjs-content{margin:10px 0;}
 </style>
 </head>
 <body>
@@ -56,18 +58,86 @@ function f() {
 }</code-->
 </pre>
 <script src="Ai.js"></script>
+<script src="kinetic-v4.4.0.min.js"></script>
 <script>
+var w = 0, h = 0;
+function draw(i, res, node) {
+	if(typeof res == 'string') {
+		return;
+	}
+	var div = document.createElement('div');
+	div.id = 'container' + i;
+	node.parentNode.insertBefore(div, node);
+	var stage = new Kinetic.Stage({
+			container: div.id,
+			width: 0,
+			height: 0
+		}),
+		layer = new Kinetic.Layer();
+	drawNode(layer, res, 0, 0, 0, 0);
+	stage.add(layer);
+	stage.setWidth(w);
+	stage.setHeight(h);
+}
+function drawNode(layer, node, x, index, parent, sibling) {
+	if(index > 0) {
+		h += 30;
+	}
+	var isToken = node.name() == 'Token',
+		text = new Kinetic.Text({
+			x: x + 6,
+			y: h + 7,
+			text: isToken ? node.leaves().content() : node.name(),
+			width: 68,
+			height: 16,
+			align: 'center',
+			fill: isToken ? '#6CF' : '#f60',
+			fontSize: 9,
+			fontFamily: 'Verdana'
+		}),
+		rect = new Kinetic.Rect({
+			x: x + 2,
+			y: h + 2,
+			width: 74,
+			height: 20,
+			fill: isToken ? '#FFF' : '#F9F9F9',
+			stroke: isToken ? '#CCC' : '#808080',
+			cornerRadius: 10
+		});
+	layer.add(rect);
+	layer.add(text);
+	var x2 = x + 88;
+	if(parent) {
+		var line = new Kinetic.Line({
+			points: [x - 10, parent.getY() + 10, x + 2, rect.getY() + 10],
+			stroke: '#6F9',
+			strokeWidth: 1,
+			lineJion: 'round',
+			dashArray: [1, 1]
+		});
+		layer.add(line);
+	}
+	if(!isToken) {
+		var sib = null;
+		node.leaves().forEach(function(leaf, index) {
+			drawNode(layer, leaf, x2, index, rect, sib);
+			sib = leaf;
+		});
+	}
+	w = Math.max(w, x2);
+}
 require(['jsdc', 'jssc'], function(jsdc, jssc) {
 	var nodes = Array.prototype.slice.call(document.getElementsByTagName('code'), 0);
-	nodes.forEach(function(node) {
+	nodes.forEach(function(node, i) {
 		var res = jsdc.parse(node.textContent || node.innerText ||  node.firstChild.nodeValue),
 			pre = node.parentNode,
 			ncode = document.createElement('code'),
-			npre = document.createElement('pre'); 
+			npre = document.createElement('pre');
 		ncode.innerHTML = res;
 		ncode.className = node.className;
 		npre.appendChild(ncode);
 		pre.parentNode.insertBefore(npre, pre.nextSibling);
+		draw(i, res, npre.nextSibling);
 	});
 	jssc.exec();
 });

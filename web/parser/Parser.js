@@ -436,7 +436,7 @@ define(function(require, exports, module) {
 					if(this.look.content() == type) {
 						var l = this.look;
 						this.move(line);
-						return l;
+						return new Node('Token', l);
 					}
 					else {
 						throw new Error('SyntaxError: missing ' + type + ' line ' + this.line + (msg ? '\n' + msg : ''));
@@ -446,7 +446,7 @@ define(function(require, exports, module) {
 					if(this.look.type() == type) {
 						var l = this.look;
 						this.move(line);
-						return l;
+						return new Node('Token', l);
 					}
 					else {
 						throw new Error('SyntaxError: missing ' + Token.type(type) + ' line ' + this.line + (msg ? '\n' + msg : ''));
@@ -480,7 +480,7 @@ define(function(require, exports, module) {
 					}
 					this.index++;
 				} while([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT].indexOf(this.look.type()) != -1);
-				return l;
+				return new Node('Token', l);
 			}
 		});
 	module.exports = Parser;
