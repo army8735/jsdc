@@ -13,7 +13,6 @@ define(function(require, exports) {
 			node;
 		try {
 			node = parser.program();
-			console.log(node);
 		} catch(e) {
 			console.log(e);
 			node = e.toString();
