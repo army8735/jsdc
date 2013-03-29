@@ -43,7 +43,7 @@ define(function(require, exports, module) {
 			stmt: function() {
 				var node = new Node('stmt');
 				if(!this.look) {
-					throw new Error('SyntaxError: syntax error line ' + this.line);
+					this.error();
 				}
 				if(this.look.type() == Token.ID) {
 					node.add(this.labstmt());
@@ -92,7 +92,7 @@ define(function(require, exports, module) {
 						node.add(this.debstmt());
 					break;
 					default:
-						throw new Error('SyntaxError line ' + this.line);
+						throw new Error();
 				}
 				return node;
 			},
@@ -116,7 +116,7 @@ define(function(require, exports, module) {
 			vardecl: function() {
 				var node = new Node('vardecl');
 				node.add(this.match(Token.ID));
-				if(this.look.content() == '=') {
+				if(this.look && this.look.content() == '=') {
 					node.add(this.assign());
 				}
 				return node;
@@ -124,7 +124,7 @@ define(function(require, exports, module) {
 			vardecls: function() {
 				var node = new Node('vardecls');
 				node.add(this.vardecl());
-				while(this.look.content() == ',') {
+				while(this.look && this.look.content() == ',') {
 					node.add(
 						this.move(),
 						this.vardecl()
@@ -302,7 +302,7 @@ define(function(require, exports, module) {
 			caseblock: function() {
 				var node = new Node('caseblock');
 				node.add(this.match('{'));
-				if(this.look.content() != '}') {
+				if(this.look && this.look.content() != '}') {
 					if(this.look.content != 'default') {
 						node.add(this.caseclauses());
 					}
@@ -316,7 +316,7 @@ define(function(require, exports, module) {
 			caseclauses: function() {
 				var node = new Node('caseclauses');
 				node.add(this.caseclause());
-				while(this.look.content() != '}' && this.look.content() != 'default') {
+				while(this.look && this.look.content() != '}' && this.look.content() != 'default') {
 					node.add(this.caseclauses());
 				}
 			},
@@ -327,7 +327,7 @@ define(function(require, exports, module) {
 					this.expr(),
 					this.match(':')
 				);
-				if(this.look.content() != 'case' && this.look.content() != 'break' && this.look.content() != '}') {
+				if(this.look && this.look.content() != 'case' && this.look.content() != 'break' && this.look.content() != '}') {
 					node.add(this.stmts());
 				}
 				return node;
@@ -338,7 +338,7 @@ define(function(require, exports, module) {
 					this.match('default'),
 					this.match(':')
 				);
-				if(this.look.content() != '}') {
+				if(this.look && this.look.content() != '}') {
 					node.add(this.stmts());
 				}
 				return node;
@@ -365,9 +365,9 @@ define(function(require, exports, module) {
 					this.match('try'),
 					this.block()
 				);
-				if(this.look.content() == 'catch') {
+				if(this.look && this.look.content() == 'catch') {
 					node.add(this.cach());
-					if(this.look.content() == 'finally') {
+					if(this.look && this.look.content() == 'finally') {
 						node.add(this.finl());
 					}
 				}
@@ -416,7 +416,7 @@ define(function(require, exports, module) {
 			fnparams: function() {
 				var node = new Node('fnparams');
 				node.add(this.fnparam());
-				while(this.look.content() == ',') {
+				while(this.look && this.look.content() == ',') {
 					node.add(
 						this.match(','),
 						this.fnparam()
@@ -431,14 +431,215 @@ define(function(require, exports, module) {
 			},
 			fnbody: function() {
 				var node = new Node('fnbody');
-				if(this.look.content() != '}') {
+				if(this.look && this.look.content() != '}') {
 					node.add(this.selements());
 				}
 				return node;
 			},
 			expr: function() {
 				var node = new Node('expr');
-				node.add(this.match('true'));
+				//node.add(this.match('true'));
+				node.add(this.assignexpr());
+				while(this.look && this.look.content() == ',') {
+					node.add(this.assignexpr());
+				}
+				return node;
+			},
+			assignexpr: function() {
+				var node = new Node('assignexpr');
+				node.add(this.cndtexpr());
+				//cndtexpr todo
+				node.add(this.lefthsexpr());
+				return node;
+			},
+			cndtexpr: function() {
+				var node = new Node('cndtexpr');
+				node.add(this.logorexpr());
+				if(this.look && this.look.content() == '?') {
+					node.add(
+						this.move(),
+						this.assignexpr(),
+						this.match(':'),
+						this.assignexpr()
+					);
+				}
+				return node;
+			},
+			logorexpr: function() {
+				var node = new Node('logorexpr');
+				node.add(this.logandexpr());
+				while(this.look && this.look.content() == '||') {
+					node.add(
+						this.move(),
+						this.logandexpr()
+					);
+				}
+				return node;
+			},
+			logandexpr: function() {
+				var node = new Node('logandexpr');
+				node.add(this.bitorexpr());
+				while(this.look && this.look.content() == '&&') {
+					node.add(
+						this.move(),
+						this.bitorexpr()
+					);
+				}
+				return node;
+			},
+			bitorexpr: function() {
+				var node = new Node('bitorexpr');
+				node.add(this.bitxorexpr());
+				while(this.look && this.look.content() == '|') {
+					node.add(
+						this.move(),
+						this.bitxorexpr()
+					);
+				}
+				return node;
+			},
+			bitxorexpr: function() {
+				var node = new Node('bitxorexpr');
+				node.add(this.bitandexpr());
+				while(this.look && this.look.content() == '^') {
+					node.add(
+						this.move(),
+						this.bitandexpr()
+					);
+				}
+				return node;
+			},
+			bitandexpr: function() {
+				var node = new Node('bitandexpr');
+				node.add(this.eqexpr());
+				while(this.look && this.look.content() == '&') {
+					node.add(
+						this.move(),
+						this.eqexpr()
+					);
+				}
+				return node;
+			},
+			eqexpr: function() {
+				var node = new Node('eqexpr');
+				node.add(this.reltexpr());
+				while(this.look && ['==', '===', '!==', '!='].indexOf(this.look.content()) != -1) {
+					node.add(
+						this.move(),
+						this.reltexpr()
+					);
+				}
+				return node;
+			},
+			reltexpr: function() {
+				var node = new Node('reltexpr');
+				node.add(this.shiftexpr());
+				while(this.look && ['<', '>', '>=', '<=', 'in', 'instanceof'].indexOf(this.look.content()) != -1) {
+					node.add(
+						this.move(),
+						this.shiftexpr()
+					);
+				}
+				return node;
+			},
+			shiftexpr: function() {
+				var node = new Node('shiftexpr');
+				node.add(this.addexpr());
+				while(this.look && ['<<', '>>', '>>>'].indexOf(this.look.content()) != -1) {
+					node.add(
+						this.move(),
+						this.addexpr()
+					);
+				}
+				return node;
+			},
+			addexpr: function() {
+				var node = new Node('addexpr');
+				node.add(this.mtplexpr());
+				while(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
+					node.add(
+						this.move(),
+						this.mtplexpr()
+					);
+				}
+				return node;
+			},
+			mtplexpr: function() {
+				var node = new Node('mtplexpr');
+				node.add(this.unaryexpr());
+				while(this.look && ['*', '/', '%'].indexOf(this.look.content()) != -1) {
+					node.add(
+						this.move(),
+						this.unaryexpr()
+					);
+				}
+				return node;
+			},
+			unaryexpr: function() {
+				var node = new Node('unaryexpr');
+				if(!this.look) {
+					this.error();
+				}
+				switch(this.look.content()) {
+					case 'delete':
+					case 'void':
+					case 'typeof':
+					case '++':
+					case '--':
+					case '+':
+					case '-':
+						node.add(
+							this.move(),
+							this.unaryexpr()
+						);
+					break;
+					case '~':
+						node.add(
+							this.move(),
+							this.unaryexpr(),
+							this.match('!'),
+							this.unaryexpr()
+						);
+					break;
+					default:
+						node.add(this.pstfixexpr());
+				}
+				return node;
+			},
+			pstfixexpr: function() {
+				var node = new Node('pstfixexpr');
+				node.add(this.lefthsexpr(true));
+				if(this.look && this.look.content() == '++' || this.look.content() == '--') {
+					node.add(this.move());
+				}
+				return node;
+			},
+			lefthsexpr: function(line) {
+				var node = new Node('lefthsexpr');
+				throw new Error('todo...');
+				return node;
+			},
+			assignoprt: function() {
+				var node = new Node('assignoprt');
+				switch(this.look.content()) {
+					case '*=':
+					case '/=':
+					case '%=':
+					case '+=':
+					case '-=':
+					case '<<=':
+					case '>>=':
+					case '>>>=':
+					case '&=':
+					case '^=':
+					case '|=':
+						node.add(
+							this.move(),
+							this.assignexpr()
+						);
+					default:
+						this.error();
+				}
 				return node;
 			},
 			match: function(type, line, msg) {
@@ -509,6 +710,10 @@ define(function(require, exports, module) {
 					this.index++;
 				} while([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT].indexOf(this.look.type()) != -1);
 				return new Node('Token', l);
+			},
+			error: function(msg) {
+				msg = msg || 'SyntaxError: syntax error';
+				throw new Error(msg + ' line ' + this.line + ' col ' + this.col);
 			}
 		});
 	module.exports = Parser;
