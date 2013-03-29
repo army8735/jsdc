@@ -1,6 +1,7 @@
 define(function(require, exports, module) {
 	var Class = require('../util/Class'),
 		character = require('../util/character'),
+		name = require('../util/name'),
 		Lexer = require('../lexer/Lexer'),
 		Token = require('../lexer/Token'),
 		Node = require('./Node'),
@@ -112,7 +113,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			vardecl: function() {
-				var node = new Node('vardeclation');
+				var node = new Node('vardecl');
 				node.add(this.match(Token.ID));
 				if(this.look.content() == '=') {
 					node.add(this.assign());
@@ -120,7 +121,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			vardecls: function() {
-				var node = new Node('vardeclations');
+				var node = new Node('vardecls');
 				node.add(this.vardecl());
 				while(this.look.content() == ',') {
 					node.add(
@@ -153,7 +154,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			emptstmt: function() {
-				var node = new Node('emptystmt');
+				var node = new Node('emptstmt');
 				node.add(this.match(';'));
 				return node;
 			},
@@ -175,7 +176,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			iterstmt: function() {
-				var node = new Node('iteratorstmt');
+				var node = new Node('iterstmt');
 				switch(this.look.content()) {
 					case 'do':
 						node.add(
@@ -242,7 +243,7 @@ define(function(require, exports, module) {
 				}
 			},
 			cntnstmt: function() {
-				var node = new Node('continuestmt');
+				var node = new Node('cntnstmt');
 				node.add(this.match('continue', true));
 				if(this.look.type() == Token.ID || this.look.type() == Token.LINE) {
 					node.add(this.move());
@@ -251,7 +252,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			brkstmt: function() {
-				var node = new Node('breakstmt');
+				var node = new Node('brkstmt');
 				node.add(this.match('break', true));
 				if(this.look.type() == Token.ID || this.look.type() == Token.LINE) {
 					node.add(this.move());
@@ -259,7 +260,7 @@ define(function(require, exports, module) {
 				node.add(this.match(';'));
 			},
 			retstmt: function() {
-				var node = new Node('returnstmt');
+				var node = new Node('retstmt');
 				node.add(this.match('return', true));
 				if(this.look.content() == ';') {
 					node.add(this.move());
@@ -284,7 +285,7 @@ define(function(require, exports, module) {
 				);
 			},
 			swchstmt: function() {
-				var node = new Node('switchstmt');
+				var node = new Node('swchstmt');
 				node.add(
 					this.match('switch'),
 					this.match('('),
@@ -327,7 +328,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			dftclause: function() {
-				var node = new Node('defaultclause');
+				var node = new Node('dftclause');
 				node.add(
 					this.match('default'),
 					this.match(':')
@@ -338,7 +339,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			labstmt: function() {
-				var node = new Node('labelstmt');
+				var node = new Node('labstmt');
 				node.add(
 					this.match(Token.ID),
 					this.match(':'),
@@ -346,7 +347,7 @@ define(function(require, exports, module) {
 				);
 			},
 			thrstmt: function() {
-				var node = new Node('throwstmt');
+				var node = new Node('thrstmt');
 				node.add(
 					this.match('throw', true),
 					this.expr(),
@@ -382,7 +383,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			finl: function() {
-				var node = new Node('finally');
+				var node = new Node('finl');
 				node.add(
 					this.match('finally'),
 					this.block()
@@ -390,7 +391,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			fndecl: function() {
-				var node = new Node('functiondeclation');
+				var node = new Node('fndecl');
 				node.add(
 					this.match('function'),
 					this.match(Token.ID),
@@ -408,7 +409,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			fnparams: function() {
-				var node = new Node('functionparams');
+				var node = new Node('fnparams');
 				node.add(this.fnparam());
 				while(this.look.content() == ',') {
 					node.add(
@@ -419,12 +420,12 @@ define(function(require, exports, module) {
 				return node;
 			},
 			fnparam: function() {
-				var node = new Node('functionparam');
+				var node = new Node('fnparam');
 				node.add(this.match(Token.ID));
 				return node;
 			},
 			fnbody: function() {
-				var node = new Node('funtionbody');
+				var node = new Node('fnbody');
 				if(this.look.content() != '}') {
 					node.add(this.selements());
 				}

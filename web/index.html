@@ -87,14 +87,14 @@ function drawNode(layer, node, x, index, parent, sibling) {
 	}
 	var isToken = node.name() == 'Token',
 		text = new Kinetic.Text({
-			x: x + 6,
-			y: h + 7,
+			x: x + 5,
+			y: h + 6,
 			text: isToken ? node.leaves().content() : node.name(),
 			width: 68,
 			height: 16,
 			align: 'center',
 			fill: isToken ? '#6CF' : '#f60',
-			fontSize: 9,
+			fontSize: 12,
 			fontFamily: 'Verdana'
 		}),
 		rect = new Kinetic.Rect({
