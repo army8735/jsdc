@@ -276,7 +276,7 @@ define(function(require, exports, module) {
 			cntnstmt: function() {
 				var node = new Node('cntnstmt');
 				node.add(this.match('continue', true));
-				if(this.look.type() == Token.ID || this.look.type() == Token.LINE) {
+				if(this.look && (this.look.type() == Token.ID || this.look.type() == Token.LINE)) {
 					node.add(this.move());
 				}
 				node.add(this.match(';'));
@@ -285,22 +285,25 @@ define(function(require, exports, module) {
 			brkstmt: function() {
 				var node = new Node('brkstmt');
 				node.add(this.match('break', true));
-				if(this.look.type() == Token.ID || this.look.type() == Token.LINE) {
+				if(this.look && (this.look.type() == Token.ID || this.look.type() == Token.LINE)) {
 					node.add(this.move());
 				}
 				node.add(this.match(';'));
+				return node;
 			},
 			retstmt: function() {
 				var node = new Node('retstmt');
 				node.add(this.match('return', true));
-				if(this.look.content() == ';') {
-					node.add(this.move());
-				}
-				else if(this.look.type() == Token.LINE) {
-					node.add(this.move());
-				}
-				else {
-					node.add(this.expr());
+				if(this.look) {
+					if(this.look.content() == ';') {
+						node.add(this.move());
+					}
+					else if(this.look.type() == Token.LINE) {
+						node.add(this.move());
+					}
+					else {
+						node.add(this.expr());
+					}
 				}
 				node.add(this.match(';'));
 				return node;
@@ -314,6 +317,7 @@ define(function(require, exports, module) {
 					this.match(')'),
 					this.stmt()
 				);
+				return node;
 			},
 			swchstmt: function() {
 				var node = new Node('swchstmt');
@@ -324,6 +328,7 @@ define(function(require, exports, module) {
 					this.match(')'),
 					this.caseblock()
 				);
+				return node;
 			},
 			caseblock: function() {
 				var node = new Node('caseblock');
@@ -345,6 +350,7 @@ define(function(require, exports, module) {
 				while(this.look && this.look.content() != '}' && this.look.content() != 'default') {
 					node.add(this.caseclauses());
 				}
+				return node;
 			},
 			caseclause: function() {
 				var node = new Node('caseclause');
@@ -376,6 +382,7 @@ define(function(require, exports, module) {
 					this.match(':'),
 					this.stmt()
 				);
+				return node;
 			},
 			thrstmt: function() {
 				var node = new Node('thrstmt');
@@ -384,6 +391,7 @@ define(function(require, exports, module) {
 					this.expr(),
 					this.match(';')
 				);
+				return node;
 			},
 			trystmt: function() {
 				var node = new Node('trystmt');
