@@ -9,6 +9,7 @@ define(function(require, exports, module) {
 			this.look = null;
 			this.tokens = lexer.tokens();
 			this.line = 1;
+			this.col = 1;
 			this.index = 0;
 			if(this.tokens.length) {
 				this.move();
@@ -206,14 +207,17 @@ define(function(require, exports, module) {
 						if(this.look.content() == 'var') {
 							node.add(
 								this.move(),
-								this.varcl()
+								this.vardecl()
 							);
 							if(this.look.content() == 'in') {
 								node.add(this.expr());
 							}
 							else {
-								if(this.look.content() != ';') {
-									node.add(this.varcls());
+								if(this.look.content() == ',') {
+									node.add(
+										this.move(),
+										this.vardecls()
+									);
 								}
 								node.add(this.match(';'));
 								if(this.look.content() != ';') {
@@ -449,7 +453,7 @@ define(function(require, exports, module) {
 						return new Node('Token', l);
 					}
 					else {
-						throw new Error('SyntaxError: missing ' + type + ' line ' + this.line + (msg ? '\n' + msg : ''));
+						throw new Error('SyntaxError: missing ' + type + ' line ' + this.line + ' col ' + this.col + (msg ? '\n' + msg : ''));
 					}
 				}
 				else if(typeof type == 'number') {
@@ -459,7 +463,7 @@ define(function(require, exports, module) {
 						return new Node('Token', l);
 					}
 					else {
-						throw new Error('SyntaxError: missing ' + Token.type(type) + ' line ' + this.line + (msg ? '\n' + msg : ''));
+						throw new Error('SyntaxError: missing ' + Token.type(type) + ' line ' + this.line + ' col ' + this.col + (msg ? '\n' + msg : ''));
 					}
 				}
 			},
@@ -473,20 +477,34 @@ define(function(require, exports, module) {
 					this.look = this.tokens.shift();
 					if(line && this.look.type() == Token.LINE) {
 						this.line++;
+						this.col = 1;
 						break;
 					}
 					if(line && this.look.type() == Token.COMMENT) {
-						var n = character.count(Token.content(), character.LINE);
+						var s = this.look.content(),
+							n = character.count(this.look.content(), character.LINE);
 						if(n > 0) {
 							this.line += n;
+							var i = s.lastIndexOf(character.LINE);
+							this.col += s.length - i - 1;
 							break;
 						}
 					}
 					if(this.look.type() == Token.LINE) {
 						this.line++;
+						this.col = 1;
 					}
 					else if(this.look.type() == Token.COMMENT) {
-						this.line += character.count(Token.content(), character.LINE);
+						var s = this.look.content(),
+							n = character.count(this.look.content(), character.LINE);
+						if(n > 0) {
+							this.line += n;
+							var i = s.lastIndexOf(character.LINE);
+							this.col += s.length - i - 1;
+						}
+					}
+					else {
+						this.col += this.look.content().length;
 					}
 					this.index++;
 				} while([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT].indexOf(this.look.type()) != -1);
