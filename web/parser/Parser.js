@@ -1,7 +1,6 @@
 define(function(require, exports, module) {
 	var Class = require('../util/Class'),
 		character = require('../util/character'),
-		name = require('../util/name'),
 		Lexer = require('../lexer/Lexer'),
 		Token = require('../lexer/Token'),
 		Node = require('./Node'),
