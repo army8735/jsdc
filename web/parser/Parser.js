@@ -87,8 +87,6 @@ define(function(require, exports, module) {
 					case 'debugger':
 						node.add(this.debstmt());
 					break;
-					case '}':
-					break;
 					default:
 						throw new Error('SyntaxError');
 				}
