@@ -99,7 +99,7 @@ define(function(require, exports, module) {
 			stmts: function() {
 				var node = new Node('stmts');
 				node.add(this.stmt());
-				while(this.look.content() != '}') {
+				while(this.look && ['var', '{', ';', 'if', 'do', 'while', 'for', 'continue', 'break', 'return', 'with', 'switch', 'throw', 'try', 'debugger'].indexOf(this.look.content()) != -1) {
 					node.add(this.stmt());
 				}
 				return node;
@@ -135,6 +135,9 @@ define(function(require, exports, module) {
 			assign: function() {
 				var node = new Node('assign');
 				node.add(this.match('='));
+				if(!this.look) {
+					this.error();
+				}
 				switch(this.look.type()) {
 					case Token.ID:
 					case Token.NUMBER:
@@ -178,6 +181,9 @@ define(function(require, exports, module) {
 			},
 			iterstmt: function() {
 				var node = new Node('iterstmt');
+				if(!this.look) {
+					this.error();
+				}
 				switch(this.look.content()) {
 					case 'do':
 						node.add(
@@ -204,11 +210,17 @@ define(function(require, exports, module) {
 							this.move(),
 							this.match('(')
 						);
+						if(!this.look) {
+							this.error();
+						}
 						if(this.look.content() == 'var') {
 							node.add(
 								this.move(),
 								this.vardecl()
 							);
+							if(!this.look) {
+								this.error();
+							}
 							if(this.look.content() == 'in') {
 								node.add(this.expr());
 							}
@@ -219,11 +231,16 @@ define(function(require, exports, module) {
 										this.vardecls()
 									);
 								}
-								node.add(this.match(';'));
+								if(!this.look) {
+									this.error();
+								}
 								if(this.look.content() != ';') {
 									node.add(this.expr());
 								}
 								node.add(this.match(';'));
+								if(!this.look) {
+									this.error();
+								}
 								if(this.look.content() != ')') {
 									node.add(this.expr());
 								}
@@ -234,10 +251,19 @@ define(function(require, exports, module) {
 								node.add(this.expr());
 							}
 							node.add(this.match(';'));
+							if(!this.look) {
+								this.error();
+							}
 							if(this.look.content() != ';') {
 								node.add(this.expr());
 							}
+							if(!this.look) {
+								this.error();
+							}
 							node.add(this.match(';'));
+							if(!this.look) {
+								this.error();
+							}
 							if(this.look.content() != ')') {
 								node.add(this.expr());
 							}
