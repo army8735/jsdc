@@ -42,7 +42,7 @@ define(function(require, exports, module) {
 			stmt: function() {
 				var node = new Node('stmt');
 				if(!this.look) {
-					throw new Error('SyntaxError: syntax error ' + this.line);
+					throw new Error('SyntaxError: syntax error line ' + this.line);
 				}
 				if(this.look.type() == Token.ID) {
 					node.add(this.labstmt());
@@ -91,7 +91,7 @@ define(function(require, exports, module) {
 						node.add(this.debstmt());
 					break;
 					default:
-						throw new Error('SyntaxError');
+						throw new Error('SyntaxError line ' + this.line);
 				}
 				return node;
 			},
@@ -241,6 +241,7 @@ define(function(require, exports, module) {
 						node.add(this.match(')'));
 						node.add(this.stmt());
 				}
+				return node;
 			},
 			cntnstmt: function() {
 				var node = new Node('cntnstmt');

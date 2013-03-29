@@ -203,6 +203,6 @@ define(function(require, exports, module) {
 				return cmode;
 			}
 		}),
-		cmode = Lexer.LOOSE;
+		cmode = Lexer.STRICT;
 	module.exports = Lexer;
 });
