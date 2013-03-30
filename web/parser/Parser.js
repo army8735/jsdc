@@ -23,14 +23,12 @@ define(function(require, exports, module) {
 				return node;
 			},
 			element: function() {
-				var node = new Node('element');
 				if(this.look.content() == 'function') {
-					node.add(this.fndecl());
+					return this.fndecl();
 				}
 				else {
-					node.add(this.stmt());
+					return this.stmt();
 				}
-				return node;
 			},
 			stmt: function() {
 				var node = new Node('stmt');
