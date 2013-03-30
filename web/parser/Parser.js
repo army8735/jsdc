@@ -767,7 +767,7 @@ define(function(require, exports, module) {
 			},
 			arrltr: function() {
 				var node = new Node('arrltr');
-				this.match('[');
+				node.add(this.match('['));
 				while(this.look && this.look.content() != ']') {
 					if(this.look.content() == ',') {
 						node.add(this.move());
