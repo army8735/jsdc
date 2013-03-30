@@ -92,9 +92,9 @@ define(function(require, exports, module) {
 				}
 				return node;
 			},
-			id: function() {
+			id: function(msg) {
 				var node = new Node('id');
-				node.add(this.match(Token.ID));
+				node.add(this.match(Token.ID, msg));
 				return node;
 			},
 			varstmt: function(noSem) {
@@ -859,20 +859,12 @@ define(function(require, exports, module) {
 				var node = new Node('objltr');
 				node.add(this.match('{'));
 				while(this.look && this.look.content() != '}') {
-					node.add(this.propts());
+					node.add(this.proptassign());
 					if(this.look && this.look.content() == ',') {
 						node.add(this.move());
 					}
 				}
 				node.add(this.match('}'));
-				return node;
-			},
-			propts: function() {
-				var node = new Node('propts');
-				node.add(this.proptassign());
-				while(this.look && this.look.content() == ',') {
-					node.add(this.move(), this.proptassign());
-				}
 				return node;
 			},
 			proptassign: function() {
@@ -896,8 +888,9 @@ define(function(require, exports, module) {
 						this.move(),
 						this.proptname(),
 						this.match('('),
-						this.id(),
+						this.propsets(),
 						this.match(')'),
+						this.match('{'),
 						this.fnbody(),
 						this.match('}')
 					);
@@ -908,7 +901,7 @@ define(function(require, exports, module) {
 						case Token.STRING:
 						case Token.NUMBER:
 							node.add(
-								this.move(),
+								this.id(),
 								this.match(':'),
 								this.assignexpr()
 							);
@@ -917,6 +910,26 @@ define(function(require, exports, module) {
 							this.error();
 					}
 				}
+				return node;
+			},
+			proptname: function() {
+				var node = new Node('proptname');
+				if(this.look) {
+					switch(this.look.type()) {
+						case Token.ID:
+						case Token.NUMBER:
+						case Token.STRING:
+							node.add(this.move());
+						break;
+						default:
+							this.error('missing name after . operator');
+					}
+				}
+				return node;
+			},
+			propsets: function() {
+				var node = new Node('propsets');
+				node.add(this.id('setter functions must have one argument'));
 				return node;
 			},
 			args: function() {

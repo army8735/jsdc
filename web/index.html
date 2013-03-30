@@ -73,7 +73,7 @@ do {
 for(var i = 0, len = 10; i < len; i++) {
 	[].push(i);break;
 }
-for(var i in { a: 1 }) {
+for(var i in { a: 1, get x() {}, set y(t) {} }) {
 	console.log(i);continue;
 }</code></pre>
 <script src="Ai.js"></script>
