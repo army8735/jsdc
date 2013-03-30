@@ -19,7 +19,12 @@ define(function(require, exports, module) {
 				var self = this,
 					args = Array.prototype.slice.call(arguments, 0);
 				args.forEach(function(node) {
-					self.children.push(node);
+					if(Array.isArray(node)) {
+						self.children = self.children.concat(node);
+					}
+					else {
+						self.children.push(node);
+					}
 				});
 			}
 		});

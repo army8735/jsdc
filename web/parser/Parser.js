@@ -37,13 +37,13 @@ define(function(require, exports, module) {
 				}
 				switch(this.look.content()) {
 					case 'var':
-						node.add(this.varstmt());
+						return this.varstmt();
 					break;
 					case '{':
-						node.add(this.block());
+						return this.block();
 					break;
 					case ';':
-						node.add(this.emptstmt());
+						return this.emptstmt();
 					break;
 					case 'if':
 						node.add(this.ifstmt());
@@ -111,15 +111,14 @@ define(function(require, exports, module) {
 				return node;
 			},
 			vardecls: function() {
-				var node = new Node('vardecls');
-				node.add(this.vardecl());
+				var res = [this.vardecl()];
 				while(this.look && this.look.content() == ',') {
-					node.add(
+					res.push(
 						this.move(),
 						this.vardecl()
 					);
 				}
-				return node;
+				return res;
 			},
 			assign: function() {
 				var node = new Node('assign');
