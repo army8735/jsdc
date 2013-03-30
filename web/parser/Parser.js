@@ -399,6 +399,11 @@ define(function(require, exports, module) {
 				}
 				return node;
 			},
+			debstmt: function() {
+				var node = new Node('debstmt');
+				node.add(this.match('debugger'), this.match(';'));
+				return node;
+			},
 			cach: function() {
 				var node = new Node('catch');
 				node.add(

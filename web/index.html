@@ -58,7 +58,10 @@ var a = function(a, b){
 	};
 	return 1;
 };
-try {} catch(e) {}
+try {} catch(e) {
+	throw new Error(1);
+}
+debugger;
 if(a > b){}
 else if(true){
 	/test/.test('test');
