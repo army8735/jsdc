@@ -54,28 +54,28 @@ define(function(require, exports, module) {
 						return this.iterstmt();
 					break;
 					case 'continue':
-						node.add(this.cntnstmt());
+						return this.cntnstmt();
 					break;
 					case 'break':
-						node.add(this.brkstmt());
+						return this.brkstmt();
 					break;
 					case 'return':
-						node.add(this.retstmt());
+						return this.retstmt();
 					break;
 					case 'with':
-						node.add(this.withstmt());
+						return this.withstmt();
 					break;
 					case 'switch':
-						node.add(this.swchstmt());
+						return this.swchstmt();
 					break;
 					case 'throw':
-						node.add(this.thrstmt());
+						return this.thrstmt();
 					break;
 					case 'try':
-						node.add(this.trystmt());
+						return this.trystmt();
 					break;
 					case 'debugger':
-						node.add(this.debstmt());
+						return this.debstmt();
 					break;
 					default:
 						if(this.look.type() == Token.ID) {
@@ -83,14 +83,18 @@ define(function(require, exports, module) {
 								var token = this.tokens[i];
 								if([Token.BLANK, Token.TAB, Token.COMMENT, Token.LINE, Token.ENTER].indexOf(token.type()) != -1) {
 									if(token.content() == ':') {
-										node.add(this.labstmt());
-										return node;
+										return this.labstmt();
 									}
 								}
 							}
 						}
 						node.add(this.expr(), this.match(';'));
 				}
+				return node;
+			},
+			id: function() {
+				var node = new Node('id');
+				node.add(this.match(Token.ID));
 				return node;
 			},
 			varstmt: function(noSem) {
@@ -106,7 +110,7 @@ define(function(require, exports, module) {
 			},
 			vardecl: function() {
 				var node = new Node('vardecl');
-				node.add(this.match(Token.ID));
+				node.add(this.id());
 				if(this.look && this.look.content() == '=') {
 					node.add(this.assign());
 				}
@@ -256,8 +260,13 @@ define(function(require, exports, module) {
 			cntnstmt: function() {
 				var node = new Node('cntnstmt');
 				node.add(this.match('continue', true));
-				if(this.look && (this.look.type() == Token.ID || this.look.type() == Token.LINE)) {
-					node.add(this.move());
+				if(this.look) {
+					if(this.look.type() == Token.ID) {
+						node.add(this.id());
+					}
+					else if(this.look.type() == Token.LINE) {
+						node.add(this.move());
+					}
 				}
 				node.add(this.match(';'));
 				return node;
@@ -265,8 +274,13 @@ define(function(require, exports, module) {
 			brkstmt: function() {
 				var node = new Node('brkstmt');
 				node.add(this.match('break', true));
-				if(this.look && (this.look.type() == Token.ID || this.look.type() == Token.LINE)) {
-					node.add(this.move());
+				if(this.look) {
+					if(this.look.type() == Token.ID) {
+						node.add(this.id());
+					}
+					else if(this.look.type() == Token.LINE) {
+						node.add(this.move());
+					}
 				}
 				node.add(this.match(';'));
 				return node;
@@ -313,23 +327,18 @@ define(function(require, exports, module) {
 			caseblock: function() {
 				var node = new Node('caseblock');
 				node.add(this.match('{'));
-				if(this.look && this.look.content() != '}') {
-					if(this.look.content != 'default') {
-						node.add(this.caseclauses());
+				while(this.look && this.look.content() != '}') {
+					if(this.look.content() == 'case') {
+						node.add(this.caseclause());
 					}
-					else {
+					else if(this.look.content() == 'default') {
 						node.add(this.dftclause());
 					}
+					else {
+						this.error('invalid switch statement');
+					}
 				}
-				node.add(this.match('{'));
-				return node;
-			},
-			caseclauses: function() {
-				var node = new Node('caseclauses');
-				node.add(this.caseclause());
-				while(this.look && this.look.content() != '}' && this.look.content() != 'default') {
-					node.add(this.caseclauses());
-				}
+				node.add(this.match('}'));
 				return node;
 			},
 			caseclause: function() {
@@ -339,7 +348,7 @@ define(function(require, exports, module) {
 					this.expr(),
 					this.match(':')
 				);
-				while(this.look && this.look.content() != 'case' && this.look.content() != 'break' && this.look.content() != '}') {
+				while(this.look && this.look.content() != 'case' && this.look.content() != 'default' && this.look.content() != '}') {
 					node.add(this.stmt());
 				}
 				return node;
@@ -358,7 +367,7 @@ define(function(require, exports, module) {
 			labstmt: function() {
 				var node = new Node('labstmt');
 				node.add(
-					this.match(Token.ID),
+					this.id(),
 					this.match(':'),
 					this.stmt()
 				);
@@ -395,7 +404,7 @@ define(function(require, exports, module) {
 				node.add(
 					this.match('catch'),
 					this.match('('),
-					this.match(Token.ID),
+					this.id(),
 					this.match(')'),
 					this.block()
 				);
@@ -413,7 +422,7 @@ define(function(require, exports, module) {
 				var node = new Node('fndecl');
 				node.add(
 					this.match('function'),
-					this.match(Token.ID),
+					this.id(),
 					this.match('(')
 				);
 				if(!this.look) {
@@ -437,7 +446,7 @@ define(function(require, exports, module) {
 					this.error();
 				}
 				if(this.look.type() == Token.ID) {
-					node.add(this.move());
+					node.add(this.id());
 				}
 				node.add(this.match('('));
 				if(!this.look) {
@@ -456,18 +465,13 @@ define(function(require, exports, module) {
 			},
 			fnparams: function() {
 				var node = new Node('fnparams');
-				node.add(this.fnparam());
+				node.add(this.id());
 				while(this.look && this.look.content() == ',') {
 					node.add(
 						this.match(','),
-						this.fnparam()
+						this.id()
 					);
 				}
-				return node;
-			},
-			fnparam: function() {
-				var node = new Node('fnparam');
-				node.add(this.match(Token.ID));
 				return node;
 			},
 			fnbody: function() {
@@ -669,7 +673,7 @@ define(function(require, exports, module) {
 			},
 			conscall: function() {
 				var node = new Node('conscall');
-				node.add(this.match(Token.ID));
+				node.add(this.id());
 				if(this.look) {
 					if(this.look.content() == '(') {
 						node.add(this.args());
@@ -796,7 +800,7 @@ define(function(require, exports, module) {
 						this.move(),
 						this.proptname(),
 						this.match('('),
-						this.match(Token.ID),
+						this.id(),
 						this.match(')'),
 						this.fnbody(),
 						this.match('}')

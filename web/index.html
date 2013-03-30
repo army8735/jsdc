@@ -44,32 +44,21 @@ textarea:hover{opacity:0.8;}
 </style>
 </head>
 <body>
-<textarea id="ta" autocomplete="off">var a = 1, b, c = 2;{}
-function test(){
-	var a;;
-}
-var a = function(){};
-var a,b,c;
-if(a > b){}
-else if(true){
-	/test/.test('test');
-}
-else {}
-do {
-	var a;
-} while(true);
-for(var i = 0, len = 10; i < len; i++) {
-	[].push(i);
-}
-for(var i in { a: 1 }) {
-	console.log(i);
-}</textarea>
+<textarea id="ta" autocomplete="off"></textarea>
 <input id="btn" type="button" value="ok"/><pre><code class="brush:js">var a = 1, b, c = 2;{}
-function test(){
-	var a;;
+function test(a){
+	switch(a) {
+		case 1:
+		break;
+		default:
+	}
 }
-var a = function(){};
-var a,b,c;
+var a = function(a, b){
+	with(a) {
+	};
+	return 1;
+};
+try {} catch(e) {}
 if(a > b){}
 else if(true){
 	/test/.test('test');
@@ -79,10 +68,10 @@ do {
 	var a;
 } while(true);
 for(var i = 0, len = 10; i < len; i++) {
-	[].push(i);
+	[].push(i);break;
 }
 for(var i in { a: 1 }) {
-	console.log(i);
+	console.log(i);continue;
 }</code></pre>
 <script src="Ai.js"></script>
 <script src="kinetic-v4.4.0.min.js"></script>
