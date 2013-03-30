@@ -747,6 +747,9 @@ define(function(require, exports, module) {
 						this.match('.')
 					);
 				}
+				else {
+					return this.conscall();
+				}
 				node.add(this.conscall());
 				return node;
 			},
