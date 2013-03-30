@@ -48,6 +48,7 @@ function test(){
 	var a;;
 }
 /test/;
+var a = function(){};
 var a,b,c;
 if(true){}
 else if(true){
@@ -60,19 +61,6 @@ for(var i = 0, len = 10; i < len; i++) {
 }
 for(var i in a) {
 }</code>
-<!--code class="brush:js">//some code
-var a = 1;
-function f() {
-	/test/;
-	var a = 2,
-		b = 3;
-	function f2() {
-		var d = 5;
-		//
-		var f = 6;
-		var e;
-	}
-}</code-->
 </pre>
 <script src="Ai.js"></script>
 <script src="kinetic-v4.4.0.min.js"></script>
@@ -98,7 +86,7 @@ function draw(i, res, node) {
 }
 function drawNode(layer, node, x, index, parent, sibling) {
 	if(index > 0) {
-		h += 30;
+		h += 24;
 	}
 	var isToken = node.name() == 'Token',
 		text = new Kinetic.Text({

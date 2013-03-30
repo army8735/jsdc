@@ -433,6 +433,33 @@ define(function(require, exports, module) {
 					this.match(Token.ID),
 					this.match('(')
 				);
+				if(!this.look) {
+					this.error();
+				}
+				if(this.look.type() == Token.ID) {
+					node.add(this.fnparams());
+				}
+				node.add(
+					this.match(')'),
+					this.match('{'),
+					this.fnbody(),
+					this.match('}')
+				);
+				return node;
+			},
+			fnexpr: function() {
+				var node = new Node('fnexpr');
+				node.add(this.match('function'));
+				if(!this.look) {
+					this.error();
+				}
+				if(this.look.type() == Token.ID) {
+					node.add(this.move());
+				}
+				node.add(this.match('('));
+				if(!this.look) {
+					this.error();
+				}
 				if(this.look.type() == Token.ID) {
 					node.add(this.fnparams());
 				}
@@ -632,6 +659,9 @@ define(function(require, exports, module) {
 							this.constor()
 						)
 					break;
+					case 'function':
+						node.add(this.fnexpr());
+					break;
 					default:
 						node.add(this.mmbexpr());
 						if(this.look && ['++', '--'].indexOf(this.look.content()) != -1) {
@@ -716,9 +746,76 @@ define(function(require, exports, module) {
 							case '(':
 								node.add(this.expr());
 							break;
+							case '[':
+								node.add(this.arrltr());
+							break;
+							case '{':
+								node.add(this.objltr());
+							break;
 							default:
 								this.error();
 						}
+				}
+				return node;
+			},
+			arrltr: function() {
+				var node = new Node('arrltr');
+				this.match('[');
+				while(this.look && this.look.content() != ']') {
+					if(this.look.content() == ',') {
+						node.add(this.move());
+					}
+					else {
+						node.add(this.assignexpr());
+					}
+				}
+				node.add(this.match(']'));
+				return node;
+			},
+			objltr: function() {
+				var node = new Node('objltr');
+				node.add(this.match('{'));
+				while(this.look && this.look.content() != '}') {
+					node.add(this.propts());
+					if(this.look && this.look.content() == ',') {
+						node.add(this.move());
+					}
+				}
+				node.add(this.match('}'));
+				return node;
+			},
+			propts: function() {
+				var node = new Node('propts');
+				node.add(this.proptassign());
+				while(this.look && this.look.content() == ',') {
+					node.add(this.move(), this.proptassign());
+				}
+				return node;
+			},
+			proptassign: function() {
+				var node = new Node('proptassign');
+				if(!this.look) {
+					this.error();
+				}
+				switch(this.look.content()) {
+					case 'get':
+						node.add(
+							this.move(),
+							this.proptname(),
+							this.match('('),
+							this.match(')'),
+							this.match('{'),
+							this.fnbody(),
+							this.match('}')
+						);
+					break;
+					case 'set':
+						node.add(
+							this.move(),
+							this.proptname(),
+							this.match('('),
+							this.match(')')
+						);
 				}
 				return node;
 			},
