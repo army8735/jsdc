@@ -46,12 +46,12 @@ define(function(require, exports, module) {
 						return this.emptstmt();
 					break;
 					case 'if':
-						node.add(this.ifstmt());
+						return this.ifstmt();
 					break;
 					case 'do':
 					case 'while':
 					case 'for':
-						node.add(this.iterstmt());
+						return this.iterstmt();
 					break;
 					case 'continue':
 						node.add(this.cntnstmt());
@@ -93,13 +93,15 @@ define(function(require, exports, module) {
 				}
 				return node;
 			},
-			varstmt: function() {
+			varstmt: function(noSem) {
 				var node = new Node('varstmt');
 				node.add(
 					this.match('var'),
-					this.vardecls(),
-					this.match(';')
+					this.vardecls()
 				);
+				if(!noSem) {
+					this.match(';');
+				}
 				return node;
 			},
 			vardecl: function() {
@@ -195,30 +197,23 @@ define(function(require, exports, module) {
 							this.error();
 						}
 						if(this.look.content() == 'var') {
-							node.add(
-								this.move(),
-								this.vardecl()
-							);
+							var node2 = this.varstmt(true);
 							if(!this.look) {
-								this.error();
+								this.error('missing ; after for-loop initializer');
 							}
 							if(this.look.content() == 'in') {
+								if(node2.leaves().length > 2) {
+									this.error('invalid for/in left-hand side');
+								}
+								node.add(node2);
 								node.add(
 									this.move(),
 									this.expr()
 								);
 							}
 							else {
-								if(this.look.content() == ',') {
-									node.add(
-										this.move(),
-										this.vardecls(),
-										this.match(';')
-									);
-								}
-								if(!this.look) {
-									this.error();
-								}
+								node.add(node2);
+								node.add(this.match(';'));
 								if(this.look.content() != ';') {
 									node.add(this.expr());
 								}
