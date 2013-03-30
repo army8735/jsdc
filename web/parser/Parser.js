@@ -487,141 +487,214 @@ define(function(require, exports, module) {
 				return node;
 			},
 			expr: function() {
-				var node = new Node('expr');
-				node.add(this.assignexpr());
-				while(this.look && this.look.content() == ',') {
-					node.add(this.assignexpr());
+				var node = new Node('expr'),
+					assignexpr = this.assignexpr();
+				if(this.look && this.look.content() == ',') {
+					node.add(assignexpr);
+					while(this.look && this.look.content() == ',') {
+						node.add(this.assignexpr());
+					}
+				}
+				else {
+					return assignexpr;
 				}
 				return node;
 			},
 			assignexpr: function() {
-				var node = new Node('assignexpr');
-				node.add(this.cndtexpr());
+				var node = new Node('assignexpr'),
+					cndt = this.cndtexpr();
 				if(this.look && ['*=', '/=', '%=', '+=', '-=', '<<=', '>>=', '>>>=', '&=', '^=', '|='].indexOf(this.look.content()) != -1) {
-					node.add(this.assignexpr());
+					node.add(cndt, this.assignexpr());
+				}
+				else {
+					return cndt;
 				}
 				return node;
 			},
 			cndtexpr: function() {
-				var node = new Node('cndtexpr');
-				node.add(this.logorexpr());
+				var node = new Node('cndtexpr'),
+					logorexpr = this.logorexpr();
 				if(this.look && this.look.content() == '?') {
 					node.add(
+						logorexpr,
 						this.move(),
 						this.assignexpr(),
 						this.match(':'),
 						this.assignexpr()
 					);
 				}
+				else {
+					return logorexpr;
+				}
 				return node;
 			},
 			logorexpr: function() {
-				var node = new Node('logorexpr');
-				node.add(this.logandexpr());
-				while(this.look && this.look.content() == '||') {
-					node.add(
-						this.move(),
-						this.logandexpr()
-					);
+				var node = new Node('logorexpr'),
+					logandexpr = this.logandexpr();
+				if(this.look && this.look.content() == '||') {
+					node.add(logandexpr);
+					while(this.look && this.look.content() == '||') {
+						node.add(
+							this.move(),
+							this.logandexpr()
+						);
+					}
+				}
+				else {
+					return logandexpr;
 				}
 				return node;
 			},
 			logandexpr: function() {
-				var node = new Node('logandexpr');
-				node.add(this.bitorexpr());
-				while(this.look && this.look.content() == '&&') {
-					node.add(
-						this.move(),
-						this.bitorexpr()
-					);
+				var node = new Node('logandexpr'),
+					bitorexpr = this.bitorexpr();
+				if(this.look && this.look.content() == '&&') {
+					node.add(bitorexpr);
+					while(this.look && this.look.content() == '&&') {
+						node.add(
+							this.move(),
+							this.bitorexpr()
+						);
+					}
+				}
+				else {
+					return bitorexpr;
 				}
 				return node;
 			},
 			bitorexpr: function() {
-				var node = new Node('bitorexpr');
-				node.add(this.bitxorexpr());
-				while(this.look && this.look.content() == '|') {
-					node.add(
-						this.move(),
-						this.bitxorexpr()
-					);
+				var node = new Node('bitorexpr'),
+					bitxorexpr = this.bitxorexpr();
+				if(this.look && this.look.content() == '|') {
+					node.add(bitxorexpr);
+					while(this.look && this.look.content() == '|') {
+						node.add(
+							this.move(),
+							this.bitxorexpr()
+						);
+					}
+				}
+				else {
+					return bitxorexpr;
 				}
 				return node;
 			},
 			bitxorexpr: function() {
-				var node = new Node('bitxorexpr');
-				node.add(this.bitandexpr());
-				while(this.look && this.look.content() == '^') {
-					node.add(
-						this.move(),
-						this.bitandexpr()
-					);
+				var node = new Node('bitxorexpr'),
+					bitandexpr = this.bitandexpr();
+				if(this.look && this.look.content() == '^') {
+					node.add(bitandexpr);
+					while(this.look && this.look.content() == '^') {
+						node.add(
+							this.move(),
+							this.bitandexpr()
+						);
+					}
+				}
+				else {
+					return bitandexpr;
 				}
 				return node;
 			},
 			bitandexpr: function() {
-				var node = new Node('bitandexpr');
-				node.add(this.eqexpr());
-				while(this.look && this.look.content() == '&') {
-					node.add(
-						this.move(),
-						this.eqexpr()
-					);
+				var node = new Node('bitandexpr'),
+					eqexpr = this.eqexpr();
+				if(this.look && this.look.content() == '&') {
+					node.add(eqexpr);
+					while(this.look && this.look.content() == '&') {
+						node.add(
+							this.move(),
+							this.eqexpr()
+						);
+					}
+				}
+				else {
+					return eqexpr;
 				}
 				return node;
 			},
 			eqexpr: function() {
-				var node = new Node('eqexpr');
-				node.add(this.reltexpr());
-				while(this.look && ['==', '===', '!==', '!='].indexOf(this.look.content()) != -1) {
-					node.add(
-						this.move(),
-						this.reltexpr()
-					);
+				var node = new Node('eqexpr'),
+					reltexpr = this.reltexpr();
+				if(this.look && ['==', '===', '!==', '!='].indexOf(this.look.content()) != -1) {
+					node.add(reltexpr);
+					while(this.look && ['==', '===', '!==', '!='].indexOf(this.look.content()) != -1) {
+						node.add(
+							this.move(),
+							this.reltexpr()
+						);
+					}
+				}
+				else {
+					return reltexpr;
 				}
 				return node;
 			},
 			reltexpr: function() {
-				var node = new Node('reltexpr');
-				node.add(this.shiftexpr());
-				while(this.look && ['<', '>', '>=', '<=', 'in', 'instanceof'].indexOf(this.look.content()) != -1) {
-					node.add(
-						this.move(),
-						this.shiftexpr()
-					);
+				var node = new Node('reltexpr'),
+					shiftexpr = this.shiftexpr();
+				if(this.look && ['<', '>', '>=', '<=', 'in', 'instanceof'].indexOf(this.look.content()) != -1) {
+					node.add(shiftexpr);
+					while(this.look && ['<', '>', '>=', '<=', 'in', 'instanceof'].indexOf(this.look.content()) != -1) {
+						node.add(
+							this.move(),
+							this.shiftexpr()
+						);
+					}
+				}
+				else {
+					return shiftexpr;
 				}
 				return node;
 			},
 			shiftexpr: function() {
-				var node = new Node('shiftexpr');
-				node.add(this.addexpr());
-				while(this.look && ['<<', '>>', '>>>'].indexOf(this.look.content()) != -1) {
-					node.add(
-						this.move(),
-						this.addexpr()
-					);
+				var node = new Node('shiftexpr'),
+					addexpr = this.addexpr();
+				if(this.look && ['<<', '>>', '>>>'].indexOf(this.look.content()) != -1) {
+					node.add(addexpr);
+					while(this.look && ['<<', '>>', '>>>'].indexOf(this.look.content()) != -1) {
+						node.add(
+							this.move(),
+							this.addexpr()
+						);
+					}
+				}
+				else {
+					return addexpr;
 				}
 				return node;
 			},
 			addexpr: function() {
-				var node = new Node('addexpr');
-				node.add(this.mtplexpr());
-				while(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
-					node.add(
-						this.move(),
-						this.mtplexpr()
-					);
+				var node = new Node('addexpr'),
+					mtplexpr = this.mtplexpr();
+				if(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
+					node.add(mtplexpr);
+					while(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
+						node.add(
+							this.move(),
+							this.mtplexpr()
+						);
+					}
+				}
+				else {
+					return mtplexpr;
 				}
 				return node;
 			},
 			mtplexpr: function() {
-				var node = new Node('mtplexpr');
-				node.add(this.unaryexpr());
-				while(this.look && ['*', '/', '%'].indexOf(this.look.content()) != -1) {
-					node.add(
-						this.move(),
-						this.unaryexpr()
-					);
+				var node = new Node('mtplexpr'),
+					unaryexpr = this.unaryexpr();
+				if(this.look && ['*', '/', '%'].indexOf(this.look.content()) != -1) {
+					node.add(unaryexpr);
+					while(this.look && ['*', '/', '%'].indexOf(this.look.content()) != -1) {
+						node.add(
+							this.move(),
+							this.unaryexpr()
+						);
+					}
+				}
+				else {
+					return unaryexpr;
 				}
 				return node;
 			},
@@ -651,13 +724,14 @@ define(function(require, exports, module) {
 							this.constor()
 						)
 					break;
-					case 'function':
-						node.add(this.fnexpr());
-					break;
 					default:
-						node.add(this.mmbexpr());
+						var mmbexpr = this.mmbexpr();
 						if(this.look && ['++', '--'].indexOf(this.look.content()) != -1) {
-							node.add(this.move());
+							node.add(mmbexpr, this.move());
+							return node;
+						}
+						else {
+							return mmbexpr;
 						}
 				}
 				return node;
@@ -694,23 +768,37 @@ define(function(require, exports, module) {
 			},
 			mmbexpr: function() {
 				var node = new Node('mmbexpr');
-				node.add(this.prmrexpr());
+				if(!this.look) {
+					this.error();
+				}
+				if(this.look.content() == 'function') {
+					return this.fnexpr();
+				}
+				var prmrexpr = this.prmrexpr();
 				if(this.look) {
 					if(this.look.content() == '.') {
 						node.add(
+							prmrexpr,
 							this.move(),
 							this.mmbexpr()
 						);
 					}
 					else if(this.look.content() == '[') {
 						node.add(
+							prmrexpr,
 							this.move(),
 							this.expr()
 						);
 					}
 					else if(this.look.content() == '(') {
-						node.add(this.args());
+						node.add(prmrexpr, this.args());
 					}
+					else {
+						return prmrexpr;
+					}
+				}
+				else {
+					return prmrexpr;
 				}
 				return node;
 			},
@@ -736,7 +824,7 @@ define(function(require, exports, module) {
 								node.add(this.move());
 							break;
 							case '(':
-								node.add(this.expr());
+								node.add(this.expr(), this.match(')'));
 							break;
 							case '[':
 								node.add(this.arrltr());
