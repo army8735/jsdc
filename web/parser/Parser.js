@@ -99,7 +99,7 @@ define(function(require, exports, module) {
 			stmts: function() {
 				var node = new Node('stmts');
 				node.add(this.stmt());
-				while(this.look && ['var', '{', ';', 'if', 'do', 'while', 'for', 'continue', 'break', 'return', 'with', 'switch', 'throw', 'try', 'debugger'].indexOf(this.look.content()) != -1) {
+				while(this.look && ['var', '{', ';', 'if', 'else', 'do', 'while', 'for', 'continue', 'break', 'return', 'with', 'switch', 'throw', 'try', 'debugger'].indexOf(this.look.content()) != -1) {
 					node.add(this.stmt());
 				}
 				return node;
@@ -472,7 +472,6 @@ define(function(require, exports, module) {
 			},
 			expr: function() {
 				var node = new Node('expr');
-				//node.add(this.match('true'));
 				node.add(this.assignexpr());
 				while(this.look && this.look.content() == ',') {
 					node.add(this.assignexpr());
@@ -482,8 +481,9 @@ define(function(require, exports, module) {
 			assignexpr: function() {
 				var node = new Node('assignexpr');
 				node.add(this.cndtexpr());
-				//lefthsexpr todo
-				node.add(this.lefthsexpr());
+				if(this.look && ['*=', '/=', '%=', '+=', '-=', '<<=', '>>=', '>>>=', '&=', '^=', '|='].indexOf(this.look.content()) != -1) {
+					node.add(this.assignexpr());
+				}
 				return node;
 			},
 			cndtexpr: function() {
@@ -622,35 +622,125 @@ define(function(require, exports, module) {
 					case '--':
 					case '+':
 					case '-':
+					case '~':
+					case '!':
 						node.add(
 							this.move(),
 							this.unaryexpr()
 						);
 					break;
-					case '~':
+					case 'new':
 						node.add(
 							this.move(),
-							this.unaryexpr(),
-							this.match('!'),
-							this.unaryexpr()
-						);
+							this.constor()
+						)
 					break;
 					default:
-						node.add(this.pstfixexpr());
+						node.add(this.mmbexpr());
+						if(this.look && ['++', '--'].indexOf(this.look.content()) != -1) {
+							node.add(this.move());
+						}
 				}
 				return node;
 			},
-			pstfixexpr: function() {
-				var node = new Node('pstfixexpr');
-				node.add(this.lefthsexpr(true));
-				if(this.look && this.look.content() == '++' || this.look.content() == '--') {
-					node.add(this.move());
+			constor: function() {
+				var node = new Node('constor');
+				if(!this.look) {
+					this.error();
+				}
+				if(this.look.content() == 'this') {
+					node.add(
+						this.move(),
+						this.match('.')
+					);
+				}
+				node.add(this.conscall());
+				return node;
+			},
+			conscall: function() {
+				var node = new Node('conscall');
+				node.add(this.match(Token.ID));
+				if(this.look) {
+					if(this.look.content() == '(') {
+						node.add(this.args());
+					}
+					else if(this.look.content() == '.') {
+						node.add(
+							this.move(),
+							this.conscall()
+						);
+					}
 				}
 				return node;
 			},
-			lefthsexpr: function(line) {
-				var node = new Node('lefthsexpr');
-				throw new Error('todo...');
+			mmbexpr: function() {
+				var node = new Node('mmbexpr');
+				node.add(this.prmrexpr());
+				if(this.look) {
+					if(this.look.content() == '.') {
+						node.add(
+							this.move(),
+							this.mmbexpr()
+						);
+					}
+					else if(this.look.content() == '[') {
+						node.add(
+							this.move(),
+							this.expr()
+						);
+					}
+					else if(this.look.content() == '(') {
+						node.add(this.args());
+					}
+				}
+				return node;
+			},
+			prmrexpr: function() {
+				var node = new Node('prmrexpr');
+				if(!this.look) {
+					this.error();
+				}
+				switch(this.look.type()) {
+					case Token.ID:
+					case Token.NUMBER:
+					case Token.STRING:
+						node.add(this.move());
+					break;
+					default:
+						switch(this.look.content()) {
+							case 'this':
+							case 'null':
+							case 'true':
+							case 'false':
+								node.add(this.move());
+							break;
+							case '(':
+								node.add(this.expr());
+							break;
+							default:
+								this.error();
+						}
+				}
+				return node;
+			},
+			args: function() {
+				var node = new Node('args');
+				node.add(this.match('('));
+				if(!this.look) {
+					this.error();
+				}
+				if(this.look.content() != ')') {
+					node.add(this.arglist());
+				}
+				node.add(this.match(')'));
+				return node;
+			},
+			arglist: function() {
+				var node = new Node('arglist');
+				node.add(this.assignexpr());
+				while(this.look && this.look.content() == ',') {
+					node.add(this.assignexpr());
+				}
 				return node;
 			},
 			assignoprt: function() {
@@ -671,6 +761,7 @@ define(function(require, exports, module) {
 							this.move(),
 							this.assignexpr()
 						);
+					break;
 					default:
 						this.error();
 				}

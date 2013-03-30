@@ -33,6 +33,8 @@ define(function(require, exports) {
 		var lexer = factory.lexer(syntax),
 			tabBlank = '',
 			div = document.createElement('div'),
+			col = document.createElement('div'),
+			lastCol = 0;
 			ol = document.createElement('ol');
 		ol.start = start;
 		for(var i = 0; i < tab; i++) {
@@ -40,15 +42,43 @@ define(function(require, exports) {
 		}
 		lexer.cache(cache !== null ? cache : cacheLine);
 		function join(tokens) {
+			//列数重新计算
+			if(lexer.col() > lastCol) {
+				lastCol = lexer.col();
+				var s = [],
+					i = 1,
+					j;
+				for(; i < lastCol; i++) {
+					if(i > 9) {
+						var j = i % 10;
+						if(j == 0) {
+							s.push('<em>' + j + '<small>' + i + '</small></em>');
+						}
+						else {
+							s.push(j);
+						}
+					}
+					else {
+						s.push(i);
+					}
+				}
+				col.innerHTML = s.join('');
+			}
+			//渲染新的代码行
 			if(!lexer.finish() && tokens[tokens.length - 1].type() == Token.LINE) {
 				tokens.pop();
 			}
 			var df = render(tokens, tabBlank);
 			ol.appendChild(df);
-			ol.style.paddingLeft = (String(lexer.line()).length - 1) * 9 + 30 + 'px';
+			//左边距
+			var pLeft = (String(lexer.line()).length - 1) * 9 + 30 + 'px';
+			col.style.paddingLeft = pLeft;
+			ol.style.paddingLeft = pLeft;
 		}
 		join(lexer.parse(code, start));
 		div.innerHTML = '<p>' + syntax + ' code</p>';
+		col.className = 'col';
+		div.appendChild(col);
 		div.appendChild(ol);
 		div.className = 'jssc';
 		if(node.parentNode.tagName.toLowerCase() == 'pre') {

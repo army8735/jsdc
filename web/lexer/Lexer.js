@@ -14,7 +14,8 @@ define(function(require, exports, module) {
 			this.parentheseStack = []; //圆括号深度记录当前是否为if/for/while等语句内部
 			this.cacheLine = 0; //行缓存值
 			this.totalLine = 1; //总行数
-			this.col = 0; //列
+			this.colNum = 0; //列
+			this.colMax = 0;
 		}).methods({
 			parse: function(code, start) {
 				if(!character.isUndefined(code)) {
@@ -63,12 +64,15 @@ define(function(require, exports, module) {
 								count += n;
 								this.totalLine += n;
 								if(n) {
-									var i = match.content().lastIndexOf(character.LINE);
-									this.col = match.content().length - Math.max(1, i);
+									var i = match.content().indexOf(character.LINE),
+										j = match.content().lastIndexOf(character.LINE);
+									this.colMax = Math.max(this.colMax, this.colNum + i);
+									this.colNum = match.content().length - j;
 								}
 								else {
-									this.col += matchLen;
+									this.colNum += matchLen;
 								}
+								this.colMax = Math.max(this.colMax, this.colNum);
 								if(error) {
 									this.error(error, this.code.slice(this.index - matchLen, this.index));
 								}
@@ -102,7 +106,7 @@ define(function(require, exports, module) {
 			},
 			readch: function() {
 				this.peek = this.code.charAt(this.index++);
-				this.col++;
+				//this.colNum++;
 			},
 			dealReg: function(temp, length) {
 				var lastIndex = this.index - 1,
@@ -154,7 +158,8 @@ define(function(require, exports, module) {
 				var token = new Token(Token.REG, this.code.slice(lastIndex, --this.index));
 				temp.push(token);
 				this.tokenList.push(token);
-				this.col += this.index - lastIndex;
+				this.colNum += this.index - lastIndex;
+				this.colMax = Math.max(this.colMax, this.colNum);
 				return this;
 			},
 			cache: function(i) {
@@ -169,22 +174,25 @@ define(function(require, exports, module) {
 			line: function() {
 				return this.totalLine;
 			},
+			col: function() {
+				return this.colMax;
+			},
 			error: function(s, str) {
 				if(character.isUndefined(str)) {
 					str = this.code.substr(this.index - 1, 20);
 				}
 				if(Lexer.mode() === Lexer.STRICT) {
-					throw new Error(s + ', line ' + this.line() + ' col ' + this.col + '\n' + str);
+					throw new Error(s + ', line ' + this.line() + ' col ' + this.colNum + '\n' + str);
 				}
 				else if(Lexer.mode() === Lexer.LOOSE && window.console) {
 					if(console.warn) {
-						console.warn(s + ', line ' + this.line() + ' col ' + this.col + '\n' + str);
+						console.warn(s + ', line ' + this.line() + ' col ' + this.colNum + '\n' + str);
 					}
 					else if(console.error) {
-						console.error(s + ', line ' + this.line() + ' col ' + this.col + '\n' + str);
+						console.error(s + ', line ' + this.line() + ' col ' + this.colNum + '\n' + str);
 					}
 					else if(console.log) {
-						console.log(s + ', line ' + this.line() + ' col ' + this.col + '\n' + str);
+						console.log(s + ', line ' + this.line() + ' col ' + this.colNum + '\n' + str);
 					}
 				}
 				return this;
