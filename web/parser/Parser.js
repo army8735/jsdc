@@ -35,7 +35,7 @@ define(function(require, exports, module) {
 			selements: function() {
 				var node = new Node('selements');
 				node.add(this.selement());
-				while(this.look && ['var', '{', ';', 'if', 'do', 'while', 'for', 'continue', 'break', 'return', 'with', 'switch', 'throw', 'try', 'debugger', 'function'].indexOf(this.look.content()) != -1) {
+				while(this.look && this.look.content() != '}') {
 					node.add(this.selement());
 				}
 				return node;
@@ -92,7 +92,7 @@ define(function(require, exports, module) {
 						node.add(this.debstmt());
 					break;
 					default:
-						this.error();
+						node.add(this.expr(), this.match(';'));
 				}
 				return node;
 			},
@@ -138,14 +138,7 @@ define(function(require, exports, module) {
 				if(!this.look) {
 					this.error();
 				}
-				switch(this.look.type()) {
-					case Token.ID:
-					case Token.NUMBER:
-						node.add(this.move());
-					break;
-					default:
-						throw new Error('todo...');
-				}
+				node.add(this.assignexpr());
 				return node;
 			},
 			block: function() {
@@ -222,13 +215,17 @@ define(function(require, exports, module) {
 								this.error();
 							}
 							if(this.look.content() == 'in') {
-								node.add(this.expr());
+								node.add(
+									this.move(),
+									this.expr()
+								);
 							}
 							else {
 								if(this.look.content() == ',') {
 									node.add(
 										this.move(),
-										this.vardecls()
+										this.vardecls(),
+										this.match(';')
 									);
 								}
 								if(!this.look) {
@@ -704,6 +701,8 @@ define(function(require, exports, module) {
 					case Token.ID:
 					case Token.NUMBER:
 					case Token.STRING:
+					case Token.REG:
+					case Token.TEMPLATE:
 						node.add(this.move());
 					break;
 					default:

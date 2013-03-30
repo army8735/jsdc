@@ -48,7 +48,7 @@ define(function(require, exports) {
 				var s = [],
 					i = 1,
 					j;
-				for(; i < lastCol; i++) {
+				for(; i <= lastCol; i++) {
 					if(i > 9) {
 						var j = i % 10;
 						if(j == 0) {
