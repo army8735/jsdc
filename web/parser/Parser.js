@@ -17,26 +17,18 @@ define(function(require, exports, module) {
 		}).methods({
 			program: function() {
 				var node = new Node('program');
-				if(this.look) {
-					node.add(this.selements());
+				while(this.look) {
+					node.add(this.element());
 				}
 				return node;
 			},
-			selement: function() {
-				var node = new Node('selement');
+			element: function() {
+				var node = new Node('element');
 				if(this.look.content() == 'function') {
 					node.add(this.fndecl());
 				}
 				else {
 					node.add(this.stmt());
-				}
-				return node;
-			},
-			selements: function() {
-				var node = new Node('selements');
-				node.add(this.selement());
-				while(this.look && this.look.content() != '}') {
-					node.add(this.selement());
 				}
 				return node;
 			},
@@ -103,14 +95,6 @@ define(function(require, exports, module) {
 				}
 				return node;
 			},
-			stmts: function() {
-				var node = new Node('stmts');
-				node.add(this.stmt());
-				while(this.look && this.look.content() != '}') {
-					node.add(this.stmt());
-				}
-				return node;
-			},
 			varstmt: function() {
 				var node = new Node('varstmt');
 				node.add(
@@ -151,10 +135,10 @@ define(function(require, exports, module) {
 			block: function() {
 				var node = new Node('block');
 				node.add(this.match('{'));
-				if(this.look && this.look.content() != '}') {
-					node.add(this.stmts());
+				while(this.look && this.look.content() != '}') {
+					node.add(this.stmt());
 				}
-				node.add(this.match('}'));
+				node.add(this.match('}', 'missing } in compound statement'));
 				return node;
 			},
 			emptstmt: function() {
@@ -363,8 +347,8 @@ define(function(require, exports, module) {
 					this.expr(),
 					this.match(':')
 				);
-				if(this.look && this.look.content() != 'case' && this.look.content() != 'break' && this.look.content() != '}') {
-					node.add(this.stmts());
+				while(this.look && this.look.content() != 'case' && this.look.content() != 'break' && this.look.content() != '}') {
+					node.add(this.stmt());
 				}
 				return node;
 			},
@@ -374,8 +358,8 @@ define(function(require, exports, module) {
 					this.match('default'),
 					this.match(':')
 				);
-				if(this.look && this.look.content() != '}') {
-					node.add(this.stmts());
+				while(this.look && this.look.content() != '}') {
+					node.add(this.stmt());
 				}
 				return node;
 			},
@@ -474,7 +458,7 @@ define(function(require, exports, module) {
 					this.match(')'),
 					this.match('{'),
 					this.fnbody(),
-					this.match('}')
+					this.match('}', 'missing } in compound statement')
 				);
 				return node;
 			},
@@ -496,8 +480,8 @@ define(function(require, exports, module) {
 			},
 			fnbody: function() {
 				var node = new Node('fnbody');
-				if(this.look && this.look.content() != '}') {
-					node.add(this.selements());
+				while(this.look && this.look.content() != '}') {
+					node.add(this.element());
 				}
 				return node;
 			},
@@ -957,7 +941,7 @@ define(function(require, exports, module) {
 				return new Node('Token', l);
 			},
 			error: function(msg) {
-				msg = msg || 'SyntaxError: syntax error';
+				msg = msg ? 'SyntaxError: ' + msg : 'SyntaxError: syntax error';
 				throw new Error(msg + ' line ' + this.line + ' col ' + this.col);
 			}
 		});
