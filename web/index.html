@@ -165,6 +165,7 @@ require(['jsdc', 'jssc'], function(jsdc, jssc) {
 	init();
 	var ta = document.getElementById('ta'),
 		input = document.getElementById('btn');
+	ta.value = document.getElementsByTagName('code')[0].innerHTML;
 	input.onclick = function() {
 		var s = ta.value;
 		Array.prototype.slice.call(document.getElementsByTagName('div'), 0).forEach(function(o) {
