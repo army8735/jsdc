@@ -4,7 +4,7 @@
 <meta charset="gbk"/>
 <title>jsdc</title>
 <style>
-body{font:12px/1.25 arail;background-color:#fff;line-height:1.25;}
+body{margin:0;padding:10px;font:12px/1.25 arail;background-color:#fff;line-height:1.25;overflow-y:scroll;}
 
 .jssc .col{margin-left:12px;color:#CCC;cursor:default;}
 .jssc .col em{position:relative;font-style:normal;}
@@ -25,7 +25,7 @@ body{font:12px/1.25 arail;background-color:#fff;line-height:1.25;}
 .jssc .java .keyword{color:#909;}
 
 .jssc{position:relative;}
-.jssc p{margin:10px 0;color:#79a;text-indent:2em;font-weight:700;font-family:"Verdana","\5b8b\4f53";}
+.jssc p{margin:10px 0;color:#79a;text-indent:2em;font-weight:700;font-family:"Verdana";}
 .jssc .error{color:#f33;}
 .jssc .copy{display:block;position:absolute;top:0;right:0;cursor:pointer;color:#39f;}
 .jssc ol{margin:0;padding:0;overflow:auto;border:1px solid #ccc;background-color:#eee;clear:both;}
@@ -38,35 +38,58 @@ body{font:12px/1.25 arail;background-color:#fff;line-height:1.25;}
 .jssc ol .hide{position:absolute;visibility:hidden;}
 
 .kineticjs-content{margin:10px 0;}
+textarea{position:absolute;top:24px;right:0;padding:5px;width:50%;height:300px;z-index:99;background:#252;border:1px solid #333;opacity:0.1;color:#FFF;font-size:13px;font-family:"宋体";border-radius:5px;}
+textarea:hover{opacity:0.8;}
+#btn{position:absolute;top:0;right:0;width:50px;z-index:99;}
 </style>
 </head>
 <body>
-<h3>var前置至作用域顶部</h3>
-<pre>
-<code class="brush:js">var a = 1, b, c = 2;{}
+<textarea id="ta" autocomplete="off">var a = 1, b, c = 2;{}
 function test(){
 	var a;;
 }
-/test/;
 var a = function(){};
 var a,b,c;
-if(true){}
+if(a > b){}
 else if(true){
+	/test/.test('test');
 }
 else {}
 do {
 	var a;
 } while(true);
 for(var i = 0, len = 10; i < len; i++) {
+	[].push(i);
 }
-for(var i in a) {
-}</code>
-</pre>
+for(var i in { a: 1 }) {
+	console.log(i);
+}</textarea>
+<input id="btn" type="button" value="ok"/><pre><code class="brush:js">var a = 1, b, c = 2;{}
+function test(){
+	var a;;
+}
+var a = function(){};
+var a,b,c;
+if(a > b){}
+else if(true){
+	/test/.test('test');
+}
+else {}
+do {
+	var a;
+} while(true);
+for(var i = 0, len = 10; i < len; i++) {
+	[].push(i);
+}
+for(var i in { a: 1 }) {
+	console.log(i);
+}</code></pre>
 <script src="Ai.js"></script>
 <script src="kinetic-v4.4.0.min.js"></script>
 <script>
 var w = 0, h = 0;
 function draw(i, res, node) {
+	w = h = 0;
 	if(typeof res == 'string') {
 		return;
 	}
@@ -98,7 +121,7 @@ function drawNode(layer, node, x, index, parent, sibling) {
 			align: 'center',
 			fill: isToken ? '#6CF' : '#f60',
 			fontSize: 12,
-			fontFamily: 'Verdana'
+			fontFamily: 'Tahoma'
 		}),
 		rect = new Kinetic.Rect({
 			x: x + 2,
@@ -132,19 +155,35 @@ function drawNode(layer, node, x, index, parent, sibling) {
 	w = Math.max(w, x2);
 }
 require(['jsdc', 'jssc'], function(jsdc, jssc) {
-	var nodes = Array.prototype.slice.call(document.getElementsByTagName('code'), 0);
-	nodes.forEach(function(node, i) {
-		var res = jsdc.parse(node.textContent || node.innerText ||  node.firstChild.nodeValue),
-			pre = node.parentNode,
-			ncode = document.createElement('code'),
-			npre = document.createElement('pre');
-		ncode.innerHTML = 'todo...';
-		ncode.className = node.className;
-		npre.appendChild(ncode);
-		pre.parentNode.insertBefore(npre, pre.nextSibling);
-		draw(i, res, npre.nextSibling);
-	});
-	jssc.exec();
+	function init() {
+		var nodes = Array.prototype.slice.call(document.getElementsByTagName('code'), 0);
+		nodes.forEach(function(node, i) {
+			var res = jsdc.parse(node.textContent || node.innerText ||  node.firstChild.nodeValue),
+				pre = node.parentNode,
+				ncode = document.createElement('code'),
+				npre = document.createElement('pre');
+			ncode.innerHTML = res;
+			ncode.className = node.className;
+			npre.appendChild(ncode);
+			pre.parentNode.insertBefore(npre, pre.nextSibling);
+			draw(i, res, npre.nextSibling);
+		});
+		jssc.exec();
+	}
+	init();
+	var ta = document.getElementById('ta'),
+		input = document.getElementById('btn');
+	input.onclick = function() {
+		var s = ta.value;
+		Array.prototype.slice.call(document.getElementsByTagName('div'), 0).forEach(function(o) {
+			o.parentNode.removeChild(o);
+		});
+		var pre = document.getElementsByTagName('pre');
+		pre[1].parentNode.removeChild(pre[1]);
+		document.getElementsByTagName('code')[0].innerHTML = s.replace('<', '&lt;');
+		pre[0].style.display = 'block';
+		init();
+	}
 });
 </script>
 </body>

@@ -45,10 +45,6 @@ define(function(require, exports, module) {
 				if(!this.look) {
 					this.error();
 				}
-				if(this.look.type() == Token.ID) {
-					node.add(this.labstmt());
-					return node;
-				}
 				switch(this.look.content()) {
 					case 'var':
 						node.add(this.varstmt());
@@ -92,6 +88,17 @@ define(function(require, exports, module) {
 						node.add(this.debstmt());
 					break;
 					default:
+						if(this.look.type() == Token.ID) {
+							for(var i = 0, len = this.tokens.length; i < len; i++) {
+								var token = this.tokens[i];
+								if([Token.BLANK, Token.TAB, Token.COMMENT, Token.LINE, Token.ENTER].indexOf(token.type()) != -1) {
+									if(token.content() == ':') {
+										node.add(this.labstmt());
+										return node;
+									}
+								}
+							}
+						}
 						node.add(this.expr(), this.match(';'));
 				}
 				return node;
@@ -99,7 +106,7 @@ define(function(require, exports, module) {
 			stmts: function() {
 				var node = new Node('stmts');
 				node.add(this.stmt());
-				while(this.look && ['var', '{', ';', 'if', 'else', 'do', 'while', 'for', 'continue', 'break', 'return', 'with', 'switch', 'throw', 'try', 'debugger'].indexOf(this.look.content()) != -1) {
+				while(this.look && this.look.content() != '}') {
 					node.add(this.stmt());
 				}
 				return node;
@@ -797,25 +804,42 @@ define(function(require, exports, module) {
 				if(!this.look) {
 					this.error();
 				}
-				switch(this.look.content()) {
-					case 'get':
-						node.add(
-							this.move(),
-							this.proptname(),
-							this.match('('),
-							this.match(')'),
-							this.match('{'),
-							this.fnbody(),
-							this.match('}')
-						);
-					break;
-					case 'set':
-						node.add(
-							this.move(),
-							this.proptname(),
-							this.match('('),
-							this.match(')')
-						);
+				if(this.look.content() == 'get') {
+					node.add(
+						this.move(),
+						this.proptname(),
+						this.match('('),
+						this.match(')'),
+						this.match('{'),
+						this.fnbody(),
+						this.match('}')
+					);
+				}
+				else if(this.look.content() == 'set') {
+					node.add(
+						this.move(),
+						this.proptname(),
+						this.match('('),
+						this.match(Token.ID),
+						this.match(')'),
+						this.fnbody(),
+						this.match('}')
+					);
+				}
+				else {
+					switch(this.look.type()) {
+						case Token.ID:
+						case Token.STRING:
+						case Token.NUMBER:
+							node.add(
+								this.move(),
+								this.match(':'),
+								this.assignexpr()
+							);
+						break;
+						default:
+							this.error();
+					}
 				}
 				return node;
 			},
