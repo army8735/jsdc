@@ -261,13 +261,8 @@ define(function(require, exports, module) {
 			cntnstmt: function() {
 				var node = new Node('cntnstmt');
 				node.add(this.match('continue', true));
-				if(this.look) {
-					if(this.look.type() == Token.ID) {
-						node.add(this.id());
-					}
-					else if(this.look.type() == Token.LINE) {
-						node.add(this.match());
-					}
+				if(this.look && this.look.type() == Token.ID) {
+					node.add(this.id());
 				}
 				node.add(this.match(';'));
 				return node;
@@ -275,13 +270,8 @@ define(function(require, exports, module) {
 			brkstmt: function() {
 				var node = new Node('brkstmt');
 				node.add(this.match('break', true));
-				if(this.look) {
-					if(this.look.type() == Token.ID) {
-						node.add(this.id());
-					}
-					else if(this.look.type() == Token.LINE) {
-						node.add(this.match());
-					}
+				if(this.look && this.look.type() == Token.ID) {
+					node.add(this.id());
 				}
 				node.add(this.match(';'));
 				return node;
@@ -290,17 +280,16 @@ define(function(require, exports, module) {
 				var node = new Node('retstmt');
 				node.add(this.match('return', true));
 				if(this.look) {
-					if(this.look.content() == ';') {
-						node.add(this.match());
-					}
-					else if(this.look.type() == Token.LINE) {
-						node.add(this.match());
+					if(this.look.content() == ';' || this.look.type() == Token.LINE) {
+						node.add(this.match(';'));
 					}
 					else {
-						node.add(this.expr());
+						node.add(this.expr(), this.match(';'));
 					}
 				}
-				node.add(this.match(';'));
+				else {
+					node.add(this.match(';'));
+				}
 				return node;
 			},
 			withstmt: function() {
@@ -1000,8 +989,11 @@ define(function(require, exports, module) {
 				}
 				//或者根据token的type或者content匹配
 				else if(typeof type == 'string') {
-					//;特殊处理，不匹配有换行或者末尾时自动补全
-					if(type == ';' && (this.look == null || (this.look.content() != type && this.hasMoveLine) || this.look.content() == '}')) {
+					//;特殊处理，不匹配有换行或者末尾时自动补全，还有受限行
+					if(type == ';' && (this.look == null || (this.look.content() != type && this.hasMoveLine) || this.look.content() == '}' || this.look.type() == Token.LINE)) {
+						if(this.look && this.look.type() == Token.LINE) {
+							this.move();
+						}
 						return new Node('Token', new Token(Token.VIRTUAL, ';'));
 					}
 					else if(this.look && this.look.content() == type) {
@@ -1025,6 +1017,7 @@ define(function(require, exports, module) {
 				}
 			},
 			move: function(line) {
+				//遗留下来的换行符
 				this.hasMoveLine = false;
 				do {
 					if(this.tokens.length == 0) {

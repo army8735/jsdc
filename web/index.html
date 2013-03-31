@@ -48,12 +48,14 @@ textarea:hover{opacity:0.8;}
 <input id="btn" type="button" value="ok"/><pre><code class="brush:js">var a = 1, b, c = 2
 {a=2}
 b = 3/*
-*/function test(a){
+*/function test(a){a;
 	switch(a) {
 		case 1:
 		break;
 		default:
 	}
+	return
+	a;
 }
 a = function(a, b){
 	with(a) {
