@@ -1000,13 +1000,14 @@ define(function(require, exports, module) {
 				}
 				//或者根据token的type或者content匹配
 				else if(typeof type == 'string') {
-					if(this.look && this.look.content() == type) {
+					//;特殊处理，不匹配有换行或者末尾时自动补全
+					if(type == ';' && (this.look == null || (this.look.content() != type && this.hasMoveLine) || this.look.content() == '}')) {
+						return new Node('Token', new Token(Token.VIRTUAL, ';'));
+					}
+					else if(this.look && this.look.content() == type) {
 						var l = this.look;
 						this.move(line);
 						return new Node('Token', l);
-					}
-					else if(this.hasMoveline) {
-						//return new Node('Token', this.autosemelocon());
 					}
 					else {
 						throw new Error('SyntaxError: missing ' + type + ' line ' + this.line + ' col ' + this.col + (msg ? '\n' + msg : ''));
