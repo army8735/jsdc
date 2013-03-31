@@ -11,16 +11,14 @@ define(function(require, exports, module) {
 			this.line = 1;
 			this.col = 1;
 			this.index = 0;
-			this.end = true;
 			if(this.tokens.length) {
-				this.end = false;
 				this.move();
 			}
 			this.hasMoveLine = false;
 		}).methods({
 			program: function() {
 				var node = new Node('program');
-				while(!this.end) {
+				while(this.look) {
 					node.add(this.element());
 				}
 				return node;
@@ -123,7 +121,7 @@ define(function(require, exports, module) {
 				var res = [this.vardecl()];
 				while(this.look && this.look.content() == ',') {
 					res.push(
-						this.move(),
+						this.match(),
 						this.vardecl()
 					);
 				}
@@ -177,7 +175,7 @@ define(function(require, exports, module) {
 				switch(this.look.content()) {
 					case 'do':
 						node.add(
-							this.move(),
+							this.match(),
 							this.stmt(),
 							this.match('while'),
 							this.match('('),
@@ -188,7 +186,7 @@ define(function(require, exports, module) {
 					break;
 					case 'while':
 						node.add(
-							this.move(),
+							this.match(),
 							this.match('('),
 							this.expr(),
 							this.match(')'),
@@ -197,7 +195,7 @@ define(function(require, exports, module) {
 					break;
 					case 'for':
 						node.add(
-							this.move(),
+							this.match(),
 							this.match('(')
 						);
 						if(!this.look) {
@@ -214,7 +212,7 @@ define(function(require, exports, module) {
 								}
 								node.add(node2);
 								node.add(
-									this.move(),
+									this.match(),
 									this.expr()
 								);
 							}
@@ -268,7 +266,7 @@ define(function(require, exports, module) {
 						node.add(this.id());
 					}
 					else if(this.look.type() == Token.LINE) {
-						node.add(this.move());
+						node.add(this.match());
 					}
 				}
 				node.add(this.match(';'));
@@ -282,7 +280,7 @@ define(function(require, exports, module) {
 						node.add(this.id());
 					}
 					else if(this.look.type() == Token.LINE) {
-						node.add(this.move());
+						node.add(this.match());
 					}
 				}
 				node.add(this.match(';'));
@@ -293,10 +291,10 @@ define(function(require, exports, module) {
 				node.add(this.match('return', true));
 				if(this.look) {
 					if(this.look.content() == ';') {
-						node.add(this.move());
+						node.add(this.match());
 					}
 					else if(this.look.type() == Token.LINE) {
-						node.add(this.move());
+						node.add(this.match());
 					}
 					else {
 						node.add(this.expr());
@@ -507,7 +505,7 @@ define(function(require, exports, module) {
 				var node = new Node('assignexpr'),
 					cndt = this.cndtexpr();
 				if(this.look && ['*=', '/=', '%=', '+=', '-=', '<<=', '>>=', '>>>=', '&=', '^=', '|=', '='].indexOf(this.look.content()) != -1) {
-					node.add(cndt, this.move(), this.assignexpr());
+					node.add(cndt, this.match(), this.assignexpr());
 				}
 				else {
 					return cndt;
@@ -520,7 +518,7 @@ define(function(require, exports, module) {
 				if(this.look && this.look.content() == '?') {
 					node.add(
 						logorexpr,
-						this.move(),
+						this.match(),
 						this.assignexpr(),
 						this.match(':'),
 						this.assignexpr()
@@ -538,7 +536,7 @@ define(function(require, exports, module) {
 					node.add(logandexpr);
 					while(this.look && this.look.content() == '||') {
 						node.add(
-							this.move(),
+							this.match(),
 							this.logandexpr()
 						);
 					}
@@ -555,7 +553,7 @@ define(function(require, exports, module) {
 					node.add(bitorexpr);
 					while(this.look && this.look.content() == '&&') {
 						node.add(
-							this.move(),
+							this.match(),
 							this.bitorexpr()
 						);
 					}
@@ -572,7 +570,7 @@ define(function(require, exports, module) {
 					node.add(bitxorexpr);
 					while(this.look && this.look.content() == '|') {
 						node.add(
-							this.move(),
+							this.match(),
 							this.bitxorexpr()
 						);
 					}
@@ -589,7 +587,7 @@ define(function(require, exports, module) {
 					node.add(bitandexpr);
 					while(this.look && this.look.content() == '^') {
 						node.add(
-							this.move(),
+							this.match(),
 							this.bitandexpr()
 						);
 					}
@@ -606,7 +604,7 @@ define(function(require, exports, module) {
 					node.add(eqexpr);
 					while(this.look && this.look.content() == '&') {
 						node.add(
-							this.move(),
+							this.match(),
 							this.eqexpr()
 						);
 					}
@@ -623,7 +621,7 @@ define(function(require, exports, module) {
 					node.add(reltexpr);
 					while(this.look && ['==', '===', '!==', '!='].indexOf(this.look.content()) != -1) {
 						node.add(
-							this.move(),
+							this.match(),
 							this.reltexpr()
 						);
 					}
@@ -640,7 +638,7 @@ define(function(require, exports, module) {
 					node.add(shiftexpr);
 					while(this.look && ['<', '>', '>=', '<=', 'in', 'instanceof'].indexOf(this.look.content()) != -1) {
 						node.add(
-							this.move(),
+							this.match(),
 							this.shiftexpr()
 						);
 					}
@@ -657,7 +655,7 @@ define(function(require, exports, module) {
 					node.add(addexpr);
 					while(this.look && ['<<', '>>', '>>>'].indexOf(this.look.content()) != -1) {
 						node.add(
-							this.move(),
+							this.match(),
 							this.addexpr()
 						);
 					}
@@ -674,7 +672,7 @@ define(function(require, exports, module) {
 					node.add(mtplexpr);
 					while(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
 						node.add(
-							this.move(),
+							this.match(),
 							this.mtplexpr()
 						);
 					}
@@ -691,7 +689,7 @@ define(function(require, exports, module) {
 					node.add(unaryexpr);
 					while(this.look && ['*', '/', '%'].indexOf(this.look.content()) != -1) {
 						node.add(
-							this.move(),
+							this.match(),
 							this.unaryexpr()
 						);
 					}
@@ -717,20 +715,20 @@ define(function(require, exports, module) {
 					case '~':
 					case '!':
 						node.add(
-							this.move(),
+							this.match(),
 							this.unaryexpr()
 						);
 					break;
 					case 'new':
 						node.add(
-							this.move(),
+							this.match(),
 							this.constor()
 						)
 					break;
 					default:
 						var mmbexpr = this.mmbexpr();
 						if(this.look && ['++', '--'].indexOf(this.look.content()) != -1) {
-							node.add(mmbexpr, this.move());
+							node.add(mmbexpr, this.match());
 							return node;
 						}
 						else {
@@ -746,7 +744,7 @@ define(function(require, exports, module) {
 				}
 				if(this.look.content() == 'this') {
 					node.add(
-						this.move(),
+						this.match(),
 						this.match('.')
 					);
 				}
@@ -765,7 +763,7 @@ define(function(require, exports, module) {
 					}
 					else if(this.look.content() == '.') {
 						node.add(
-							this.move(),
+							this.match(),
 							this.conscall()
 						);
 					}
@@ -785,14 +783,14 @@ define(function(require, exports, module) {
 					if(this.look.content() == '.') {
 						node.add(
 							prmrexpr,
-							this.move(),
+							this.match(),
 							this.mmbexpr()
 						);
 					}
 					else if(this.look.content() == '[') {
 						node.add(
 							prmrexpr,
-							this.move(),
+							this.match(),
 							this.expr()
 						);
 					}
@@ -819,7 +817,7 @@ define(function(require, exports, module) {
 					case Token.STRING:
 					case Token.REG:
 					case Token.TEMPLATE:
-						node.add(this.move());
+						node.add(this.match());
 					break;
 					default:
 						switch(this.look.content()) {
@@ -827,7 +825,7 @@ define(function(require, exports, module) {
 							case 'null':
 							case 'true':
 							case 'false':
-								node.add(this.move());
+								node.add(this.match());
 							break;
 							case '(':
 								node.add(this.expr(), this.match(')'));
@@ -849,7 +847,7 @@ define(function(require, exports, module) {
 				node.add(this.match('['));
 				while(this.look && this.look.content() != ']') {
 					if(this.look.content() == ',') {
-						node.add(this.move());
+						node.add(this.match());
 					}
 					else {
 						node.add(this.assignexpr());
@@ -864,7 +862,7 @@ define(function(require, exports, module) {
 				while(this.look && this.look.content() != '}') {
 					node.add(this.proptassign());
 					if(this.look && this.look.content() == ',') {
-						node.add(this.move());
+						node.add(this.match());
 					}
 				}
 				node.add(this.match('}'));
@@ -877,7 +875,7 @@ define(function(require, exports, module) {
 				}
 				if(this.look.content() == 'get') {
 					node.add(
-						this.move(),
+						this.match(),
 						this.proptname(),
 						this.match('('),
 						this.match(')'),
@@ -888,7 +886,7 @@ define(function(require, exports, module) {
 				}
 				else if(this.look.content() == 'set') {
 					node.add(
-						this.move(),
+						this.match(),
 						this.proptname(),
 						this.match('('),
 						this.propsets(),
@@ -922,7 +920,7 @@ define(function(require, exports, module) {
 						case Token.ID:
 						case Token.NUMBER:
 						case Token.STRING:
-							node.add(this.move());
+							node.add(this.match());
 						break;
 						default:
 							this.error('missing name after . operator');
@@ -970,7 +968,7 @@ define(function(require, exports, module) {
 					case '^=':
 					case '|=':
 						node.add(
-							this.move(),
+							this.match(),
 							this.assignexpr()
 						);
 					break;
@@ -980,18 +978,35 @@ define(function(require, exports, module) {
 				return node;
 			},
 			match: function(type, line, msg) {
+				if(typeof type == 'boolean') {
+					msg = line;
+					line = type;
+					type = undefined;
+				}
 				if(typeof line != 'boolean') {
 					line = false;
 					msg = line;
 				}
-				if(typeof type == 'string') {
+				//未定义为所有
+				if(character.isUndefined(type)) {
+					if(this.look) {
+						var l = this.look;
+						this.move(line);
+						return new Node('Token', l);
+					}
+					else {
+						throw new Error('SyntaxError: syntax error line ' + this.line + ' col ' + this.col + (msg ? '\n' + msg : ''));
+					}
+				}
+				//或者根据token的type或者content匹配
+				else if(typeof type == 'string') {
 					if(this.look && this.look.content() == type) {
 						var l = this.look;
 						this.move(line);
 						return new Node('Token', l);
 					}
-					else if(this.hasMoveline || this.end) {
-						return new Node('Token', this.autosemelocon());
+					else if(this.hasMoveline) {
+						//return new Node('Token', this.autosemelocon());
 					}
 					else {
 						throw new Error('SyntaxError: missing ' + type + ' line ' + this.line + ' col ' + this.col + (msg ? '\n' + msg : ''));
@@ -1010,11 +1025,9 @@ define(function(require, exports, module) {
 			},
 			move: function(line) {
 				this.hasMoveLine = false;
-				var l = this.look;
 				do {
 					if(this.tokens.length == 0) {
 						this.look = null;
-						this.end = true;
 						break;
 					}
 					this.look = this.tokens.shift();
@@ -1053,7 +1066,6 @@ define(function(require, exports, module) {
 					}
 					this.index++;
 				} while([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT].indexOf(this.look.type()) != -1);
-				return new Node('Token', l);
 			},
 			error: function(msg) {
 				msg = msg ? 'SyntaxError: ' + msg : 'SyntaxError: syntax error';
