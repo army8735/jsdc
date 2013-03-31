@@ -96,11 +96,6 @@ define(function(require, exports, module) {
 				}
 				return node;
 			},
-			id: function(msg) {
-				var node = new Node('id');
-				node.add(this.match(Token.ID, msg));
-				return node;
-			},
 			varstmt: function(noSem) {
 				var node = new Node('varstmt');
 				node.add(
@@ -267,7 +262,7 @@ define(function(require, exports, module) {
 				var node = new Node('cntnstmt');
 				node.add(this.match('continue', true));
 				if(this.look && this.look.type() == Token.ID) {
-					node.add(this.id());
+					node.add(this.match());
 				}
 				node.add(this.match(';'));
 				return node;
@@ -276,7 +271,7 @@ define(function(require, exports, module) {
 				var node = new Node('brkstmt');
 				node.add(this.match('break', true));
 				if(this.look && this.look.type() == Token.ID) {
-					node.add(this.id());
+					node.add(this.match());
 				}
 				node.add(this.match(';'));
 				return node;
@@ -362,7 +357,7 @@ define(function(require, exports, module) {
 			labstmt: function() {
 				var node = new Node('labstmt');
 				node.add(
-					this.id(),
+					this.match(Token.ID),
 					this.match(':'),
 					this.stmt()
 				);
@@ -400,11 +395,11 @@ define(function(require, exports, module) {
 				return node;
 			},
 			cach: function() {
-				var node = new Node('catch');
+				var node = new Node('cach');
 				node.add(
 					this.match('catch'),
 					this.match('('),
-					this.id(),
+					this.match(Token.ID, 'missing identifier in catch'),
 					this.match(')'),
 					this.block()
 				);
@@ -422,7 +417,7 @@ define(function(require, exports, module) {
 				var node = new Node('fndecl');
 				node.add(
 					this.match('function'),
-					this.id(),
+					this.match(Token.ID, 'function statement requires a name'),
 					this.match('(')
 				);
 				if(!this.look) {
@@ -446,7 +441,7 @@ define(function(require, exports, module) {
 					this.error();
 				}
 				if(this.look.type() == Token.ID) {
-					node.add(this.id());
+					node.add(this.match());
 				}
 				node.add(this.match('('));
 				if(!this.look) {
@@ -465,11 +460,11 @@ define(function(require, exports, module) {
 			},
 			fnparams: function() {
 				var node = new Node('fnparams');
-				node.add(this.id());
+				node.add(this.match(Token.ID, 'missing formal parameter'));
 				while(this.look && this.look.content() == ',') {
 					node.add(
 						this.match(','),
-						this.id()
+						this.match(Token.ID, 'missing formal parameter')
 					);
 				}
 				return node;
@@ -750,7 +745,7 @@ define(function(require, exports, module) {
 			},
 			conscall: function() {
 				var node = new Node('conscall');
-				node.add(this.id());
+				node.add(this.match(Token.ID, this.look.content() + ' is not a constructor'));
 				if(this.look) {
 					if(this.look.content() == '(') {
 						node.add(this.args());
