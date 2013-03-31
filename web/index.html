@@ -53,7 +53,7 @@ function test(a){
 		default:
 	}
 }
-var a = function(a, b){
+a = function(a, b){
 	with(a) {
 	};
 	return 1;
@@ -75,7 +75,7 @@ for(var i = 0, len = 10; i < len; i++) {
 }
 for(var i in { a: 1, get x() {}, set y(t) {} }) {
 	console.log(i);continue;
-}</code></pre>
+}var a = 1</code></pre>
 <script src="Ai.js"></script>
 <script src="kinetic-v4.4.0.min.js"></script>
 <script>
@@ -104,6 +104,7 @@ function drawNode(layer, node, x, index, parent, sibling) {
 		h += 24;
 	}
 	var isToken = node.name() == 'Token',
+		isVirtual = isToken && node.leaves().type() == -1,
 		text = new Kinetic.Text({
 			x: x + 5,
 			y: h + 6,
@@ -111,7 +112,7 @@ function drawNode(layer, node, x, index, parent, sibling) {
 			width: 68,
 			height: 16,
 			align: 'center',
-			fill: isToken ? '#6CF' : '#f60',
+			fill: isToken ? (isVirtual ? '#F33' : '#6CF') : '#F60',
 			fontSize: 12,
 			fontFamily: 'Tahoma'
 		}),
@@ -120,8 +121,8 @@ function drawNode(layer, node, x, index, parent, sibling) {
 			y: h + 2,
 			width: 74,
 			height: 20,
-			fill: isToken ? '#FFF' : '#F6F6F6',
-			stroke: isToken ? '#CCC' : '#808080',
+			fill: isToken ? (isVirtual ? '#FCC' : '#FFF') : '#F6F6F6',
+			stroke: isToken ? '#CCC' : '#F93',
 			cornerRadius: 10
 		});
 	layer.add(rect);

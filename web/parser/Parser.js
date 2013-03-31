@@ -11,13 +11,16 @@ define(function(require, exports, module) {
 			this.line = 1;
 			this.col = 1;
 			this.index = 0;
+			this.end = true;
 			if(this.tokens.length) {
+				this.end = false;
 				this.move();
 			}
+			this.hasMoveLine = false;
 		}).methods({
 			program: function() {
 				var node = new Node('program');
-				while(this.look) {
+				while(!this.end) {
 					node.add(this.element());
 				}
 				return node;
@@ -104,7 +107,7 @@ define(function(require, exports, module) {
 					this.vardecls()
 				);
 				if(!noSem) {
-					this.match(';');
+					node.add(this.match(';'));
 				}
 				return node;
 			},
@@ -503,8 +506,8 @@ define(function(require, exports, module) {
 			assignexpr: function() {
 				var node = new Node('assignexpr'),
 					cndt = this.cndtexpr();
-				if(this.look && ['*=', '/=', '%=', '+=', '-=', '<<=', '>>=', '>>>=', '&=', '^=', '|='].indexOf(this.look.content()) != -1) {
-					node.add(cndt, this.assignexpr());
+				if(this.look && ['*=', '/=', '%=', '+=', '-=', '<<=', '>>=', '>>>=', '&=', '^=', '|=', '='].indexOf(this.look.content()) != -1) {
+					node.add(cndt, this.move(), this.assignexpr());
 				}
 				else {
 					return cndt;
@@ -987,6 +990,9 @@ define(function(require, exports, module) {
 						this.move(line);
 						return new Node('Token', l);
 					}
+					else if(this.hasMoveline || this.end) {
+						return new Node('Token', this.autosemelocon());
+					}
 					else {
 						throw new Error('SyntaxError: missing ' + type + ' line ' + this.line + ' col ' + this.col + (msg ? '\n' + msg : ''));
 					}
@@ -1003,10 +1009,12 @@ define(function(require, exports, module) {
 				}
 			},
 			move: function(line) {
+				this.hasMoveLine = false;
 				var l = this.look;
 				do {
 					if(this.tokens.length == 0) {
 						this.look = null;
+						this.end = true;
 						break;
 					}
 					this.look = this.tokens.shift();
@@ -1026,6 +1034,7 @@ define(function(require, exports, module) {
 						}
 					}
 					if(this.look.type() == Token.LINE) {
+						this.hasMoveLine = true;
 						this.line++;
 						this.col = 1;
 					}
@@ -1033,6 +1042,7 @@ define(function(require, exports, module) {
 						var s = this.look.content(),
 							n = character.count(this.look.content(), character.LINE);
 						if(n > 0) {
+							this.hasMoveLine = true;
 							this.line += n;
 							var i = s.lastIndexOf(character.LINE);
 							this.col += s.length - i - 1;
@@ -1048,6 +1058,9 @@ define(function(require, exports, module) {
 			error: function(msg) {
 				msg = msg ? 'SyntaxError: ' + msg : 'SyntaxError: syntax error';
 				throw new Error(msg + ' line ' + this.line + ' col ' + this.col);
+			},
+			autosemelocon: function() {
+				return new Token(Token.VIRTUAL, ';');
 			}
 		});
 	module.exports = Parser;

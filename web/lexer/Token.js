@@ -26,6 +26,7 @@ define(function(require, exports, module) {
 				return Token.type(this.t);
 			}
 		}).statics({
+			VIRTUAL: -1,
 			OTHER: 0,
 			BLANK: 1,
 			TAB: 2,
