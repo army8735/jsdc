@@ -114,7 +114,7 @@ define(function(require, exports, module) {
 			},
 			vardecl: function() {
 				var node = new Node('vardecl');
-				node.add(this.id());
+				node.add(this.match(Token.ID, 'missing variable name'));
 				if(this.look && this.look.content() == '=') {
 					node.add(this.assign());
 				}
@@ -896,13 +896,13 @@ define(function(require, exports, module) {
 						case Token.STRING:
 						case Token.NUMBER:
 							node.add(
-								this.id(),
+								this.match(),
 								this.match(':'),
 								this.assignexpr()
 							);
 						break;
 						default:
-							this.error();
+							this.error('invalid property id');
 					}
 				}
 				return node;
@@ -924,7 +924,7 @@ define(function(require, exports, module) {
 			},
 			propsets: function() {
 				var node = new Node('propsets');
-				node.add(this.id('setter functions must have one argument'));
+				node.add(this.match(Token.ID, 'setter functions must have one argument'));
 				return node;
 			},
 			args: function() {
