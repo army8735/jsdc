@@ -8,6 +8,8 @@ define(function(require, exports, module) {
 			this.lexer = lexer;
 			this.look = null;
 			this.tokens = lexer.tokens();
+			this.lastLine = 1;
+			this.lastCol = 1;
 			this.line = 1;
 			this.col = 1;
 			this.index = 0;
@@ -987,12 +989,12 @@ define(function(require, exports, module) {
 						return new Node('Token', l);
 					}
 					else {
-						throw new Error('SyntaxError: syntax error line ' + this.line + ' col ' + this.col + (msg ? '\n' + msg : ''));
+						this.error('syntax error' + (msg || ''));
 					}
 				}
 				//或者根据token的type或者content匹配
 				else if(typeof type == 'string') {
-					//;特殊处理，不匹配有换行或者末尾时自动补全，还有受限行
+					//特殊处理，不匹配有换行或者末尾时自动补全，还有受限行
 					if(type == ';' && !this.inFor && (this.look == null || (this.look.content() != type && this.hasMoveLine) || this.look.content() == '}' || this.look.type() == Token.LINE)) {
 						if(this.look && this.look.type() == Token.LINE) {
 							this.move();
@@ -1005,7 +1007,7 @@ define(function(require, exports, module) {
 						return new Node('Token', l);
 					}
 					else {
-						throw new Error('SyntaxError: missing ' + type + ' line ' + this.line + ' col ' + this.col + (msg ? '\n' + msg : ''));
+						this.error('missing ' + type + (msg || ''));
 					}
 				}
 				else if(typeof type == 'number') {
@@ -1015,11 +1017,13 @@ define(function(require, exports, module) {
 						return new Node('Token', l);
 					}
 					else {
-						throw new Error('SyntaxError: missing ' + Token.type(type) + ' line ' + this.line + ' col ' + this.col + (msg ? '\n' + msg : ''));
+						this.error('missing ' + Token.type(type) + (msg || ''));
 					}
 				}
 			},
 			move: function(line) {
+				this.lastLine = this.line;
+				this.lastCol = this.col;
 				//遗留下来的换行符
 				this.hasMoveLine = false;
 				do {
@@ -1065,8 +1069,8 @@ define(function(require, exports, module) {
 				} while([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT].indexOf(this.look.type()) != -1);
 			},
 			error: function(msg) {
-				msg = msg ? 'SyntaxError: ' + msg : 'SyntaxError: syntax error';
-				throw new Error(msg + ' line ' + this.line + ' col ' + this.col);
+				msg = 'SyntaxError: ' + msg || ' syntax error';
+				throw new Error(msg + ' line ' + this.lastLine + ' col ' + this.lastCol);
 			},
 			autosemelocon: function() {
 				return new Token(Token.VIRTUAL, ';');
