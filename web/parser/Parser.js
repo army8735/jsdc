@@ -11,6 +11,7 @@ define(function(require, exports, module) {
 			this.line = 1;
 			this.col = 1;
 			this.index = 0;
+			this.inFor = false;
 			if(this.tokens.length) {
 				this.move();
 			}
@@ -194,6 +195,7 @@ define(function(require, exports, module) {
 						);
 					break;
 					case 'for':
+						this.inFor = true;
 						node.add(
 							this.match(),
 							this.match('(')
@@ -253,6 +255,7 @@ define(function(require, exports, module) {
 								node.add(this.expr());
 							}
 						}
+						this.inFor = false;
 						node.add(this.match(')'));
 						node.add(this.stmt());
 				}
@@ -990,7 +993,7 @@ define(function(require, exports, module) {
 				//或者根据token的type或者content匹配
 				else if(typeof type == 'string') {
 					//;特殊处理，不匹配有换行或者末尾时自动补全，还有受限行
-					if(type == ';' && (this.look == null || (this.look.content() != type && this.hasMoveLine) || this.look.content() == '}' || this.look.type() == Token.LINE)) {
+					if(type == ';' && !this.inFor && (this.look == null || (this.look.content() != type && this.hasMoveLine) || this.look.content() == '}' || this.look.type() == Token.LINE)) {
 						if(this.look && this.look.type() == Token.LINE) {
 							this.move();
 						}
