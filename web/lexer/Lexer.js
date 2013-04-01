@@ -54,7 +54,7 @@ define(function(require, exports, module) {
 								var token = new Token(match.tokenType(), match.content(), match.val()),
 									error = match.error(),
 									matchLen = match.content().length;
-								if(token.type() == Token.ID && this.rule.keyWords()[token.val()]) {
+								if(token.type() == Token.ID && this.rule.keyWords().hasOwnProperty(token.content())) {
 									token.type(Token.KEYWORD);
 								}
 								temp.push(token);

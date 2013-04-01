@@ -6,9 +6,9 @@
 <style>
 body{margin:0;padding:10px;font:12px/1.25 arail;background-color:#fff;line-height:1.25;overflow-y:scroll;}
 
-.jssc .col{margin-left:12px;color:#CCC;cursor:default;}
+.jssc .col{margin-left:12px;color:#CCC;cursor:default;line-height:1.5;}
 .jssc .col em{position:relative;font-style:normal;}
-.jssc .col em small{position:absolute;left:0;top:-10px;color:#A0A080;}
+.jssc .col em small{position:absolute;left:0;top:-7px;color:#A0A080;}
 .jssc .col,.jssc ol{font-family:Consolas,momospace,"ËÎÌו","Courier New";font-size:12px;}
 .jssc li:hover{background:#FF9;}
 .jssc .number{color:#088;}
@@ -156,6 +156,7 @@ require(['jsdc', 'jssc'], function(jsdc, jssc) {
 		var nodes = Array.prototype.slice.call(document.getElementsByTagName('code'), 0);
 		nodes.forEach(function(node, i) {
 			var res = jsdc.parse(node.textContent || node.innerText ||  node.firstChild.nodeValue),
+				tree = jsdc.tree(),
 				pre = node.parentNode,
 				ncode = document.createElement('code'),
 				npre = document.createElement('pre');
@@ -163,7 +164,7 @@ require(['jsdc', 'jssc'], function(jsdc, jssc) {
 			ncode.className = node.className;
 			npre.appendChild(ncode);
 			pre.parentNode.insertBefore(npre, pre.nextSibling);
-			draw(i, res, npre.nextSibling);
+			draw(i, tree, npre.nextSibling);
 		});
 		jssc.exec();
 	}

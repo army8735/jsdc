@@ -14,6 +14,7 @@ define(function(require, exports, module) {
 			this.col = 1;
 			this.index = 0;
 			this.inFor = false;
+			this.ignores = {};
 			if(this.tokens.length) {
 				this.move();
 			}
@@ -231,25 +232,43 @@ define(function(require, exports, module) {
 							}
 						}
 						else {
-							if(this.look.content() != ';') {
-								node.add(this.expr());
-							}
-							node.add(this.match(';'));
-							if(!this.look) {
+							if(this.look.content() == 'in') {
 								this.error();
 							}
-							if(this.look.content() != ';') {
-								node.add(this.expr());
+							var hasIn = false;
+							for(var i = 0, len = this.tokens.length; i < len; i++) {
+								var t = this.tokens[i];
+								if(t.content() == 'in') {
+									hasIn = true;
+								}
+								else if(t.content() == ')') {
+									break;
+								}
 							}
-							if(!this.look) {
-								this.error();
+							if(hasIn) {
+								node.add(this.expr(true), this.match('in'), this.expr());
 							}
-							node.add(this.match(';'));
-							if(!this.look) {
-								this.error();
-							}
-							if(this.look.content() != ')') {
-								node.add(this.expr());
+							else {
+								if(this.look.content() != ';') {
+									node.add(this.expr());
+								}
+								node.add(this.match(';'));
+								if(!this.look) {
+									this.error();
+								}
+								if(this.look.content() != ';') {
+									node.add(this.expr());
+								}
+								if(!this.look) {
+									this.error();
+								}
+								node.add(this.match(';'));
+								if(!this.look) {
+									this.error();
+								}
+								if(this.look.content() != ')') {
+									node.add(this.expr());
+								}
 							}
 						}
 						this.inFor = false;
@@ -476,13 +495,13 @@ define(function(require, exports, module) {
 				}
 				return node;
 			},
-			expr: function() {
+			expr: function(noIn) {
 				var node = new Node('expr'),
-					assignexpr = this.assignexpr();
+					assignexpr = this.assignexpr(noIn);
 				if(this.look && this.look.content() == ',') {
 					node.add(assignexpr);
 					while(this.look && this.look.content() == ',') {
-						node.add(this.assignexpr());
+						node.add(this.match(), this.assignexpr(noIn));
 					}
 				}
 				else {
@@ -490,27 +509,27 @@ define(function(require, exports, module) {
 				}
 				return node;
 			},
-			assignexpr: function() {
+			assignexpr: function(noIn) {
 				var node = new Node('assignexpr'),
-					cndt = this.cndtexpr();
+					cndt = this.cndtexpr(noIn);
 				if(this.look && ['*=', '/=', '%=', '+=', '-=', '<<=', '>>=', '>>>=', '&=', '^=', '|=', '='].indexOf(this.look.content()) != -1) {
-					node.add(cndt, this.match(), this.assignexpr());
+					node.add(cndt, this.match(), this.assignexpr(noIn));
 				}
 				else {
 					return cndt;
 				}
 				return node;
 			},
-			cndtexpr: function() {
+			cndtexpr: function(noIn) {
 				var node = new Node('cndtexpr'),
-					logorexpr = this.logorexpr();
+					logorexpr = this.logorexpr(noIn);
 				if(this.look && this.look.content() == '?') {
 					node.add(
 						logorexpr,
 						this.match(),
-						this.assignexpr(),
+						this.assignexpr(noIn),
 						this.match(':'),
-						this.assignexpr()
+						this.assignexpr(noIn)
 					);
 				}
 				else {
@@ -518,15 +537,15 @@ define(function(require, exports, module) {
 				}
 				return node;
 			},
-			logorexpr: function() {
+			logorexpr: function(noIn) {
 				var node = new Node('logorexpr'),
-					logandexpr = this.logandexpr();
+					logandexpr = this.logandexpr(noIn);
 				if(this.look && this.look.content() == '||') {
 					node.add(logandexpr);
 					while(this.look && this.look.content() == '||') {
 						node.add(
 							this.match(),
-							this.logandexpr()
+							this.logandexpr(noIn)
 						);
 					}
 				}
@@ -535,15 +554,15 @@ define(function(require, exports, module) {
 				}
 				return node;
 			},
-			logandexpr: function() {
+			logandexpr: function(noIn) {
 				var node = new Node('logandexpr'),
-					bitorexpr = this.bitorexpr();
+					bitorexpr = this.bitorexpr(noIn);
 				if(this.look && this.look.content() == '&&') {
 					node.add(bitorexpr);
 					while(this.look && this.look.content() == '&&') {
 						node.add(
 							this.match(),
-							this.bitorexpr()
+							this.bitorexpr(noIn)
 						);
 					}
 				}
@@ -552,15 +571,15 @@ define(function(require, exports, module) {
 				}
 				return node;
 			},
-			bitorexpr: function() {
+			bitorexpr: function(noIn) {
 				var node = new Node('bitorexpr'),
-					bitxorexpr = this.bitxorexpr();
+					bitxorexpr = this.bitxorexpr(noIn);
 				if(this.look && this.look.content() == '|') {
 					node.add(bitxorexpr);
 					while(this.look && this.look.content() == '|') {
 						node.add(
 							this.match(),
-							this.bitxorexpr()
+							this.bitxorexpr(noIn)
 						);
 					}
 				}
@@ -569,15 +588,15 @@ define(function(require, exports, module) {
 				}
 				return node;
 			},
-			bitxorexpr: function() {
+			bitxorexpr: function(noIn) {
 				var node = new Node('bitxorexpr'),
-					bitandexpr = this.bitandexpr();
+					bitandexpr = this.bitandexpr(noIn);
 				if(this.look && this.look.content() == '^') {
 					node.add(bitandexpr);
 					while(this.look && this.look.content() == '^') {
 						node.add(
 							this.match(),
-							this.bitandexpr()
+							this.bitandexpr(noIn)
 						);
 					}
 				}
@@ -586,15 +605,15 @@ define(function(require, exports, module) {
 				}
 				return node;
 			},
-			bitandexpr: function() {
+			bitandexpr: function(noIn) {
 				var node = new Node('bitandexpr'),
-					eqexpr = this.eqexpr();
+					eqexpr = this.eqexpr(noIn);
 				if(this.look && this.look.content() == '&') {
 					node.add(eqexpr);
 					while(this.look && this.look.content() == '&') {
 						node.add(
 							this.match(),
-							this.eqexpr()
+							this.eqexpr(noIn)
 						);
 					}
 				}
@@ -603,15 +622,15 @@ define(function(require, exports, module) {
 				}
 				return node;
 			},
-			eqexpr: function() {
+			eqexpr: function(noIn) {
 				var node = new Node('eqexpr'),
-					reltexpr = this.reltexpr();
+					reltexpr = this.reltexpr(noIn);
 				if(this.look && ['==', '===', '!==', '!='].indexOf(this.look.content()) != -1) {
 					node.add(reltexpr);
 					while(this.look && ['==', '===', '!==', '!='].indexOf(this.look.content()) != -1) {
 						node.add(
 							this.match(),
-							this.reltexpr()
+							this.reltexpr(noIn)
 						);
 					}
 				}
@@ -620,12 +639,12 @@ define(function(require, exports, module) {
 				}
 				return node;
 			},
-			reltexpr: function() {
+			reltexpr: function(noIn) {
 				var node = new Node('reltexpr'),
 					shiftexpr = this.shiftexpr();
-				if(this.look && ['<', '>', '>=', '<=', 'in', 'instanceof'].indexOf(this.look.content()) != -1) {
+				if(this.look && (['<', '>', '>=', '<=', 'instanceof'].indexOf(this.look.content()) != -1 || (!noIn && this.look.content() == 'in'))) {
 					node.add(shiftexpr);
-					while(this.look && ['<', '>', '>=', '<=', 'in', 'instanceof'].indexOf(this.look.content()) != -1) {
+					while(this.look && (['<', '>', '>=', '<=', 'instanceof'].indexOf(this.look.content()) != -1 || (!noIn && this.look.content() == 'in'))) {
 						node.add(
 							this.match(),
 							this.shiftexpr()
@@ -712,7 +731,7 @@ define(function(require, exports, module) {
 						node.add(
 							this.match(),
 							this.constor()
-						)
+						);
 					break;
 					default:
 						var mmbexpr = this.mmbexpr();
@@ -755,6 +774,12 @@ define(function(require, exports, module) {
 							this.match(),
 							this.conscall()
 						);
+						while(this.look && this.look.content() == '.') {
+							node.add(
+								this.match(),
+								this.conscall()
+							);
+						}
 					}
 				}
 				return node;
@@ -768,6 +793,23 @@ define(function(require, exports, module) {
 					return this.fnexpr();
 				}
 				var prmrexpr = this.prmrexpr();
+				function goOn() {
+					while(this.look && ['.', '[', '('].indexOf(this.look.content()) != -1) {
+						if(this.look.content() == '.') {
+							node.add(this.match(), this.mmbexpr());
+						}
+						else if(this.look.content() == '[') {
+							node.add(
+								this.match(),
+								this.expr(),
+								this.match(']')
+							);
+						}
+						else {
+							node.add(this.args());
+						}
+					}
+				}
 				if(this.look) {
 					if(this.look.content() == '.') {
 						node.add(
@@ -775,16 +817,20 @@ define(function(require, exports, module) {
 							this.match(),
 							this.mmbexpr()
 						);
+						goOn.call(this);
 					}
 					else if(this.look.content() == '[') {
 						node.add(
 							prmrexpr,
 							this.match(),
-							this.expr()
+							this.expr(),
+							this.match(']')
 						);
+						goOn.call(this);
 					}
 					else if(this.look.content() == '(') {
 						node.add(prmrexpr, this.args());
+						goOn.call(this);
 					}
 					else {
 						return prmrexpr;
@@ -817,7 +863,7 @@ define(function(require, exports, module) {
 								node.add(this.match());
 							break;
 							case '(':
-								node.add(this.expr(), this.match(')'));
+								node.add(this.match(), this.expr(), this.match(')'));
 							break;
 							case '[':
 								node.add(this.arrltr());
@@ -863,27 +909,43 @@ define(function(require, exports, module) {
 					this.error();
 				}
 				if(this.look.content() == 'get') {
-					node.add(
-						this.match(),
-						this.proptname(),
-						this.match('('),
-						this.match(')'),
-						this.match('{'),
-						this.fnbody(),
-						this.match('}')
-					);
+					node.add(this.match());
+					if(!this.look) {
+						this.error();
+					}
+					if(this.look.content() == ':') {
+						node.add(this.match(), this.assignexpr());
+					}
+					else {
+						node.add(
+							this.proptname(),
+							this.match('('),
+							this.match(')'),
+							this.match('{'),
+							this.fnbody(),
+							this.match('}')
+						);
+					}
 				}
 				else if(this.look.content() == 'set') {
-					node.add(
-						this.match(),
-						this.proptname(),
-						this.match('('),
-						this.propsets(),
-						this.match(')'),
-						this.match('{'),
-						this.fnbody(),
-						this.match('}')
-					);
+					node.add(this.match());
+					if(!this.look) {
+						this.error();
+					}
+					if(this.look.content() == ':') {
+						node.add(this.match(), this.assignexpr());
+					}
+					else {
+						node.add(
+							this.proptname(),
+							this.match('('),
+							this.propsets(),
+							this.match(')'),
+							this.match('{'),
+							this.fnbody(),
+							this.match('}')
+						);
+					}
 				}
 				else {
 					switch(this.look.type()) {
@@ -938,7 +1000,7 @@ define(function(require, exports, module) {
 				var node = new Node('arglist');
 				node.add(this.assignexpr());
 				while(this.look && this.look.content() == ',') {
-					node.add(this.assignexpr());
+					node.add(this.match(), this.assignexpr());
 				}
 				return node;
 			},
@@ -1027,6 +1089,10 @@ define(function(require, exports, module) {
 						break;
 					}
 					this.look = this.tokens.shift();
+					//´æÏÂºöÂÔµÄtoken
+					if([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT].indexOf(this.look.type()) != -1) {
+						this.ignores[this.index] = this.look;
+					}
 					if(line && this.look.type() == Token.LINE) {
 						this.line++;
 						this.col = 1;
@@ -1064,11 +1130,11 @@ define(function(require, exports, module) {
 				} while([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT].indexOf(this.look.type()) != -1);
 			},
 			error: function(msg) {
-				msg = 'SyntaxError: ' + msg || ' syntax error';
+				msg = 'SyntaxError: ' + (msg || ' syntax error');
 				throw new Error(msg + ' line ' + this.lastLine + ' col ' + this.lastCol);
 			},
-			autosemelocon: function() {
-				return new Token(Token.VIRTUAL, ';');
+			ignore: function() {
+				return this.ignores;
 			}
 		});
 	module.exports = Parser;

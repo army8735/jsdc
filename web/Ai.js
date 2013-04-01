@@ -527,6 +527,7 @@ var require,
 			}
 			else {
 				isReg = peek != ']';
+				modName = false;
 			}
 		}
 		return res;

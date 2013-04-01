@@ -45,4 +45,14 @@ define(function(require, exports) {
 	exports.isUndefined = function(s) {
 		return typeof s == 'undefined';
 	};
+	exports.escapeHTML = function(str) {
+		var xmlchar = {
+			"&": "&amp;",
+			"<": "&lt;",
+			">": "&gt;"
+		};
+		return str.replace(/[<>&]/g, function($1){
+			return xmlchar[$1];
+		});
+	};
 });

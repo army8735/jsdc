@@ -10,7 +10,7 @@ define(function(require, exports, module) {
 			return xmlchar[$1];
 		});
 	}
-	module.exports = function (tokens, tabBlank) {
+	module.exports = function(tokens, tabBlank) {
 		var df = document.createDocumentFragment(),
 			li = document.createElement('li'),
 			temp = [];
