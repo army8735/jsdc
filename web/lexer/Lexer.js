@@ -211,6 +211,6 @@ define(function(require, exports, module) {
 				return cmode;
 			}
 		}),
-		cmode = Lexer.STRICT;
+		cmode = Lexer.LOOSE;
 	module.exports = Lexer;
 });

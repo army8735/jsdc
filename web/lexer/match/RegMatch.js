@@ -1,8 +1,13 @@
 define(function(require, exports, module) {
 	var Match = require('./Match'),
-		Lexer = require('../Lexer');
-	var RegMatch = Match.extend(function(type, reg, valid, setPReg) {
-		Match.call(this, type, setPReg);
+		RegMatch = Match.extend(function(type, reg, valid, setPReg, special, parenthese) {
+		if(typeof valid == 'number') {
+			parenthese = special;
+			special = setPReg;
+			setPReg = valid;
+			valid = null;
+		}
+		Match.call(this, type, setPReg, special, parenthese);
 		this.reg = reg;
 		this.valid = valid;
 	}).methods({

@@ -1,7 +1,6 @@
 define(function(require, exports, module) {
 	var Rule = require('./Rule'),
 		LineSearch = require('../match/LineSearch'),
-		CharacterSet = require('../match/CharacterSet'),
 		LineParse = require('../match/LineParse'),
 		CompleteEqual = require('../match/CompleteEqual'),
 		RegMatch = require('../match/RegMatch'),
@@ -23,17 +22,8 @@ define(function(require, exports, module) {
 			self.addMatch(new LineParse(Token.STRING, "'", "'", false, Lexer.IS_REG));
 			self.addMatch(new LineParse(Token.TEMPLATE, '`', '`', true, Lexer.IS_REG));
 
-			self.addMatch(new CharacterSet(Token.ID, [
-				CharacterSet.LETTER,
-				CharacterSet.UNDERLINE,
-				CharacterSet.DOLLAR
-			], [
-				CharacterSet.LETTER,
-				CharacterSet.UNDERLINE,
-				CharacterSet.DOLLAR,
-				CharacterSet.DIGIT
-			], Lexer.SPECIAL, function() {
-				return !!(self.keyWords()[this.content()]);
+			self.addMatch(new RegMatch(Token.ID, /^[$a-zA-Z_][$\w]*/, Lexer.SPECIAL, function() {
+				return !!(self.keyWords().hasOwnProperty(this.content()));
 			}, function() {
 				return ['if', 'for', 'while'].indexOf(this.content()) != -1;
 			}));

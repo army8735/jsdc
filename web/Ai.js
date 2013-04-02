@@ -189,13 +189,17 @@ var require,
 		defQueue,
 		delayCount = 0,
 		delayQueue = [],
-		interactive = document.attachEvent && !window['opera'];
+		interactive = document.attachEvent && !window['opera'],
+		lock = {};
 
 	function isString(o) {
         return toString.call(o) == '[object String]';
 	}
 	function isFunction(o) {
         return toString.call(o) == '[object Function]';
+	}
+	function isUndefined(o) {
+		return typeof o === 'undefined';
 	}
 
 	/**
@@ -306,12 +310,15 @@ var require,
 								deps.push(m.exports);
 							}
 						});
+						deps.push(require);
+						deps.push(mod.exports);
+						deps.push(mod);
 					}
 					else
 						deps = [require, mod.exports, mod];
 					if(isFunction(mod.factory)) {
 						var ret = mod.factory.apply(null, deps);
-						mod.exports = ret === undefined ? mod.exports : ret;
+						mod.exports = isUndefined(ret) ? mod.exports : ret;
 					}
 					else {
 						mod.exports = mod.factory;
@@ -331,7 +338,7 @@ var require,
 				var mod = getMod(url),
 					d = mod.dependencies;
 				//尚未初始化的模块�?��循环依赖和统计依�?
-				if(mod.exports === undefined) {
+				if(isUndefined(mod.exports)) {
 					checkCyclic(mod, {}, []);
 					d.forEach(function(id) {
 						deps.push(lib[id] ? id : getAbsUrl(id, mod.uri));
@@ -454,7 +461,7 @@ var require,
 		return $$.path(url, depend);
 	}
 	//默认的require虚拟模块
-	require = function(id) {
+	require = function(id, cb, charset) {
 		if(arguments.length == 0) {
 			return lib;
 		}
@@ -470,10 +477,57 @@ var require,
 			});
 			return getMod(getAbsUrl(id, mod.uri)).exports;
 		}
-		else
-			use.apply(null, Array.prototype.slice.call(arguments));
+		else {
+			use(id, cb, charset);
+		}
 	};
+	//仅对构建调试工具有效，不自动打包进来模块
 	require.async = require;
+	//同步使用模块，之后使用的必须等到同步执行完成�?
+	require.sync = function(id, cb, charset) {
+		if(!Array.isArray(id)) {
+			id = [id];
+		}
+		id = id.map(function(id) {
+			return id.charAt(0) == '/' ? id.slice(1) : id;
+		});
+		function wrap() {
+			var first = true,
+				args = Array.prototype.slice.call(arguments, 0);
+			id.forEach(function(id) {
+				if(lock[id][0] != wrap) {
+					first = false;
+				}
+			});
+			if(first) {
+				wrap.execed = true;
+				cb.apply(null, args);
+				id.forEach(function(id) {
+					lock[id].shift();
+					if(lock[id].length) {
+						var w = lock[id][0];
+						if(w.execed) {
+							lock[id].shift();
+						}
+						else if(w.init && !w.execed) {
+							w.execed = true;
+							w.apply(null, w.args);
+							lock[id].shift();
+						}
+					}
+				});
+			}
+			else {
+				wrap.args = args;
+				wrap.init = true;
+			}
+		}
+		id.forEach(function(id) {
+			lock[id] = lock[id] || [];
+			lock[id].push(wrap);
+		});
+		require(id, wrap, charset);
+	};
 
 	define('require', require);
 	//exports和module

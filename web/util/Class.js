@@ -1,8 +1,3 @@
-/**
- * @url $URL: https://exp.svn.intra.tudou.com/svn/ui/trunk/module/Class.js $
- * @modified $Author: lxhao $
- * @version $Rev: 643 $
- */
 define(function(require, exports, module) {
 	function inheritPrototype(subType, superType) {
 		var prototype = Object.create(superType.prototype);
