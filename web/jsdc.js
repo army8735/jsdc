@@ -9,7 +9,6 @@ define(function(require, exports) {
 		node = null;
 	
 	function join(node, ignore) {
-		index = 0;
 		var isToken = node.name() == 'Token',
 			isVirtual = isToken && node.leaves().type() == Token.VIRTUAL,
 			res = '';
@@ -43,6 +42,7 @@ define(function(require, exports) {
 			}
 			return e.toString();
 		}
+		index = 0;
 		return character.escapeHTML(join(node, ignore));
 	};
 	exports.tree = function() {
