@@ -4,20 +4,25 @@ var Lexer = require('./lexer/Lexer'),
 	Parser = require('./parser/Parser'),
 	Node = require('./parser/Node'),
 	character = require('./util/character'),
-	node,
-	res = '';
+	index = 0,
+	node = null;
 
-function join(node) {
+function join(node, ignore) {
+	index = 0;
 	var isToken = node.name() == 'Token',
-		isVirtual = isToken && node.leaves().type() == Token.VIRTUAL;
+		isVirtual = isToken && node.leaves().type() == Token.VIRTUAL,
+		res = '';
 	if(isToken) {
 		if(!isVirtual) {
 			res += node.leaves().content();
+			while(ignore[++index]) {
+				res += ignore[index].content();
+			}
 		}
 	}
 	else {
 		node.leaves().forEach(function(leaf) {
-			join(leaf);
+			res += join(leaf, ignore, index);
 		});
 	}
 	return res;
@@ -27,16 +32,17 @@ exports.parse = function(code) {
 	var lexer = new Lexer(new EcmascriptRule());
 	lexer.parse(code);
 	var parser = new Parser(lexer);
+	var ignore = {};
 	try {
 		node = parser.program();
+		ignore = parser.ignore();
 	} catch(e) {
 		if(console) {
 			console.error(e);
 		}
-		node = null;
 		return e.toString();
 	}
-	return character.escapeHTML(join(node));
+	return character.escapeHTML(join(node, ignore));
 };
 exports.tree = function() {
 	return node;
