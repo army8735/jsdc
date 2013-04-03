@@ -31,7 +31,7 @@ define(function(require, exports) {
 		try {
 			node = parser.program();
 		} catch(e) {
-			if(console) {
+			if(window.console) {
 				console.error(e);
 			}
 			node = null;
