@@ -1092,7 +1092,7 @@ define(function(require, exports, module) {
 					}
 					//´æÏÂºöÂÔµÄtoken
 					if([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT].indexOf(this.look.type()) != -1) {
-						this.ignores[this.index] = this.look;
+						this.ignores[this.index - 1] = this.look;
 					}
 					//°üÀ¨line
 					if(line && this.look.type() == Token.LINE) {
