@@ -21,14 +21,14 @@ public class Transform {
 		File[] list = source.listFiles();
 		for(File f : list) {
 			if(f.isDirectory()) {
-				copy(f, target);
+				copy(f, target, false);
 			}
 			else if(f.getName().equals("jsdc.js")) {
-				copy(f, target);
+				copy(f, target, true);
 			}
 		}
 	}
-	public static void copy(File src, File targetRoot) {
+	public static void copy(File src, File targetRoot, boolean console) {
 		if(src.isDirectory()) {
 			File[] list = src.listFiles();
 			File target = new File(targetRoot, src.getName());
@@ -39,7 +39,7 @@ public class Transform {
 				throw new Error(target.toString() + " exists and is not a Directory.");
 			}
 			for(File f : list) {
-				copy(f, target);
+				copy(f, target, console);
 			}
 		}
 		else {
@@ -53,7 +53,12 @@ public class Transform {
 				while((s = br.readLine()) != null) {
 					if(i++ > 0) {
 						if(s.length() > 0) {
-							sb.append(s.substring(1));
+							if(console) {
+								sb.append(s.substring(1).replaceAll("window\\.console", "console"));
+							}
+							else {
+								sb.append(s.substring(1));
+							}
 						}
 						else {
 							sb.append(s);
