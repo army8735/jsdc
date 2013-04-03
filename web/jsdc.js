@@ -9,6 +9,7 @@ define(function(require, exports) {
 		node = null;
 	
 	function join(node, ignore) {
+		index = 0;
 		var isToken = node.name() == 'Token',
 			isVirtual = isToken && node.leaves().type() == Token.VIRTUAL,
 			res = '';
