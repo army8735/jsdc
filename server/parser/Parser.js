@@ -12,6 +12,7 @@ var Class = require('../util/Class'),
 		this.line = 1;
 		this.col = 1;
 		this.index = 0;
+		this.length = this.tokens.length;
 		this.inFor = false;
 		this.ignores = {};
 		if(this.tokens.length) {
@@ -83,7 +84,7 @@ var Class = require('../util/Class'),
 				break;
 				default:
 					if(this.look.type() == Token.ID) {
-						for(var i = 0, len = this.tokens.length; i < len; i++) {
+						for(var i = this.index; i < this.length; i++) {
 							var token = this.tokens[i];
 							if([Token.BLANK, Token.TAB, Token.COMMENT, Token.LINE, Token.ENTER].indexOf(token.type()) != -1) {
 								if(token.content() == ':') {
@@ -235,10 +236,11 @@ var Class = require('../util/Class'),
 							this.error();
 						}
 						var hasIn = false;
-						for(var i = 0, len = this.tokens.length; i < len; i++) {
+						for(var i = this.index; i < this.length; i++) {
 							var t = this.tokens[i];
 							if(t.content() == 'in') {
 								hasIn = true;
+								break;
 							}
 							else if(t.content() == ')') {
 								break;
@@ -1051,7 +1053,7 @@ var Class = require('../util/Class'),
 			//或者根据token的type或者content匹配
 			else if(typeof type == 'string') {
 				//特殊处理，不匹配有换行或者末尾时自动补全，还有受限行
-				if(type == ';' && !this.inFor && (this.look == null || (this.look.content() != type && this.hasMoveLine) || this.look.content() == '}' || this.look.type() == Token.LINE)) {
+				if(type == ';' && !this.inFor && (!this.look || (this.look.content() != type && this.hasMoveLine) || this.look.content() == '}' || this.look.type() == Token.LINE)) {
 					if(this.look && this.look.type() == Token.LINE) {
 						this.move();
 					}
@@ -1083,15 +1085,15 @@ var Class = require('../util/Class'),
 			//遗留下来的换行符
 			this.hasMoveLine = false;
 			do {
-				if(this.tokens.length == 0) {
-					this.look = null;
-					break;
+				this.look = this.tokens[this.index++];
+				if(!this.look) {
+					return;
 				}
-				this.look = this.tokens.shift();
 				//存下忽略的token
 				if([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT].indexOf(this.look.type()) != -1) {
 					this.ignores[this.index] = this.look;
 				}
+				//包括line
 				if(line && this.look.type() == Token.LINE) {
 					this.line++;
 					this.col = 1;
@@ -1124,9 +1126,11 @@ var Class = require('../util/Class'),
 				}
 				else {
 					this.col += this.look.content().length;
+					if([Token.BLANK, Token.TAB, Token.ENTER].indexOf(this.look.type()) == -1) {
+						break;
+					}
 				}
-				this.index++;
-			} while([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT].indexOf(this.look.type()) != -1);
+			} while(this.index <= this.length);
 		},
 		error: function(msg) {
 			msg = 'SyntaxError: ' + (msg || ' syntax error');
