@@ -48,7 +48,10 @@ function join(node, ignore) {
 		//记录作用域索引入栈并将默认参数赋值添加至此
 		else if(node.name() == Node.FNBODY) {
 			var i = res.lastIndexOf('{') + 1;
-			res = res.slice(0, i) + bind + res.slice(i);
+			if(bind.length) {
+				res = res.slice(0, i) + bind + res.slice(i);
+			}
+			bind = '';
 			env.push(i);
 		}
 		//检测block子节点是否有let或const
