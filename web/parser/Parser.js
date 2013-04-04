@@ -476,9 +476,9 @@ define(function(require, exports, module) {
 					this.match('(')
 				);
 				if(!this.look) {
-					this.error();
+					this.error('missing formal parameter');
 				}
-				if(this.look.type() == Token.ID) {
+				if(this.look.content() != ')') {
 					node.add(this.fnparams());
 				}
 				node.add(
@@ -493,7 +493,7 @@ define(function(require, exports, module) {
 				var node = new Node('fnexpr');
 				node.add(this.match('function'));
 				if(!this.look) {
-					this.error();
+					this.error('missing formal parameter');
 				}
 				if(this.look.type() == Token.ID) {
 					node.add(this.match());
@@ -502,7 +502,7 @@ define(function(require, exports, module) {
 				if(!this.look) {
 					this.error();
 				}
-				if(this.look.type() == Token.ID) {
+				if(this.look.content() != ')') {
 					node.add(this.fnparams());
 				}
 				node.add(
@@ -514,14 +514,22 @@ define(function(require, exports, module) {
 				return node;
 			},
 			fnparams: function() {
-				var node = new Node('fnparams');
+				var node = new Node(Node.FNPARAMS);
 				node.add(this.match(Token.ID, 'missing formal parameter'));
 				while(this.look && this.look.content() == ',') {
 					node.add(
-						this.match(','),
+						this.match(),
 						this.match(Token.ID, 'missing formal parameter')
 					);
+					if(this.look && this.look.content() == '=') {
+						node.add(this.bindelement());
+					}
 				}
+				return node;
+			},
+			bindelement: function() {
+				var node = new Node(Node.BINDELEMENT);
+				node.add(this.match('='), this.assignexpr());
 				return node;
 			},
 			fnbody: function() {
