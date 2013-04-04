@@ -38,6 +38,7 @@ var Class = require('../util/Class'),
 		ITERSTMT: 'iterstmt',
 		TOKEN: 'Token',
 		FNPARAMS: 'fnparams',
-		BINDELEMENT: 'bindelement'
+		BINDELEMENT: 'bindelement',
+		RESTPARAM: 'restparam'
 	});
 module.exports = Node;

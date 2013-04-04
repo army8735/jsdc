@@ -9,6 +9,8 @@ define(function(require, exports) {
 		temp,
 		bindId,
 		bind,
+		rest,
+		restLength,
 		preHash,
 		index,
 		res,
@@ -21,6 +23,8 @@ define(function(require, exports) {
 		env = [0];
 		temp = '';
 		bind = '';
+		rest = '';
+		restLength = 0;
 	}
 	function join(node, ignore) {
 		var isToken = node.name() == Node.TOKEN,
@@ -28,7 +32,8 @@ define(function(require, exports) {
 		if(isToken) {
 			if(!isVirtual) {
 				var token = node.leaves();
-				if(token.content() != 'var') {
+				//忽略var和...
+				if(token.content() != 'var' && token.content() != '...') {
 					if(token.content() == 'let' || token.content() == 'const') {
 						res += 'var';
 					}
@@ -46,14 +51,20 @@ define(function(require, exports) {
 			if(node.name() == Node.VARSTMT) {
 				preVar(node);
 			}
-			//记录作用域索引入栈并将默认参数赋值添加至此
+			//记录作用域索引入栈并将默认参数省略赋值添加至此
 			else if(node.name() == Node.FNBODY) {
 				var i = res.lastIndexOf('{') + 1;
+				env.push(i);
 				if(bind.length) {
 					res = res.slice(0, i) + bind + res.slice(i);
+					i += bind.length;
+					bind = '';
 				}
-				bind = '';
-				env.push(i);
+				if(rest.length) {
+					res = res.slice(0, i) + rest + ' = Array.prototype.slice.call(arguments, ' + restLength + ');' + res.slice(i);
+					rest = '';
+					restLenght = 0;
+				}
 			}
 			//检测block子节点是否有let或const
 			else if(node.name() == Node.BLOCK) {
@@ -71,9 +82,10 @@ define(function(require, exports) {
 					forstmt(true, res.length);
 				}
 			}
-			//记录fnparams里的默认赋值
+			//记录fnparams里的默认赋值和省略赋值
 			else if(node.name() == Node.FNPARAMS) {
 				bindelement(node);
+				restparam(node);
 			}
 			//默认赋值前缓存当前结果，之后互换
 			else if(node.name() == Node.BINDELEMENT) {
@@ -146,6 +158,18 @@ define(function(require, exports) {
 			if(leaves[i].name() == Node.BINDELEMENT) {
 				bindId.push(leaves[i - 1].leaves().content());
 				i += 2;
+			}
+		}
+	}
+	function restparam(node) {
+		var leaves = node.leaves(),
+			len = leaves.length;
+		if(leaves[len - 1].name() == Node.RESTPARAM) {
+			rest = leaves[len - 1].leaves()[1].leaves().content();
+			for(var i = 1; i < len - 1; i++) {
+				if(leaves[i].name() == Node.TOKEN && leaves[i].leaves().content() == character.COMMA) {
+					restLength++;
+				}
 			}
 		}
 	}

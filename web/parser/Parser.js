@@ -517,12 +517,21 @@ define(function(require, exports, module) {
 				var node = new Node(Node.FNPARAMS);
 				node.add(this.match(Token.ID, 'missing formal parameter'));
 				while(this.look && this.look.content() == ',') {
-					node.add(
-						this.match(),
-						this.match(Token.ID, 'missing formal parameter')
-					);
-					if(this.look && this.look.content() == '=') {
-						node.add(this.bindelement());
+					node.add(this.match());
+					if(!this.look) {
+						this.error('missing formal parameter');
+					}
+					if(this.look.type() == Token.ID) {
+						node.add(this.match());
+						if(this.look && this.look.content() == '=') {
+							node.add(this.bindelement());
+						}
+					}
+					else if(this.look.content() == '...') {
+						node.add(this.restparam());
+					}
+					else {
+						this.error('missing formal parameter');
 					}
 				}
 				return node;
@@ -530,6 +539,11 @@ define(function(require, exports, module) {
 			bindelement: function() {
 				var node = new Node(Node.BINDELEMENT);
 				node.add(this.match('='), this.assignexpr());
+				return node;
+			},
+			restparam: function() {
+				var node = new Node(Node.RESTPARAM);
+				node.add(this.match('...'), this.match(Token.ID));
 				return node;
 			},
 			fnbody: function() {

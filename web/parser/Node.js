@@ -39,7 +39,8 @@ define(function(require, exports, module) {
 			ITERSTMT: 'iterstmt',
 			TOKEN: 'Token',
 			FNPARAMS: 'fnparams',
-			BINDELEMENT: 'bindelement'
+			BINDELEMENT: 'bindelement',
+			RESTPARAM: 'restparam'
 		});
 	module.exports = Node;
 });
