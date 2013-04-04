@@ -7,6 +7,7 @@ var Class = require('../util/Class'),
 		else {
 			this.children = [];
 		}
+		return this;
 	}).methods({
 		name: function() {
 			return this.type;
@@ -25,6 +26,16 @@ var Class = require('../util/Class'),
 					self.children.push(node);
 				}
 			});
+			return self;
 		}
+	}).statics({
+		LETSTMT: 'letstmt',
+		LETDECL: 'letdecl',
+		VARSTMT: 'varstmt',
+		VARDECL: 'vardecl',
+		FNBODY: 'fnbody',
+		BLOCK: 'block',
+		ITERSTMT: 'iterstmt',
+		TOKEN: 'Token'
 	});
 module.exports = Node;

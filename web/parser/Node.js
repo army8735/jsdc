@@ -8,6 +8,7 @@ define(function(require, exports, module) {
 			else {
 				this.children = [];
 			}
+			return this;
 		}).methods({
 			name: function() {
 				return this.type;
@@ -26,7 +27,17 @@ define(function(require, exports, module) {
 						self.children.push(node);
 					}
 				});
+				return self;
 			}
+		}).statics({
+			LETSTMT: 'letstmt',
+			LETDECL: 'letdecl',
+			VARSTMT: 'varstmt',
+			VARDECL: 'vardecl',
+			FNBODY: 'fnbody',
+			BLOCK: 'block',
+			ITERSTMT: 'iterstmt',
+			TOKEN: 'Token'
 		});
 	module.exports = Node;
 });

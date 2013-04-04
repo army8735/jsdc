@@ -48,17 +48,20 @@ textarea:hover{opacity:0.8;}
 <input id="btn" type="button" value="ok"/><pre><code class="brush:js">var a = 1, b, c = 2
 {a=2}
 b = 3/*
-*/function test(a){a;
+*/function test(a){
 	switch(a) {
 		case 1:
 		break;
 		default:
+			var d
 	}
 	return
 	a
 }
 a = function(a, b){
 	with(a) {
+		let c
+		console.log(c);
 	};
 	return 1;
 };
@@ -68,16 +71,18 @@ try {} catch(e) {
 debugger;
 if(a > b){}
 else if(true){
-	/test/.test('test');
+	/test/.test('test')
 }
-else {}
+else {
+	let a = {}
+}
 do {
 	var a = [1, 2, 3];
 } while(true);
 for(var i = 0, len = 10; i < len; i++) {
 	[].push(i);break;
 }
-for(var i in { a: 1, get x() {}, set y(t) {} }) {
+for(let i in { a: 1, get x() {}, set y(t) {} }) {
 	console.log(i);continue;
 }var a = 1</code></pre>
 <script src="Ai.js"></script>

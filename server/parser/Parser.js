@@ -41,6 +41,8 @@ var Class = require('../util/Class'),
 				this.error();
 			}
 			switch(this.look.content()) {
+				case 'let':
+					return this.letstmt();
 				case 'var':
 					return this.varstmt();
 				break;
@@ -97,8 +99,37 @@ var Class = require('../util/Class'),
 			}
 			return node;
 		},
+		letstmt: function(noSem) {
+			var node = new Node(Node.LETSTMT);
+			node.add(
+				this.match('let'),
+				this.letdecls()
+			);
+			if(!noSem) {
+				node.add(this.match(';'));
+			}
+			return node;
+		},
+		letdecl: function() {
+			var node = new Node(Node.LETDECL);
+			node.add(this.match(Token.ID, 'missing variable name'));
+			if(this.look && this.look.content() == '=') {
+				node.add(this.assign());
+			}
+			return node;
+		},
+		letdecls: function() {
+			var res = [this.letdecl()];
+			while(this.look && this.look.content() == ',') {
+				res.push(
+					this.match(),
+					this.letdecl()
+				);
+			}
+			return res;
+		},
 		varstmt: function(noSem) {
-			var node = new Node('varstmt');
+			var node = new Node(Node.VARSTMT);
 			node.add(
 				this.match('var'),
 				this.vardecls()
@@ -109,7 +140,7 @@ var Class = require('../util/Class'),
 			return node;
 		},
 		vardecl: function() {
-			var node = new Node('vardecl');
+			var node = new Node(Node.VARDECL);
 			node.add(this.match(Token.ID, 'missing variable name'));
 			if(this.look && this.look.content() == '=') {
 				node.add(this.assign());
@@ -136,7 +167,7 @@ var Class = require('../util/Class'),
 			return node;
 		},
 		block: function() {
-			var node = new Node('block');
+			var node = new Node(Node.BLOCK);
 			node.add(this.match('{'));
 			while(this.look && this.look.content() != '}') {
 				node.add(this.stmt());
@@ -167,7 +198,7 @@ var Class = require('../util/Class'),
 			return node;
 		},
 		iterstmt: function() {
-			var node = new Node('iterstmt');
+			var node = new Node(Node.ITERSTMT);
 			if(!this.look) {
 				this.error();
 			}
@@ -201,8 +232,8 @@ var Class = require('../util/Class'),
 					if(!this.look) {
 						this.error();
 					}
-					if(this.look.content() == 'var') {
-						var node2 = this.varstmt(true);
+					if(this.look.content() == 'var' || this.look.content() == 'let') {
+						var node2 = this.look.content() == 'var' ? this.varstmt(true) : this.letstmt(true);
 						if(!this.look) {
 							this.error('missing ; after for-loop initializer');
 						}
@@ -490,7 +521,7 @@ var Class = require('../util/Class'),
 			return node;
 		},
 		fnbody: function() {
-			var node = new Node('fnbody');
+			var node = new Node(Node.FNBODY);
 			while(this.look && this.look.content() != '}') {
 				node.add(this.element());
 			}
@@ -1044,7 +1075,7 @@ var Class = require('../util/Class'),
 				if(this.look) {
 					var l = this.look;
 					this.move(line);
-					return new Node('Token', l);
+					return new Node(Node.TOKEN, l);
 				}
 				else {
 					this.error('syntax error' + (msg || ''));
@@ -1057,12 +1088,12 @@ var Class = require('../util/Class'),
 					if(this.look && this.look.type() == Token.LINE) {
 						this.move();
 					}
-					return new Node('Token', new Token(Token.VIRTUAL, ';'));
+					return new Node(Node.TOKEN, new Token(Token.VIRTUAL, ';'));
 				}
 				else if(this.look && this.look.content() == type) {
 					var l = this.look;
 					this.move(line);
-					return new Node('Token', l);
+					return new Node(Node.TOKEN, l);
 				}
 				else {
 					this.error('missing ' + type + (msg || ''));
@@ -1072,7 +1103,7 @@ var Class = require('../util/Class'),
 				if(this.look && this.look.type() == type) {
 					var l = this.look;
 					this.move(line);
-					return new Node('Token', l);
+					return new Node(Node.TOKEN, l);
 				}
 				else {
 					this.error('missing ' + Token.type(type) + (msg || ''));
