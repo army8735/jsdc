@@ -43,6 +43,8 @@ var Class = require('../util/Class'),
 			switch(this.look.content()) {
 				case 'let':
 					return this.letstmt();
+				case 'const':
+					return this.cststmt();
 				case 'var':
 					return this.varstmt();
 				break;
@@ -99,41 +101,52 @@ var Class = require('../util/Class'),
 			}
 			return node;
 		},
-		letstmt: function(noSem) {
-			var node = new Node(Node.LETSTMT);
+		cststmt: function(noSem) {
+			var node = new Node(Node.CSTSTMT);
 			node.add(
-				this.match('let'),
-				this.letdecls()
+				this.match('const'),
+				this.vardecl()
 			);
+			while(this.look && this.look.content() == ',') {
+				node.add(
+					this.match(),
+					this.vardecl()
+				);
+			}
 			if(!noSem) {
 				node.add(this.match(';'));
 			}
 			return node;
 		},
-		letdecl: function() {
-			var node = new Node(Node.LETDECL);
-			node.add(this.match(Token.ID, 'missing variable name'));
-			if(this.look && this.look.content() == '=') {
-				node.add(this.assign());
-			}
-			return node;
-		},
-		letdecls: function() {
-			var res = [this.letdecl()];
+		letstmt: function(noSem) {
+			var node = new Node(Node.LETSTMT);
+			node.add(
+				this.match('let'),
+				this.vardecl()
+			);
 			while(this.look && this.look.content() == ',') {
-				res.push(
+				node.add(
 					this.match(),
-					this.letdecl()
+					this.vardecl()
 				);
 			}
-			return res;
+			if(!noSem) {
+				node.add(this.match(';'));
+			}
+			return node;
 		},
 		varstmt: function(noSem) {
 			var node = new Node(Node.VARSTMT);
 			node.add(
 				this.match('var'),
-				this.vardecls()
+				this.vardecl()
 			);
+			while(this.look && this.look.content() == ',') {
+				node.add(
+					this.match(),
+					this.vardecl()
+				);
+			}
 			if(!noSem) {
 				node.add(this.match(';'));
 			}
@@ -146,16 +159,6 @@ var Class = require('../util/Class'),
 				node.add(this.assign());
 			}
 			return node;
-		},
-		vardecls: function() {
-			var res = [this.vardecl()];
-			while(this.look && this.look.content() == ',') {
-				res.push(
-					this.match(),
-					this.vardecl()
-				);
-			}
-			return res;
 		},
 		assign: function() {
 			var node = new Node('assign');

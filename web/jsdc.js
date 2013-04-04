@@ -24,7 +24,7 @@ define(function(require, exports) {
 			if(!isVirtual) {
 				var token = node.leaves();
 				if(token.content() != 'var') {
-					if(token.content() == 'let') {
+					if(token.content() == 'let' || token.content() == 'const') {
 						res += 'var';
 					}
 					else {
@@ -37,11 +37,12 @@ define(function(require, exports) {
 			}
 		}
 		else {
-			if(node.name() == Node.VARDECL) {
+			if(node.name() == Node.VARSTMT) {
 				preVar(node);
 			}
 			else if(node.name() == Node.FNBODY) {
-				env.push(res.length);
+				var i = res.lastIndexOf('{');
+				env.push(i + 1);
 			}
 			else if(node.name() == Node.BLOCK) {
 				var blockHasLet = false;
@@ -74,17 +75,19 @@ define(function(require, exports) {
 			}
 		}
 	}
-	function preVar(vardecl) {
-		var vn = vardecl.leaves()[0].leaves().content(),
-			index = env[env.length - 1];
+	function preVar(varstmt) {
+		var index = env[env.length - 1];
 		preHash[index] = preHash[index] || {};
-		if(preHash[index][vn]) {
-			return;
+		for(var i = 1, len = varstmt.leaves().length; i < len; i += 2) {
+			var vn = varstmt.leaves()[i].leaves()[0].leaves().content();
+			if(preHash[index][vn]) {
+				return;
+			}
+			preHash[index][vn] = true;
+			var prefix = res.slice(0, index),
+				suffix = res.slice(index);
+			res = prefix + 'var ' + vn + ';' + suffix;
 		}
-		preHash[index][vn] = true;
-		var prefix = res.slice(0, index),
-			suffix = res.slice(index);
-		res = prefix + 'var ' + vn + ';' + suffix;
 	}
 	function block(startOrEnd, index) {
 		var prefix = res.slice(0, index),

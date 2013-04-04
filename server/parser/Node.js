@@ -29,8 +29,8 @@ var Class = require('../util/Class'),
 			return self;
 		}
 	}).statics({
+		CSTSTMT: 'cststmt',
 		LETSTMT: 'letstmt',
-		LETDECL: 'letdecl',
 		VARSTMT: 'varstmt',
 		VARDECL: 'vardecl',
 		FNBODY: 'fnbody',

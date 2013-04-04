@@ -30,8 +30,8 @@ define(function(require, exports, module) {
 				return self;
 			}
 		}).statics({
+			CSTSTMT: 'cststmt',
 			LETSTMT: 'letstmt',
-			LETDECL: 'letdecl',
 			VARSTMT: 'varstmt',
 			VARDECL: 'vardecl',
 			FNBODY: 'fnbody',
