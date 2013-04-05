@@ -293,8 +293,13 @@ function superstmt(startOrEnd, node) {
 			first = true;
 		while(nowClass.supernum-- > 0) {
 			if(first) {
-				suffix = suffix.replace('super', nowClass.heritage + '.prototype');
-				first = false;
+				if(nowClass.supernum == 0) {
+					suffix = suffix.replace('super', nowClass.heritage);
+				}
+				else {
+					suffix = suffix.replace('super', nowClass.heritage + '.prototype');
+					first = false;
+				}
 			}
 			else {
 				suffix = suffix.replace('super', 'constructor.prototype');
