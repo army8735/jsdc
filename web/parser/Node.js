@@ -28,6 +28,9 @@ define(function(require, exports, module) {
 					}
 				});
 				return self;
+			},
+			token: function() {
+				return this.children;
 			}
 		}).statics({
 			CSTSTMT: 'cststmt',
@@ -40,7 +43,14 @@ define(function(require, exports, module) {
 			TOKEN: 'Token',
 			FNPARAMS: 'fnparams',
 			BINDELEMENT: 'bindelement',
-			RESTPARAM: 'restparam'
+			RESTPARAM: 'restparam',
+			EXPR: 'expr',
+			CLASSDECL: 'classdecl',
+			CLASSTAIL: 'classtail',
+			HERITAGE: 'heritage',
+			CLASSBODY: 'classbody',
+			METHOD: 'method',
+			SUPERSTMT: 'superstmt'
 		});
 	module.exports = Node;
 });

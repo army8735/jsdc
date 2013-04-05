@@ -46,7 +46,6 @@ textarea:hover{opacity:0.8;}
 <body>
 <textarea id="ta" autocomplete="off"></textarea>
 <input id="btn" type="button" value="ok"/><pre><code class="brush:js">var a = 1, b, c = 2
-{a=2}
 b = 3/*
 */function test(a, b, c, ...args){
 	switch(a) {
@@ -65,6 +64,32 @@ a = function(a, b = 0, c = 1){
 	}
 	return 1;
 };
+class Monster {
+	hurt(n) {
+		this.health -= n
+	}
+	constructor(name, health) {
+		this.name = name;
+		this.health = health;
+	}
+	static TYPE() {
+		return 'enemy'
+	}
+}
+class Goblin extends Monster {
+	constructor(color) {
+		this.color = color;
+		super('goblin', 100);
+	}
+}
+class GoblinLeader extends Goblin {
+	constructor() {
+		super('red');
+	}
+	hurt(n) {
+		super.super.hurt(n >> 1)
+	}
+}
 try {} catch(e) {
 	throw new Error(1);
 }
@@ -83,9 +108,6 @@ do {
 } while(true);
 for(var i = 0, len = 10; i < len; i++) {
 	[].push(i);break;
-}
-for(let i in { a: 1, get x() {}, set y(t) {} }) {
-	console.log(i);continue;
 }</code></pre>
 <script src="Ai.js"></script>
 <script src="kinetic-v4.4.0.min.js"></script>
@@ -119,7 +141,7 @@ function drawNode(layer, node, x, index, parent, sibling) {
 		text = new Kinetic.Text({
 			x: x + 5,
 			y: h + 6,
-			text: isToken ? node.leaves().content() : node.name(),
+			text: isToken ? node.token().content() : node.name(),
 			width: 68,
 			height: 16,
 			align: 'center',

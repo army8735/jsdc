@@ -28,15 +28,18 @@ define(function(require, exports, module) {
 				}
 				return node;
 			},
-			element: function() {
+			element: function(allowSuper) {
 				if(this.look.content() == 'function') {
 					return this.fndecl();
 				}
+				else if(this.look.content() == 'class') {
+					return this.classdecl();
+				}
 				else {
-					return this.stmt();
+					return this.stmt(allowSuper);
 				}
 			},
-			stmt: function() {
+			stmt: function(allowSuper) {
 				var node = new Node('stmt');
 				if(!this.look) {
 					this.error();
@@ -87,6 +90,11 @@ define(function(require, exports, module) {
 					case 'debugger':
 						return this.debstmt();
 					break;
+					case 'super':
+						if(!allowSuper) {
+							this.error('super must in a class');
+						}
+						return this.superstmt();
 					default:
 						if(this.look.type() == Token.ID) {
 							for(var i = this.index; i < this.length; i++) {
@@ -468,6 +476,38 @@ define(function(require, exports, module) {
 				);
 				return node;
 			},
+			superstmt: function() {
+				var node = new Node(Node.SUPERSTMT);
+				node.add(this.match());
+				if(!this.look) {
+					this.error();
+				}
+				if(this.look.content() == '.') {
+					while(this.look && this.look.content() == '.') {
+						node.add(this.match());
+						if(!this.look) {
+							this.error();
+						}
+						if(this.look.content() == 'super') {
+							node.add(this.match());
+						}
+						else {
+							break;
+						}
+					}
+					if(this.look.content() != '(') {
+						node.add(this.match(Token.ID));
+						while(this.look && this.look.content() == '.') {
+							node.add(this.match(), this.match(Token.ID));
+						}
+					}
+				}
+				node.add(
+					this.args(),
+					this.match(';')
+				);
+				return node;
+			},
 			fndecl: function() {
 				var node = new Node('fndecl');
 				node.add(
@@ -546,15 +586,77 @@ define(function(require, exports, module) {
 				node.add(this.match('...'), this.match(Token.ID));
 				return node;
 			},
-			fnbody: function() {
+			fnbody: function(allowSuper) {
 				var node = new Node(Node.FNBODY);
 				while(this.look && this.look.content() != '}') {
-					node.add(this.element());
+					node.add(this.element(allowSuper));
 				}
 				return node;
 			},
+			classdecl: function() {
+				var node = new Node(Node.CLASSDECL);
+				node.add(this.match('class'), this.match(Token.ID));
+				if(!this.look) {
+					this.error();
+				}
+				if(this.look.content() == 'extends') {
+					node.add(this.heratige());
+				}
+				node.add(
+					this.match('{'),
+					this.classbody(),
+					this.match('}')
+				);
+				return node;
+			},
+			heratige: function() {
+				var node = new Node(Node.HERITAGE);
+				node.add(this.match('extends'), this.match(Token.ID));
+				return node;
+			},
+			classbody: function() {
+				var node = new Node(Node.CLASSBODY),
+					methods = {},
+					hasStatic = false;
+				while(this.look && this.look.content() != '}') {
+					if(this.look.content() == ';') {
+						node.add(this.match());
+						continue;
+					}
+					hasStatic = false;
+					if(this.look.content() == 'static') {
+						node.add(this.match());
+						hasStatic = true;
+					}
+					if(!this.look) {
+						this.error();
+					}
+					node.add(this.method(hasStatic, methods));
+				}
+				return node;
+			},
+			method: function(hasStatic, methods, statics) {
+				var node = new Node(Node.METHOD);
+				node.add(this.match(Token.ID));
+				var id = node.leaves()[0].token().content();
+				if(methods.hasOwnProperty(id)) {
+					this.error('duplicate method decl in class');
+				}
+				methods[id] = true;
+				node.add(this.match('('));
+				if(this.look.content() != ')') {
+					node.add(this.fnparams());
+				}
+				node.add(
+					this.match(')'),
+					this.match('{'),
+					this.fnbody(true),
+					this.match('}', 'missing } in compound statement')
+				);
+				return node;
+			},
 			expr: function(noIn) {
-				var node = new Node('expr'),
+				var node = new Node(Node.EXPR),
 					assignexpr = this.assignexpr(noIn);
 				if(this.look && this.look.content() == ',') {
 					node.add(assignexpr);
