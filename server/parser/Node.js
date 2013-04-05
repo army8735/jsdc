@@ -27,6 +27,9 @@ var Class = require('../util/Class'),
 				}
 			});
 			return self;
+		},
+		token: function() {
+			return this.children;
 		}
 	}).statics({
 		CSTSTMT: 'cststmt',
@@ -39,6 +42,13 @@ var Class = require('../util/Class'),
 		TOKEN: 'Token',
 		FNPARAMS: 'fnparams',
 		BINDELEMENT: 'bindelement',
-		RESTPARAM: 'restparam'
+		RESTPARAM: 'restparam',
+		EXPR: 'expr',
+		CLASSDECL: 'classdecl',
+		CLASSTAIL: 'classtail',
+		HERITAGE: 'heritage',
+		CLASSBODY: 'classbody',
+		METHOD: 'method',
+		SUPERSTMT: 'superstmt'
 	});
 module.exports = Node;
