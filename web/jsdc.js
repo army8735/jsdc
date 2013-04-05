@@ -292,18 +292,18 @@ define(function(require, exports) {
 			var prefix = res.slice(0, nowClass.superstart),
 				suffix = res.slice(nowClass.superstart),
 				first = true;
-			while(nowClass.supernum-- > 0) {
-				if(first) {
-					if(nowClass.supernum == 0) {
-						suffix = suffix.replace('super', nowClass.heritage);
-					}
-					else {
+			if(nowClass.isCon) {
+				suffix = suffix.replace('super', nowClass.heritage);
+			}
+			else {
+				while(nowClass.supernum-- > 0) {
+					if(first) {
 						suffix = suffix.replace('super', nowClass.heritage + '.prototype');
 						first = false;
 					}
-				}
-				else {
-					suffix = suffix.replace('super', 'constructor.prototype');
+					else {
+						suffix = suffix.replace('super', 'constructor.prototype');
+					}
 				}
 			}
 			var i = suffix.indexOf('('),
