@@ -70,8 +70,8 @@ define(function(require, exports) {
 			else if(node.name() == Node.BLOCK) {
 				var blockHasLet = false;
 				node.leaves().forEach(function(leaf) {
-					if(!blockHasLet && leaf.name() == (Node.LETSTMT || leaf.name() == Node.CSTSTMT)) {
-						hasLet = true;
+					if(!blockHasLet && (leaf.name() == Node.LETSTMT || leaf.name() == Node.CSTSTMT)) {
+						blockHasLet = true;
 					}
 				});
 			}
@@ -94,7 +94,7 @@ define(function(require, exports) {
 			//递归子节点
 			node.leaves().forEach(function(leaf, i) {
 				if(blockHasLet && i == 1) {
-					block(true, res.length);
+					block(true);
 				}
 				join(leaf, ignore, index);
 			});
@@ -104,7 +104,7 @@ define(function(require, exports) {
 			}
 			//block结束后如有let和const需用匿名function包裹模拟块级作用域
 			else if(node.name() == Node.BLOCK && blockHasLet) {
-				block(false, res.length - 1);
+				block(false);
 			}
 			//for结束后如有let也需包裹模拟
 			else if(node.name() == Node.ITERSTMT && forHasLet) {
@@ -132,8 +132,9 @@ define(function(require, exports) {
 			res = prefix + 'var ' + vn + ';' + suffix;
 		}
 	}
-	function block(startOrEnd, index) {
-		var prefix = res.slice(0, index),
+	function block(startOrEnd) {
+		var index = startOrEnd ? res.lastIndexOf('{') + 1 : res.lastIndexOf('}');
+			prefix = res.slice(0, index),
 			suffix = res.slice(index);
 		if(startOrEnd) {
 			res = prefix + '(function() {' + suffix;
@@ -177,8 +178,8 @@ define(function(require, exports) {
 	exports.parse = function(code) {
 		var lexer = new Lexer(new EcmascriptRule());
 		lexer.parse(code);
-		var parser = new Parser(lexer);
-		var ignore = {};
+		var parser = new Parser(lexer),
+			ignore = {};
 		try {
 			node = parser.program();
 			ignore = parser.ignore();

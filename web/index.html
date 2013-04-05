@@ -79,14 +79,14 @@ else {
 	let a = {}
 }
 do {
-	var a = [1, 2, 3];
+	let a = [1, 2, 3];
 } while(true);
 for(var i = 0, len = 10; i < len; i++) {
 	[].push(i);break;
 }
 for(let i in { a: 1, get x() {}, set y(t) {} }) {
 	console.log(i);continue;
-}var a = 1</code></pre>
+}</code></pre>
 <script src="Ai.js"></script>
 <script src="kinetic-v4.4.0.min.js"></script>
 <script>
