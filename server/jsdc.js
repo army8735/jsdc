@@ -291,18 +291,18 @@ function superstmt(startOrEnd, node) {
 		var prefix = res.slice(0, nowClass.superstart),
 			suffix = res.slice(nowClass.superstart),
 			first = true;
-		if(nowClass.isCon) {
-			suffix = suffix.replace('super', nowClass.heritage);
-		}
-		else {
-			while(nowClass.supernum-- > 0) {
-				if(first) {
+		while(nowClass.supernum-- > 0) {
+			if(first) {
+				if(nowClass.supernum == 0 && nowClass.isCon) {
+					suffix = suffix.replace('super', nowClass.heritage);
+				}
+				else {
 					suffix = suffix.replace('super', nowClass.heritage + '.prototype');
 					first = false;
 				}
-				else {
-					suffix = suffix.replace('super', 'constructor.prototype');
-				}
+			}
+			else {
+				suffix = suffix.replace('super', 'constructor.prototype');
 			}
 		}
 		var i = suffix.indexOf('('),
