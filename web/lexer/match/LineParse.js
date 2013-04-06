@@ -15,7 +15,7 @@ define(function(require, exports, module) {
 		}).methods({
 			match: function(c, code, index) {
 				this.msg = null;
-				if(this.begin == code.substr(index - 1, this.begin.length)) {
+				if(this.begin == code.charAt(index - 1)) {
 					var len = code.length,
 						lastIndex = index - 1,
 						res = false;
