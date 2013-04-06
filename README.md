@@ -1,6 +1,10 @@
 ##transform ecmascript6 to ecmascript5
 
-web目录下为书写符合AMD/CMD规范的js文件；server目录下为nodejs环境的module模块；java目录为性能考虑后续提供的java版本。
+web目录下为书写符合AMD/CMD规范的js文件；
+server目录下为nodejs环境的module模块；
+java目录为性能考虑后续提供的java版本。
+
+如果想直接用npm安装，请执行npm install jsdc
 
 语法转换规则参见wiki：https://github.com/army8735/jsdc/wiki/%E8%AF%AD%E6%B3%95%E8%BD%AC%E6%8D%A2%E8%A7%84%E5%88%99
 
