@@ -1,4 +1,4 @@
-transform ecmascript6 to ecmascript5
+#transform ecmascript6 to ecmascript5
 
 web目录下为书写符合AMD/CMD规范的js文件；server目录下为nodejs环境的module模块；java目录为性能考虑后续提供的java版本。
 
