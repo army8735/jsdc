@@ -22,7 +22,7 @@ define(function(require, exports, module) {
 			this.hasMoveLine = false;
 		}).methods({
 			program: function() {
-				var node = new Node('program');
+				var node = new Node(Node.PROGRAM);
 				while(this.look) {
 					node.add(this.element());
 				}
@@ -40,7 +40,7 @@ define(function(require, exports, module) {
 				}
 			},
 			stmt: function(allowSuper) {
-				var node = new Node('stmt');
+				var node = new Node(Node.STMT);
 				if(!this.look) {
 					this.error();
 				}
@@ -170,7 +170,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			assign: function() {
-				var node = new Node('assign');
+				var node = new Node(Node.ASSIGN);
 				node.add(this.match('='));
 				if(!this.look) {
 					this.error();
@@ -188,12 +188,12 @@ define(function(require, exports, module) {
 				return node;
 			},
 			emptstmt: function() {
-				var node = new Node('emptstmt');
+				var node = new Node(Node.EMPTSTMT);
 				node.add(this.match(';'));
 				return node;
 			},
 			ifstmt: function() {
-				var node = new Node('ifstmt');
+				var node = new Node(Node.IFSTMT);
 				node.add(
 					this.match('if'),
 					this.match('('),
@@ -322,7 +322,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			cntnstmt: function() {
-				var node = new Node('cntnstmt');
+				var node = new Node(Node.CNTNSTMT);
 				node.add(this.match('continue', true));
 				if(this.look && this.look.type() == Token.ID) {
 					node.add(this.match());
@@ -331,7 +331,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			brkstmt: function() {
-				var node = new Node('brkstmt');
+				var node = new Node(Node.BRKSTMT);
 				node.add(this.match('break', true));
 				if(this.look && this.look.type() == Token.ID) {
 					node.add(this.match());
@@ -340,7 +340,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			retstmt: function() {
-				var node = new Node('retstmt');
+				var node = new Node(Node.RETSTMT);
 				node.add(this.match('return', true));
 				if(this.look) {
 					if(this.look.content() == ';' || this.look.type() == Token.LINE) {
@@ -356,7 +356,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			withstmt: function() {
-				var node = new Node('withstmt');
+				var node = new Node(Node.WITHSTMT);
 				node.add(
 					this.match('with'),
 					this.match('('),
@@ -367,7 +367,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			swchstmt: function() {
-				var node = new Node('swchstmt');
+				var node = new Node(Node.SWCHSTMT);
 				node.add(
 					this.match('switch'),
 					this.match('('),
@@ -378,7 +378,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			caseblock: function() {
-				var node = new Node('caseblock');
+				var node = new Node(Node.CASEBLOCK);
 				node.add(this.match('{'));
 				while(this.look && this.look.content() != '}') {
 					if(this.look.content() == 'case') {
@@ -395,7 +395,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			caseclause: function() {
-				var node = new Node('caseclause');
+				var node = new Node(Node.CASECLAUSE);
 				node.add(
 					this.match('case'),
 					this.expr(),
@@ -407,7 +407,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			dftclause: function() {
-				var node = new Node('dftclause');
+				var node = new Node(Node.DFTCLAUSE);
 				node.add(
 					this.match('default'),
 					this.match(':')
@@ -418,7 +418,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			labstmt: function() {
-				var node = new Node('labstmt');
+				var node = new Node(Node.LABSTMT);
 				node.add(
 					this.match(Token.ID),
 					this.match(':'),
@@ -427,7 +427,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			thrstmt: function() {
-				var node = new Node('thrstmt');
+				var node = new Node(Node.THRSTMT);
 				node.add(
 					this.match('throw', true),
 					this.expr(),
@@ -436,7 +436,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			trystmt: function() {
-				var node = new Node('trystmt');
+				var node = new Node(Node.TRYSTMT);
 				node.add(
 					this.match('try'),
 					this.block()
@@ -453,12 +453,12 @@ define(function(require, exports, module) {
 				return node;
 			},
 			debstmt: function() {
-				var node = new Node('debstmt');
+				var node = new Node(Node.DEBSTMT);
 				node.add(this.match('debugger'), this.match(';'));
 				return node;
 			},
 			cach: function() {
-				var node = new Node('cach');
+				var node = new Node(Node.CACH);
 				node.add(
 					this.match('catch'),
 					this.match('('),
@@ -469,7 +469,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			finl: function() {
-				var node = new Node('finl');
+				var node = new Node(Node.FINL);
 				node.add(
 					this.match('finally'),
 					this.block()
@@ -509,7 +509,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			fndecl: function() {
-				var node = new Node('fndecl');
+				var node = new Node(Node.FNDECL);
 				node.add(
 					this.match('function'),
 					this.match(Token.ID, 'function statement requires a name'),
@@ -530,7 +530,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			fnexpr: function() {
-				var node = new Node('fnexpr');
+				var node = new Node(Node.FNEXPR);
 				node.add(this.match('function'));
 				if(!this.look) {
 					this.error('missing formal parameter');
@@ -670,7 +670,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			assignexpr: function(noIn) {
-				var node = new Node('assignexpr'),
+				var node = new Node(Node.ASSIGNEXPR),
 					cndt = this.cndtexpr(noIn);
 				if(this.look && ['*=', '/=', '%=', '+=', '-=', '<<=', '>>=', '>>>=', '&=', '^=', '|=', '='].indexOf(this.look.content()) != -1) {
 					node.add(cndt, this.match(), this.assignexpr(noIn));
@@ -681,7 +681,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			cndtexpr: function(noIn) {
-				var node = new Node('cndtexpr'),
+				var node = new Node(Node.CNDTEXPR),
 					logorexpr = this.logorexpr(noIn);
 				if(this.look && this.look.content() == '?') {
 					node.add(
@@ -698,7 +698,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			logorexpr: function(noIn) {
-				var node = new Node('logorexpr'),
+				var node = new Node(Node.LOGOREXPR),
 					logandexpr = this.logandexpr(noIn);
 				if(this.look && this.look.content() == '||') {
 					node.add(logandexpr);
@@ -715,7 +715,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			logandexpr: function(noIn) {
-				var node = new Node('logandexpr'),
+				var node = new Node(Node.LOGANDEXPR),
 					bitorexpr = this.bitorexpr(noIn);
 				if(this.look && this.look.content() == '&&') {
 					node.add(bitorexpr);
@@ -732,7 +732,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			bitorexpr: function(noIn) {
-				var node = new Node('bitorexpr'),
+				var node = new Node(Node.BITOREXPR),
 					bitxorexpr = this.bitxorexpr(noIn);
 				if(this.look && this.look.content() == '|') {
 					node.add(bitxorexpr);
@@ -749,7 +749,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			bitxorexpr: function(noIn) {
-				var node = new Node('bitxorexpr'),
+				var node = new Node(Node.BITXOREXPR),
 					bitandexpr = this.bitandexpr(noIn);
 				if(this.look && this.look.content() == '^') {
 					node.add(bitandexpr);
@@ -766,7 +766,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			bitandexpr: function(noIn) {
-				var node = new Node('bitandexpr'),
+				var node = new Node(Node.BITANDEXPR),
 					eqexpr = this.eqexpr(noIn);
 				if(this.look && this.look.content() == '&') {
 					node.add(eqexpr);
@@ -783,7 +783,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			eqexpr: function(noIn) {
-				var node = new Node('eqexpr'),
+				var node = new Node(Node.EQEXPR),
 					reltexpr = this.reltexpr(noIn);
 				if(this.look && ['==', '===', '!==', '!='].indexOf(this.look.content()) != -1) {
 					node.add(reltexpr);
@@ -800,7 +800,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			reltexpr: function(noIn) {
-				var node = new Node('reltexpr'),
+				var node = new Node(Node.RELTEXPR),
 					shiftexpr = this.shiftexpr();
 				if(this.look && (['<', '>', '>=', '<=', 'instanceof'].indexOf(this.look.content()) != -1 || (!noIn && this.look.content() == 'in'))) {
 					node.add(shiftexpr);
@@ -817,7 +817,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			shiftexpr: function() {
-				var node = new Node('shiftexpr'),
+				var node = new Node(Node.SHIFTEXPR),
 					addexpr = this.addexpr();
 				if(this.look && ['<<', '>>', '>>>'].indexOf(this.look.content()) != -1) {
 					node.add(addexpr);
@@ -834,7 +834,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			addexpr: function() {
-				var node = new Node('addexpr'),
+				var node = new Node(Node.ADDEXPR),
 					mtplexpr = this.mtplexpr();
 				if(this.look && ['+', '-'].indexOf(this.look.content()) != -1) {
 					node.add(mtplexpr);
@@ -851,7 +851,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			mtplexpr: function() {
-				var node = new Node('mtplexpr'),
+				var node = new Node(Node.MTPLEXPR),
 					unaryexpr = this.unaryexpr();
 				if(this.look && ['*', '/', '%'].indexOf(this.look.content()) != -1) {
 					node.add(unaryexpr);
@@ -868,7 +868,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			unaryexpr: function() {
-				var node = new Node('unaryexpr');
+				var node = new Node(Node.UNARYEXPR);
 				if(!this.look) {
 					this.error();
 				}
@@ -906,7 +906,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			constor: function() {
-				var node = new Node('constor');
+				var node = new Node(Node.CONSTOR);
 				if(!this.look) {
 					this.error();
 				}
@@ -923,7 +923,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			conscall: function() {
-				var node = new Node('conscall');
+				var node = new Node(Node.CONSCALL);
 				node.add(this.match(Token.ID, this.look.content() + ' is not a constructor'));
 				if(this.look) {
 					if(this.look.content() == '(') {
@@ -945,7 +945,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			mmbexpr: function() {
-				var node = new Node('mmbexpr');
+				var node = new Node(Node.MMBEXPR);
 				if(!this.look) {
 					this.error();
 				}
@@ -1002,7 +1002,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			prmrexpr: function() {
-				var node = new Node('prmrexpr');
+				var node = new Node(Node.PRMREXPR);
 				if(!this.look) {
 					this.error();
 				}
@@ -1038,7 +1038,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			arrltr: function() {
-				var node = new Node('arrltr');
+				var node = new Node(Node.ARRLTR);
 				node.add(this.match('['));
 				while(this.look && this.look.content() != ']') {
 					if(this.look.content() == ',') {
@@ -1052,7 +1052,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			objltr: function() {
-				var node = new Node('objltr');
+				var node = new Node(Node.OBJLTR);
 				node.add(this.match('{'));
 				while(this.look && this.look.content() != '}') {
 					node.add(this.proptassign());
@@ -1064,7 +1064,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			proptassign: function() {
-				var node = new Node('proptassign');
+				var node = new Node(Node.PROPTASSIGN);
 				if(!this.look) {
 					this.error();
 				}
@@ -1077,7 +1077,8 @@ define(function(require, exports, module) {
 						node.add(this.match(), this.assignexpr());
 					}
 					else {
-						node.add(
+						var node2 = new Node(Node.GETFN);
+						node2.add(
 							this.proptname(),
 							this.match('('),
 							this.match(')'),
@@ -1085,6 +1086,7 @@ define(function(require, exports, module) {
 							this.fnbody(),
 							this.match('}')
 						);
+						node.add(node2);
 					}
 				}
 				else if(this.look.content() == 'set') {
@@ -1096,7 +1098,8 @@ define(function(require, exports, module) {
 						node.add(this.match(), this.assignexpr());
 					}
 					else {
-						node.add(
+						var node2 = new Node(Node.SETFN);
+						node2.add(
 							this.proptname(),
 							this.match('('),
 							this.propsets(),
@@ -1105,6 +1108,7 @@ define(function(require, exports, module) {
 							this.fnbody(),
 							this.match('}')
 						);
+						node.add(node2);
 					}
 				}
 				else {
@@ -1125,7 +1129,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			proptname: function() {
-				var node = new Node('proptname');
+				var node = new Node(Node.PROPTNAME);
 				if(this.look) {
 					switch(this.look.type()) {
 						case Token.ID:
@@ -1140,12 +1144,12 @@ define(function(require, exports, module) {
 				return node;
 			},
 			propsets: function() {
-				var node = new Node('propsets');
+				var node = new Node(Node.PROPTSETS);
 				node.add(this.match(Token.ID, 'setter functions must have one argument'));
 				return node;
 			},
 			args: function() {
-				var node = new Node('args');
+				var node = new Node(Node.ARGS);
 				node.add(this.match('('));
 				if(!this.look) {
 					this.error();
@@ -1157,7 +1161,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			arglist: function() {
-				var node = new Node('arglist');
+				var node = new Node(Node.ARGLIST);
 				node.add(this.assignexpr());
 				while(this.look && this.look.content() == ',') {
 					node.add(this.match(), this.assignexpr());
@@ -1165,7 +1169,7 @@ define(function(require, exports, module) {
 				return node;
 			},
 			assignoprt: function() {
-				var node = new Node('assignoprt');
+				var node = new Node(Node.ASSIGNOPRT);
 				switch(this.look.content()) {
 					case '*=':
 					case '/=':
