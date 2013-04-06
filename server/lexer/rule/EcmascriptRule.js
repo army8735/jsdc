@@ -27,8 +27,8 @@ var Rule = require('./Rule'),
 			return ['if', 'for', 'while'].indexOf(this.content()) != -1;
 		}));
 
-		self.addMatch(new RegMatch(Token.NUMBER, /^\.\d+(?:E[+-]?\d*)?/, {
-			'SyntaxError: missing exponent': /E[+-]?$/
+		self.addMatch(new RegMatch(Token.NUMBER, /^\.\d+(?:E[+-]?\d*)?/i, {
+			'SyntaxError: missing exponent': /E[+-]?$/i
 		}, Lexer.NOT_REG));
 
 		self.addMatch(new CompleteEqual(Token.SIGN, ']', Lexer.NOT_REG));
@@ -39,8 +39,8 @@ var Rule = require('./Rule'),
 		self.addMatch(new RegMatch(Token.NUMBER, /^0x[\da-f]*/i, {
 			"SyntaxError: missing hexadecimal digits after '0x'": /^0x$/i
 		}, Lexer.NOT_REG));
-		self.addMatch(new RegMatch(Token.NUMBER, /^\d+\.?\d*(?:E[+-]?\d*)?/, {
-			'SyntaxError: missing exponent': /E[+-]?$/
+		self.addMatch(new RegMatch(Token.NUMBER, /^\d+\.?\d*(?:E[+-]?\d*)?/i, {
+			'SyntaxError: missing exponent': /E[+-]?$/i
 		}, Lexer.NOT_REG));
 	}).statics({
 		KEYWORDS: 'abstract boolean break byte case catch char class const continue debugger default delete do double else enum export extends false final finally float for function goto if implements import in instanceof int interface let long native new package private protected public return short static super switch synchronized this throw throws transient true try typeof var void volatile while with'.split(' ')
