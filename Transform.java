@@ -42,7 +42,7 @@ public class Transform {
 				copy(f, target, console);
 			}
 		}
-		else {
+		else if(!src.getName().endsWith("render.js")){
 			BufferedReader br = null;
 			BufferedWriter bw = null;
 			try {
