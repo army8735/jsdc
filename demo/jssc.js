@@ -1,7 +1,7 @@
 define(function(require, exports) {
-	var factory = require('./lexer/factory'),
-		Token = require('./lexer/Token'),
-		render = require('./util/render'),
+	var factory = require('../web/lexer/factory'),
+		Token = require('../web/lexer/Token'),
+		render = require('../web/util/render'),
 		cacheLine = 0,
 		cacheTime = 0,
 		find;

@@ -180,7 +180,7 @@ function drawNode(layer, node, x, index, parent, sibling) {
 	}
 	w = Math.max(w, x2);
 }
-require(['jsdc', 'jssc'], function(jsdc, jssc) {
+require(['../web/jsdc', 'jssc'], function(jsdc, jssc) {
 	function init() {
 		var nodes = Array.prototype.slice.call(document.getElementsByTagName('code'), 0);
 		nodes.forEach(function(node, i) {
