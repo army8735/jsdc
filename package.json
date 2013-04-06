@@ -1,0 +1,35 @@
+{
+  "name": "jsdc",
+  "version": "0.1.0",
+  "description": "transform ecmascript6 to ecmascript5",
+  "maintainers": [
+    {
+      "name": "army8735",
+      "email": "army8735@qq.com" 
+    } 
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/army8735/jsdc.git"
+  },
+  "keywords": [
+    "jsdc",
+    "ecmascript6",
+    "ecmascript5"
+  ],
+  "author": "army8735",
+  "license": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/addyosmani/es6-module-loader/blob/master/LICENSE-MIT"
+    }
+  ],
+  "dependencies": {},
+  "engines": {
+    "node": ">= 0.11.0"
+  },
+  "readmeFilename": "README.md"
+}
