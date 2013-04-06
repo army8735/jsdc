@@ -41,6 +41,7 @@ define(function(require, exports, module) {
 			ANNOT: 11,
 			HEAD: 12,
 			TEMPLATE: 13,
+			ENTER: 14,
 			type: function(tag) {
 				if(character.isUndefined(types)) {
 					types = [];
