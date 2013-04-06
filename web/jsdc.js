@@ -107,6 +107,9 @@ define(function(require, exports) {
 			else if(node.name() == Node.SUPERSTMT) {
 				superstmt(true, node);
 			}
+			else if(node.name() == Node.GETFN) {
+				throw new Error('does not support get/set method');
+			}
 			//µÝ¹é×Ó½Úµã
 			node.leaves().forEach(function(leaf, i) {
 				if(blockHasLet && i == 1) {
@@ -327,7 +330,14 @@ define(function(require, exports) {
 			return e.toString();
 		}
 		init();
-		join(node, ignore);
+		try {
+			join(node, ignore);
+		} catch(e) {
+			if(window.console) {
+				console.error(e);
+			}
+			return e.toString();
+		}
 		return character.escapeHTML(res);
 	};
 	exports.tree = function() {

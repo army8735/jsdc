@@ -97,6 +97,7 @@ var Class = require('../util/Class'),
 		PROPTSETS: 'propsets',
 		ARGS: 'args',
 		ARGLIST: 'arglist',
-		ASSIGNOPRT: 'assignoprt'
+		ASSIGNOPRT: 'assignoprt',
+		IMPTSTMT: 'imptstmt'
 	});
 module.exports = Node;

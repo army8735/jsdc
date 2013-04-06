@@ -95,6 +95,8 @@ define(function(require, exports, module) {
 							this.error('super must in a class');
 						}
 						return this.superstmt();
+					case 'import':
+						return this.imptstmt();
 					default:
 						if(this.look.type() == Token.ID) {
 							for(var i = this.index; i < this.length; i++) {
@@ -478,7 +480,7 @@ define(function(require, exports, module) {
 			},
 			superstmt: function() {
 				var node = new Node(Node.SUPERSTMT);
-				node.add(this.match());
+				node.add(this.match('super'));
 				if(!this.look) {
 					this.error();
 				}
@@ -506,6 +508,10 @@ define(function(require, exports, module) {
 					this.args(),
 					this.match(';')
 				);
+				return node;
+			},
+			imptstmt: function() {
+				var node = new Node(Node.IMPTSTMT);
 				return node;
 			},
 			fndecl: function() {
@@ -637,22 +643,30 @@ define(function(require, exports, module) {
 			},
 			method: function(hasStatic, methods, statics) {
 				var node = new Node(Node.METHOD);
-				node.add(this.match(Token.ID));
-				var id = node.leaves()[0].token().content();
-				if(methods.hasOwnProperty(id)) {
-					this.error('duplicate method decl in class');
+				if(this.look.content() == 'get') {
+					node.add(this.match(), this.getfn());
 				}
-				methods[id] = true;
-				node.add(this.match('('));
-				if(this.look.content() != ')') {
-					node.add(this.fnparams());
+				else if(this.look.content() == 'set') {
+					node.add(this.match(), this.setfn());
 				}
-				node.add(
-					this.match(')'),
-					this.match('{'),
-					this.fnbody(true),
-					this.match('}', 'missing } in compound statement')
-				);
+				else {
+					node.add(this.match(Token.ID));
+					var id = node.leaves()[0].token().content();
+					if(methods.hasOwnProperty(id)) {
+						this.error('duplicate method decl in class');
+					}
+					methods[id] = true;
+					node.add(this.match('('));
+					if(this.look.content() != ')') {
+						node.add(this.fnparams());
+					}
+					node.add(
+						this.match(')'),
+						this.match('{'),
+						this.fnbody(true),
+						this.match('}', 'missing } in compound statement')
+					);
+				}
 				return node;
 			},
 			expr: function(noIn) {
@@ -1077,16 +1091,7 @@ define(function(require, exports, module) {
 						node.add(this.match(), this.assignexpr());
 					}
 					else {
-						var node2 = new Node(Node.GETFN);
-						node2.add(
-							this.proptname(),
-							this.match('('),
-							this.match(')'),
-							this.match('{'),
-							this.fnbody(),
-							this.match('}')
-						);
-						node.add(node2);
+						node.add(this.getfn());
 					}
 				}
 				else if(this.look.content() == 'set') {
@@ -1098,17 +1103,7 @@ define(function(require, exports, module) {
 						node.add(this.match(), this.assignexpr());
 					}
 					else {
-						var node2 = new Node(Node.SETFN);
-						node2.add(
-							this.proptname(),
-							this.match('('),
-							this.propsets(),
-							this.match(')'),
-							this.match('{'),
-							this.fnbody(),
-							this.match('}')
-						);
-						node.add(node2);
+						node.add(this.setfn());
 					}
 				}
 				else {
@@ -1126,6 +1121,31 @@ define(function(require, exports, module) {
 							this.error('invalid property id');
 					}
 				}
+				return node;
+			},
+			getfn: function() {
+				var node = new Node(Node.GETFN);
+				node.add(
+					this.proptname(),
+					this.match('('),
+					this.match(')'),
+					this.match('{'),
+					this.fnbody(),
+					this.match('}')
+				);
+				return node;
+			},
+			setfn: function() {
+				var node = new Node(Node.SETFN);
+				node.add(
+					this.proptname(),
+					this.match('('),
+					this.propsets(),
+					this.match(')'),
+					this.match('{'),
+					this.fnbody(),
+					this.match('}')
+				);
 				return node;
 			},
 			proptname: function() {

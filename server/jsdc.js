@@ -106,6 +106,9 @@ function join(node, ignore) {
 		else if(node.name() == Node.SUPERSTMT) {
 			superstmt(true, node);
 		}
+		else if(node.name() == Node.GETFN) {
+			throw new Error('does not support get/set method');
+		}
 		//µÝ¹é×Ó½Úµã
 		node.leaves().forEach(function(leaf, i) {
 			if(blockHasLet && i == 1) {
@@ -326,7 +329,14 @@ exports.parse = function(code) {
 		return e.toString();
 	}
 	init();
-	join(node, ignore);
+	try {
+		join(node, ignore);
+	} catch(e) {
+		if(console) {
+			console.error(e);
+		}
+		return e.toString();
+	}
 	return character.escapeHTML(res);
 };
 exports.tree = function() {
