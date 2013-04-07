@@ -23,6 +23,9 @@ var Class = require('../util/Class'),
 		},
 		tag: function() {
 			return Token.type(this.t);
+		},
+		toString: function() {
+			return this.t + ' ' + this.c;
 		}
 	}).statics({
 		VIRTUAL: -1,

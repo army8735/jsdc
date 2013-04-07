@@ -15,7 +15,8 @@ define(function(require, exports) {
 		classes,
 		index,
 		res,
-		node;
+		node,
+		token;
 	
 	function init() {
 		index = 0;
@@ -316,11 +317,11 @@ define(function(require, exports) {
 	}
 
 	exports.parse = function(code) {
-		var lexer = new Lexer(new EcmascriptRule());
-		lexer.parse(code);
-		var parser = new Parser(lexer),
+		var lexer = new Lexer(new EcmascriptRule()),
+			parser = new Parser(lexer),
 			ignore = {};
 		try {
+			token = lexer.parse(code);
 			node = parser.program();
 			ignore = parser.ignore();
 		} catch(e) {
@@ -342,5 +343,8 @@ define(function(require, exports) {
 	};
 	exports.tree = function() {
 		return node;
+	};
+	exports.token = function() {
+		return token;
 	};
 });

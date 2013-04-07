@@ -14,7 +14,8 @@ var Lexer = require('./lexer/Lexer'),
 	classes,
 	index,
 	res,
-	node;
+	node,
+	token;
 
 function init() {
 	index = 0;
@@ -315,11 +316,11 @@ function superstmt(startOrEnd, node) {
 }
 
 exports.parse = function(code) {
-	var lexer = new Lexer(new EcmascriptRule());
-	lexer.parse(code);
-	var parser = new Parser(lexer),
+	var lexer = new Lexer(new EcmascriptRule()),
+		parser = new Parser(lexer),
 		ignore = {};
 	try {
+		token = lexer.parse(code);
 		node = parser.program();
 		ignore = parser.ignore();
 	} catch(e) {
@@ -341,4 +342,7 @@ exports.parse = function(code) {
 };
 exports.tree = function() {
 	return node;
+};
+exports.token = function() {
+	return token;
 };

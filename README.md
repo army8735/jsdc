@@ -21,9 +21,13 @@ jsdc.parse(code:String):String
 
 方法传入源代码，返回解析后的代码，如果出错，返回错误信息。
 
-jsdc.tree():Object
+jsdc.tree():Node
 
 获取解析后的语法树。此为内部接口，一般用不到。
+
+jsdc.token():Array<Token>
+
+获取解析后的词法单元列表。此为内部接口，一般用不到。
 
 # License
 

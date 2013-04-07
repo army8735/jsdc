@@ -6,21 +6,23 @@ var Class = require('../util/Class'),
 	Parser = Class(function(lexer) {
 		this.lexer = lexer;
 		this.look = null;
-		this.tokens = lexer.tokens();
+		this.tokens = null;
 		this.lastLine = 1;
 		this.lastCol = 1;
 		this.line = 1;
 		this.col = 1;
 		this.index = 0;
-		this.length = this.tokens.length;
+		this.length = 0;
 		this.inFor = false;
 		this.ignores = {};
-		if(this.tokens.length) {
-			this.move();
-		}
 		this.hasMoveLine = false;
 	}).methods({
 		program: function() {
+			this.tokens = this.lexer.tokens();
+			this.length = this.tokens.length;
+			if(this.tokens.length) {
+				this.move();
+			}
 			var node = new Node(Node.PROGRAM);
 			while(this.look) {
 				node.add(this.element());
