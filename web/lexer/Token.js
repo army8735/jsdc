@@ -2,13 +2,9 @@ define(function(require, exports, module) {
 	var Class = require('../util/Class'),
 		character = require('../util/character'),
 		types,
-		Token = Class(function(type, content, val) {
+		Token = Class(function(type, content) {
 			this.t = type;
 			this.c = content;
-			if(character.isUndefined(val)) {
-				val = content;
-			}
-			this.v = val;
 		}).methods({
 			type: function(t) {
 				if(!character.isUndefined(t)) {
@@ -19,14 +15,8 @@ define(function(require, exports, module) {
 			content: function() {
 				return this.c;
 			},
-			val: function() {
-				return this.v;
-			},
 			tag: function() {
 				return Token.type(this.t);
-			},
-			toString: function() {
-				return this.t + ' ' + this.c;
 			}
 		}).statics({
 			VIRTUAL: -1,

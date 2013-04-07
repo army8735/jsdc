@@ -51,7 +51,7 @@ define(function(require, exports, module) {
 						for(var i = 0, matches = this.rule.matches(), len = matches.length; i < len; i++) {
 							var match = matches[i];
 							if(match.match(this.peek, this.code, this.index)) {
-								var token = new Token(match.tokenType(), match.content(), match.val()),
+								var token = new Token(match.tokenType(), match.content()),
 									error = match.error(),
 									matchLen = match.content().length;
 								if(token.type() == Token.ID && this.rule.keyWords().hasOwnProperty(token.content())) {
@@ -60,7 +60,7 @@ define(function(require, exports, module) {
 								temp.push(token);
 								this.tokenList.push(token);
 								this.index += matchLen - 1;
-								var n = character.count(token.val(), character.LINE);
+								var n = character.count(token.content(), character.LINE);
 								count += n;
 								this.totalLine += n;
 								if(n) {

@@ -1,4 +1,4 @@
-var jsdc = require('./jsdc');
+var jsdc = require('../server/jsdc');
 var fs = require('fs');
 
 fs.readFile('./jquery-1.9.1.js', { encoding: 'utf-8' }, function(err, data) {

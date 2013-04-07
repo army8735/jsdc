@@ -1,13 +1,9 @@
 var Class = require('../util/Class'),
 	character = require('../util/character'),
 	types,
-	Token = Class(function(type, content, val) {
+	Token = Class(function(type, content) {
 		this.t = type;
 		this.c = content;
-		if(character.isUndefined(val)) {
-			val = content;
-		}
-		this.v = val;
 	}).methods({
 		type: function(t) {
 			if(!character.isUndefined(t)) {
