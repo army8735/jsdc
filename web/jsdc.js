@@ -7,6 +7,8 @@ define(function(require, exports) {
 		character = require('./util/character'),
 		env,
 		temp,
+		fold,
+		foldIndex,
 		bindId,
 		bind,
 		rest,
@@ -24,6 +26,8 @@ define(function(require, exports) {
 		res = '';
 		env = [0];
 		temp = '';
+		fold = null;
+		foldIndex = 0;
 		bind = '';
 		rest = '';
 		restLength = 0;
@@ -51,8 +55,8 @@ define(function(require, exports) {
 		}
 		else {
 			//var前置最近作用域顶部
-			if(node.name() == Node.VARSTMT) {
-				preVar(node);
+			if(node.name() == Node.VARDECL) {
+				vardecl(true, node);
 			}
 			//记录作用域索引入栈并将默认参数省略赋值添加至此
 			else if(node.name() == Node.FNBODY) {
@@ -118,8 +122,12 @@ define(function(require, exports) {
 				}
 				join(leaf, ignore, index);
 			});
+			//自动展开赋值
+			if(node.name() == Node.VARDECL && fold) {
+				vardecl(false, node);
+			}
 			//fnbody结束后作用域出栈
-			if(node.name() == Node.FNBODY) {
+			else if(node.name() == Node.FNBODY) {
 				env.pop();
 			}
 			//block结束后如有let和const需用匿名function包裹模拟块级作用域
@@ -152,11 +160,48 @@ define(function(require, exports) {
 			}
 		}
 	}
-	function preVar(varstmt) {
+	function vardecl(startOrEnd, vardecl) {
 		var index = env[env.length - 1];
-		preHash[index] = preHash[index] || {};
-		for(var i = 1, leaves = varstmt.leaves(), len = leaves.length; i < len; i += 2) {
-			var vn = leaves[i].leaves()[0].token().content();
+		if(startOrEnd) {
+			preHash[index] = preHash[index] || {};
+			var vn = vardecl.leaves()[0];
+			if(vn.name() == Node.TOKEN) {
+				preVar(vn.token().content());
+			}
+			//自动展开赋值
+			else if(vn.name() == Node.ARRLTR) {
+				fold = [];
+				for(var prms = vn.leaves(), j = 1, l = prms.length - 1; j < l; j += 2) {
+					vn = prms[j].leaves()[0].token().content();
+					fold.push(vn);
+					preVar(vn);
+				}
+				foldIndex = res.length;
+			}
+		}
+		else {
+			//去掉[]声明语句和后面的=
+			var end = res.indexOf(']', foldIndex),
+				prefix = res.slice(0, foldIndex),
+				suffix = res.slice(end + 1);
+			end = suffix.indexOf('=');
+			prefix += suffix.slice(0, end);
+			suffix = suffix.slice(end + 1);
+			res = prefix + suffix;
+			//添加forEach
+			end = /([;\s\r\n])*$/.exec(res)[1];
+			end = res.length - end.length;
+			prefix = res.slice(0, end);
+			suffix = res.slice(end);
+			prefix += '.forEach(function(o, i) { ';
+			fold.forEach(function(o, i) {
+				prefix += 'if(i == ' + i + ') ' + o + ' = o; '
+			});
+			prefix += '})';
+			res = prefix + suffix;
+			fold = null;
+		}
+		function preVar(vn) {
 			if(preHash[index][vn]) {
 				return;
 			}
@@ -165,6 +210,8 @@ define(function(require, exports) {
 				suffix = res.slice(index);
 			res = prefix + 'var ' + vn + ';' + suffix;
 		}
+	}
+	function varfold(varstmt) {
 	}
 	function block(startOrEnd) {
 		var index = startOrEnd ? res.lastIndexOf('{') + 1 : res.lastIndexOf('}');

@@ -167,7 +167,15 @@ define(function(require, exports, module) {
 			},
 			vardecl: function() {
 				var node = new Node(Node.VARDECL);
-				node.add(this.match(Token.ID, 'missing variable name'));
+				if(!this.look) {
+					this.error('missing variable name');
+				}
+				if(this.look.content() == '[') {
+					node.add(this.arrltr());
+				}
+				else {
+					node.add(this.match(Token.ID, 'missing variable name'));
+				}
 				if(this.look && this.look.content() == '=') {
 					node.add(this.assign());
 				}
@@ -1036,16 +1044,16 @@ define(function(require, exports, module) {
 							case 'null':
 							case 'true':
 							case 'false':
-								node.add(this.match());
+								return this.match();
 							break;
 							case '(':
 								node.add(this.match(), this.expr(), this.match(')'));
 							break;
 							case '[':
-								node.add(this.arrltr());
+								return this.arrltr();
 							break;
 							case '{':
-								node.add(this.objltr());
+								return this.objltr();
 							break;
 							default:
 								this.error();
