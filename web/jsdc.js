@@ -189,7 +189,7 @@ define(function(require, exports) {
 			suffix = suffix.slice(end + 1);
 			res = prefix + suffix;
 			//Ìí¼ÓforEach
-			end = /([;\s\r\n])*$/.exec(res)[1];
+			end = /([,;\s\r\n])*$/.exec(res)[1];
 			end = res.length - end.length;
 			prefix = res.slice(0, end);
 			suffix = res.slice(end);
