@@ -1,12 +1,15 @@
 define(function(require, exports, module) {
 	var Class = require('../util/Class'),
-		Node = Class(function(type, token) {
+		Node = Class(function(type, children) {
 			this.type = type;
-			if(token) {
-				this.children = token;
+			if(type == Node.TOKEN) {
+				this.children = children;
+			}
+			else if(Array.isArray(children)) {
+				this.children = children;
 			}
 			else {
-				this.children = [];
+				this.children = children ? [children] : [];
 			}
 			return this;
 		}).methods({
@@ -33,6 +36,9 @@ define(function(require, exports, module) {
 				return this.children;
 			}
 		}).statics({
+			PROGRAM: 'program',
+			ELEMS: 'elems',
+			ELEM: 'elem',
 			CSTSTMT: 'cststmt',
 			LETSTMT: 'letstmt',
 			VARSTMT: 'varstmt',

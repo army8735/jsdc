@@ -1,7 +1,7 @@
 define(function(require, exports, module) {
 	var Class = require('../util/Class'),
 		character = require('../util/character'),
-		types,
+		types = {},
 		Token = Class(function(type, content) {
 			this.t = type;
 			this.c = content;
@@ -16,6 +16,12 @@ define(function(require, exports, module) {
 				return this.c;
 			},
 			tag: function() {
+				return Token.type(this.t);
+			},
+			val: function() {
+				if(this.t == Token.SIGN || this.t == Token.KEYWORD) {
+					return this.c;
+				}
 				return Token.type(this.t);
 			}
 		}).statics({
@@ -36,16 +42,11 @@ define(function(require, exports, module) {
 			TEMPLATE: 13,
 			ENTER: 14,
 			type: function(tag) {
-				if(character.isUndefined(types)) {
-					types = [];
-					Object.keys(Token).forEach(function(o) {
-						if(typeof Token[o] == 'number') {
-							types[Token[o]] = o;
-						}
-					});
-				}
 				return types[tag];
 			}
 		});
+	Object.keys(Token).forEach(function(o) {
+		types[Token[o]] = o.toLowerCase();
+	});
 	module.exports = Token;
 });
