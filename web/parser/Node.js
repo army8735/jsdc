@@ -46,7 +46,7 @@ define(function(require, exports, module) {
 			FNBODY: 'fnbody',
 			BLOCK: 'block',
 			ITERSTMT: 'iterstmt',
-			TOKEN: 'Token',
+			TOKEN: 'token',
 			FNPARAMS: 'fnparams',
 			BINDELEMENT: 'bindelement',
 			RESTPARAM: 'restparam',

@@ -19,14 +19,20 @@ define(function(require, exports, module) {
 	gotoList.forEach(function(o, i) {
 		gotoHash[o] = i;
 	});
+	actionTable[0][87] = 's6';
 	actionTable[0][110] = 's2';
 	actionTable[0][117] = 'r1';
 	actionTable[1][117] = 'acc';
+	actionTable[6][87] = 's6';
+	actionTable[6][88] = 's7';
+	actionTable[6][110] = 's2';
 	for(i = 0; i < actionLen; i++) {
 		actionTable[2][i] = 'r23';
 		actionTable[3][i] = 'r8';
 		actionTable[4][i] = 'r5';
 		actionTable[5][i] = 'r3';
+		actionTable[7][i] = 'r24';
+		actionTable[8][i] = 'r9';
 	}
 
 	exports.actionList = actionList;

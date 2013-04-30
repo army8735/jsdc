@@ -74,30 +74,54 @@ define(function(require, exports, module) {
 				this.states.push(1);
 			},
 			r23: function() {
-				this.states.pop();
 				var token = new Node(Node.TOKEN, this.signs.pop());
 				this.signs.push(new Node(Node.EMPTSTMT, token));
+				this.states.pop();
 				this.states.push(3);
 			},
 			r8: function() {
-				this.states.pop();
 				this.signs.push(new Node(Node.STMT, this.signs.pop()));
+				this.states.pop();
 				this.states.push(4);
 			},
 			r5: function() {
-				this.states.pop();
 				this.signs.push(new Node(Node.ELEM, this.signs.pop()));
+				this.states.pop();
 				this.states.push(5);
 			},
 			r3: function() {
 				this.states.pop();
 				var elem = this.signs.pop();
-				if(this.signs.length && this.signs[this.signs.length - 1].name() == Node.ELEMS) {
+				if(this.signs.length && this.signs[this.signs.length - 1] instanceof Node && this.signs[this.signs.length - 1].name() == Node.ELEMS) {
 					this.signs[this.signs.length - 1].add(elem);
 				}
 				else {
 					this.signs.push(new Node(Node.ELEMS, elem));
 				}
+			},
+			r24: function() {
+				this.states.pop();
+				for(var i = this.signs.length - 1; i >= 0; i--) {
+					if(this.signs[i] instanceof Token && this.signs[i].content() == '{') {
+						var block = new Node(Node.BLOCK);
+						block.add(
+							new Node(Node.TOKEN, this.signs[i]),
+							this.signs.slice(i + 1, this.signs.length - 1),
+							new Node(Node.TOKEN, this.signs.pop())
+						);
+						this.signs.splice(i);
+						this.signs.push(block);
+						this.states.pop();
+						this.states.push(8);
+						break;
+					}
+				}
+			},
+			r9: function() {
+				var stmt = new Node(Node.STMT, this.signs.pop());
+				this.signs.push(stmt);
+				this.states.pop();
+				this.states.push(4);
 			},
 			move: function(line) {
 				this.lastLine = this.line;

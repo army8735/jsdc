@@ -137,7 +137,7 @@ function drawNode(layer, node, x, index, parent, sibling) {
 	if(index > 0) {
 		h += 24;
 	}
-	var isToken = node.name() == 'Token',
+	var isToken = node.name() == 'token',
 		isVirtual = isToken && node.leaves().type() == -1,
 		text = new Kinetic.Text({
 			x: x + 5,
