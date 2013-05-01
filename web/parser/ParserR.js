@@ -92,9 +92,8 @@ define(function(require, exports, module) {
 				var gt = table.gotoTable[this.states[this.states.length - 1]][2];
 				this.states.push(gt);
 			},
-			r3: function() {console.log(this.states)
-				this.states.pop();console.log(this.states)
-				var gt = table.gotoTable[this.states[this.states.length - 1]];
+			r3: function() {
+				this.states.pop();
 				var elem = this.signs.pop();
 				if(this.signs[this.signs.length - 1] instanceof Node && this.signs[this.signs.length - 1].name() == Node.ELEMS) {
 					this.signs[this.signs.length - 1].add(elem);
@@ -116,7 +115,8 @@ define(function(require, exports, module) {
 						this.signs.splice(i);
 						this.signs.push(block);
 						this.states.pop();
-						this.states.push(8);
+						var gt = table.gotoTable[this.states[this.states.length - 1]][7];
+						this.states.push(gt);
 						break;
 					}
 				}
@@ -125,7 +125,8 @@ define(function(require, exports, module) {
 				var stmt = new Node(Node.STMT, this.signs.pop());
 				this.signs.push(stmt);
 				this.states.pop();
-				this.states.push(4);
+				var gt = table.gotoTable[this.states[this.states.length - 1]][5];
+				this.states.push(gt);
 			},
 			move: function(line) {
 				this.lastLine = this.line;

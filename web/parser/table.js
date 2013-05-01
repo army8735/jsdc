@@ -37,7 +37,8 @@ define(function(require, exports, module) {
 	gotoTable[0][0] = 1;
 	gotoTable[0][2] = 5;
 	gotoTable[0][5] = 4;
-	gotoTable[0][6] = 3; 
+	gotoTable[0][6] = 3;
+	gotoTable[0][7] = 8;
 	gotoTable[6][2] = 5;
 	gotoTable[6][5] = 4;
 	gotoTable[6][6] = 3;
