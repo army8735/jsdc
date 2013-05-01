@@ -77,22 +77,26 @@ define(function(require, exports, module) {
 				var token = new Node(Node.TOKEN, this.signs.pop());
 				this.signs.push(new Node(Node.EMPTSTMT, token));
 				this.states.pop();
-				this.states.push(3);
+				var gt = table.gotoTable[this.states[this.states.length - 1]][6];
+				this.states.push(gt);
 			},
 			r8: function() {
 				this.signs.push(new Node(Node.STMT, this.signs.pop()));
 				this.states.pop();
-				this.states.push(4);
+				var gt = table.gotoTable[this.states[this.states.length - 1]][5];
+				this.states.push(gt);
 			},
 			r5: function() {
 				this.signs.push(new Node(Node.ELEM, this.signs.pop()));
 				this.states.pop();
-				this.states.push(5);
+				var gt = table.gotoTable[this.states[this.states.length - 1]][2];
+				this.states.push(gt);
 			},
-			r3: function() {
-				this.states.pop();
+			r3: function() {console.log(this.states)
+				this.states.pop();console.log(this.states)
+				var gt = table.gotoTable[this.states[this.states.length - 1]];
 				var elem = this.signs.pop();
-				if(this.signs.length && this.signs[this.signs.length - 1] instanceof Node && this.signs[this.signs.length - 1].name() == Node.ELEMS) {
+				if(this.signs[this.signs.length - 1] instanceof Node && this.signs[this.signs.length - 1].name() == Node.ELEMS) {
 					this.signs[this.signs.length - 1].add(elem);
 				}
 				else {

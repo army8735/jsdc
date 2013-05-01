@@ -34,6 +34,13 @@ define(function(require, exports, module) {
 		actionTable[7][i] = 'r24';
 		actionTable[8][i] = 'r9';
 	}
+	gotoTable[0][0] = 1;
+	gotoTable[0][2] = 5;
+	gotoTable[0][5] = 4;
+	gotoTable[0][6] = 3; 
+	gotoTable[6][2] = 5;
+	gotoTable[6][5] = 4;
+	gotoTable[6][6] = 3;
 
 	exports.actionList = actionList;
 	exports.gotoList = gotoList;
