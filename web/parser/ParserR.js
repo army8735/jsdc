@@ -122,8 +122,34 @@ define(function(require, exports, module) {
 				}
 			},
 			r9: function() {
-				var stmt = new Node(Node.STMT, this.signs.pop());
-				this.signs.push(stmt);
+				this.signs.push(new Node(Node.STMT, this.signs.pop()));
+				this.states.pop();
+				var gt = table.gotoTable[this.states[this.states.length - 1]][5];
+				this.states.push(gt);
+			},
+			r28: function() {
+				var id = new Node(Node.TOKEN, this.signs.pop());
+				var vardecl = new Node(Node.VARDECL, id);
+				this.signs.push(vardecl);
+				this.states.pop();
+				var gt = table.gotoTable[this.states[this.states.length - 1]][22];
+				this.states.push(gt);
+			},
+			r25: function() {
+				var varstmt = new Node(Node.VARSTMT);
+				varstmt.add(
+					new Node(Node.TOKEN, this.signs[this.signs.length - 3]),
+					this.signs[this.signs.length - 2],
+					new Node(Node.TOKEN, this.signs[this.signs.length - 1])
+				);
+				this.signs.splice(this.signs.length - 3, 3);
+				this.signs.push(varstmt);
+				this.states.splice(this.states.length - 3, 3);
+				var gt = table.gotoTable[this.states[this.states.length - 1]][8];
+				this.states.push(gt);
+			},
+			r10: function() {
+				this.signs.push(new Node(Node.STMT, this.signs.pop()));
 				this.states.pop();
 				var gt = table.gotoTable[this.states[this.states.length - 1]][5];
 				this.states.push(gt);
