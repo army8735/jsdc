@@ -40,7 +40,7 @@ define(function(require, exports, module) {
 					else {
 						col = table.actionHash[this.look.val()];
 					}
-					var action = table.actionTable[row][col];console.log(action, row, col, this.look)
+					var action = table.actionTable[row][col];console.log(action, row, col, this.states.join(','), this.look)
 					if(!action) {
 						this.error();
 					}
@@ -137,14 +137,21 @@ define(function(require, exports, module) {
 			},
 			r25: function() {
 				var varstmt = new Node(Node.VARSTMT);
-				varstmt.add(
-					new Node(Node.TOKEN, this.signs[this.signs.length - 3]),
-					this.signs[this.signs.length - 2],
-					new Node(Node.TOKEN, this.signs[this.signs.length - 1])
-				);
-				this.signs.splice(this.signs.length - 3, 3);
-				this.signs.push(varstmt);
-				this.states.splice(this.states.length - 3, 3);
+				for(var i = this.signs.length - 1; i >=0; i--) {
+					if(this.signs[i] instanceof Token && this.signs[i].content() == 'var') {
+						this.signs.splice(i, this.signs.length - i).forEach(function(o) {
+							if(o instanceof Token) {
+								varstmt.add(new Node(Node.TOKEN, o));
+							}
+							else {
+								varstmt.add(o);
+							}
+						});
+						this.signs.push(varstmt);
+						this.states.splice(this.states.length - varstmt.leaves().length, varstmt.leaves().length);
+						break;
+					}
+				}
 				var gt = table.gotoTable[this.states[this.states.length - 1]][8];
 				this.states.push(gt);
 			},

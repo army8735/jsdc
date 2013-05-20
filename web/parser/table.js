@@ -40,7 +40,7 @@ define(function(require, exports, module) {
 	}
 	actionTable[9][113] = 's10';
 	actionTable[10][81] = 's11';
-	actionTable[10][104] = 's9';
+	actionTable[10][104] = 'r28';
 	actionTable[10][110] = 'r28';
 	actionTable[11][19] = 's10';
 	actionTable[11][47] = 's10';
@@ -50,6 +50,7 @@ define(function(require, exports, module) {
 	actionTable[11][114] = 's10';
 	actionTable[11][115] = 's10';
 	actionTable[11][116] = 's10';
+	actionTable[12][104] = 's9';
 	actionTable[12][110] = 's13';
 	gotoTable[0][0] = 1;
 	gotoTable[0][2] = 5;
