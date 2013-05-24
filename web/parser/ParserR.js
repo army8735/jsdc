@@ -135,23 +135,31 @@ define(function(require, exports, module) {
 				var gt = table.gotoTable[this.states[this.states.length - 1]][22];
 				this.states.push(gt);
 			},
+			r27: function() {
+				var vardecl = this.signs.pop();
+				if(this.signs[this.signs.length - 2] instanceof Node && this.signs[this.signs.length - 2].name() == Node.VARDECLS) {
+					var vardecls = this.signs[this.signs.length - 2];
+					vardecls.add(new Node(Node.TOKEN, this.signs.pop()));
+					vardecls.add(vardecl);
+					this.states.splice(this.states.length - 3, 3);
+				}
+				else {
+					this.signs.push(new Node(Node.VARDECLS, vardecl));
+					this.states.pop();
+				}
+				var gt = table.gotoTable[this.states[this.states.length - 1]][21];
+				this.states.push(gt);
+			},
 			r25: function() {
 				var varstmt = new Node(Node.VARSTMT);
-				for(var i = this.signs.length - 1; i >=0; i--) {
-					if(this.signs[i] instanceof Token && this.signs[i].content() == 'var') {
-						this.signs.splice(i, this.signs.length - i).forEach(function(o) {
-							if(o instanceof Token) {
-								varstmt.add(new Node(Node.TOKEN, o));
-							}
-							else {
-								varstmt.add(o);
-							}
-						});
-						this.signs.push(varstmt);
-						this.states.splice(this.states.length - varstmt.leaves().length, varstmt.leaves().length);
-						break;
-					}
-				}
+				varstmt.add(
+					new Node(Node.TOKEN, this.signs[this.signs.length - 3]),
+					this.signs[this.signs.length - 2],
+					new Node(Node.TOKEN, this.signs[this.signs.length - 1])
+				);
+				this.signs.splice(this.signs.length - 3, 3);
+				this.signs.push(varstmt);
+				this.states.splice(this.states.length - 3, 3);
 				var gt = table.gotoTable[this.states[this.states.length - 1]][8];
 				this.states.push(gt);
 			},

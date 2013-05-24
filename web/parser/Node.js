@@ -43,6 +43,7 @@ define(function(require, exports, module) {
 			LETSTMT: 'letstmt',
 			VARSTMT: 'varstmt',
 			VARDECL: 'vardecl',
+			VARDECLS: 'vardecls',
 			FNBODY: 'fnbody',
 			BLOCK: 'block',
 			ITERSTMT: 'iterstmt',

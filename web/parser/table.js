@@ -35,6 +35,7 @@ define(function(require, exports, module) {
 		actionTable[5][i] = 'r3';
 		actionTable[7][i] = 'r24';
 		actionTable[8][i] = 'r9';
+		actionTable[11][i] = 'r27';
 		actionTable[13][i] = 'r25';
 		actionTable[14][i] = 'r10';
 	}
@@ -62,7 +63,8 @@ define(function(require, exports, module) {
 	gotoTable[6][5] = 4;
 	gotoTable[6][6] = 3;
 	gotoTable[6][8] = 14;
-	gotoTable[9][22] = 12;
+	gotoTable[9][21] = 12;
+	gotoTable[9][22] = 11;
 
 	exports.actionList = actionList;
 	exports.gotoList = gotoList;
