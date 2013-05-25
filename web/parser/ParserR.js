@@ -169,6 +169,40 @@ define(function(require, exports, module) {
 				var gt = table.gotoTable[this.states[this.states.length - 1]][5];
 				this.states.push(gt);
 			},
+			r32: function() {
+				var ltr = new Node(Node.TOKEN, this.signs.pop());
+				var assignexpr = new Node(Node.ASSIGNEXPR, ltr);
+				this.signs.push(assignexpr);
+				this.states.pop();
+				var gt = table.gotoTable[this.states[this.states.length - 1]][23];
+				this.states.push(gt);
+			},
+			r33: function() {
+				var assignexpr = new Node(Node.ASSIGNEXPR);
+				assignexpr.add(
+					new Node(Node.TOKEN, this.signs[this.signs.length - 3]),
+					new Node(Node.TOKEN, this.signs[this.signs.length - 2]),
+					this.signs.pop()
+				);
+				this.signs.splice(this.signs.length - 2, 2);
+				this.signs.push(assignexpr);
+				this.states.splice(this.states.length - 3, 3);
+				var gt = table.gotoTable[this.states[this.states.length - 1]][23];
+				this.states.push(gt);
+			},
+			r29: function() {
+				var vardecl = new Node(Node.VARDECL);
+				vardecl.add(
+					new Node(Node.TOKEN, this.signs[this.signs.length - 3]),
+					new Node(Node.TOKEN, this.signs[this.signs.length - 2]),
+					this.signs.pop()
+				);
+				this.signs.splice(this.signs.length - 2, 2);
+				this.signs.push(vardecl);
+				this.states.splice(this.states.length - 3, 3);
+				var gt = table.gotoTable[this.states[this.states.length - 1]][22];
+				this.states.push(gt);
+			},
 			move: function(line) {
 				this.lastLine = this.line;
 				this.lastCol = this.col;
