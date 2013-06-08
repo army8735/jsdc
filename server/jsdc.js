@@ -19,11 +19,10 @@ var Lexer = require('./lexer/Lexer'),
 	node,
 	token;
 
-function init() {
+function init(ignore) {
 	index = 0;
 	preHash = {};
 	res = '';
-	env = [0];
 	temp = '';
 	fold = null;
 	foldIndex = 0;
@@ -31,6 +30,10 @@ function init() {
 	rest = '';
 	restLength = 0;
 	classes = [];
+	while(ignore[index]) {
+		res += ignore[index++].content();
+	}
+	env = [res.length];
 }
 function join(node, ignore) {
 	var isToken = node.name() == Node.TOKEN,
@@ -376,7 +379,7 @@ exports.parse = function(code) {
 		}
 		return e.toString();
 	}
-	init();
+	init(ignore);
 	try {
 		join(node, ignore);
 	} catch(e) {

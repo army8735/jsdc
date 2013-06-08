@@ -20,11 +20,10 @@ define(function(require, exports) {
 		node,
 		token;
 	
-	function init() {
+	function init(ignore) {
 		index = 0;
 		preHash = {};
 		res = '';
-		env = [0];
 		temp = '';
 		fold = null;
 		foldIndex = 0;
@@ -32,6 +31,10 @@ define(function(require, exports) {
 		rest = '';
 		restLength = 0;
 		classes = [];
+		while(ignore[index]) {
+			res += ignore[index++].content();
+		}
+		env = [res.length];
 	}
 	function join(node, ignore) {
 		var isToken = node.name() == Node.TOKEN,
@@ -377,7 +380,7 @@ define(function(require, exports) {
 			}
 			return e.toString();
 		}
-		init();
+		init(ignore);
 		try {
 			join(node, ignore);
 		} catch(e) {
