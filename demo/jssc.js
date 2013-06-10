@@ -7,7 +7,7 @@ define(function(require, exports) {
 		find;
 
 	function getText(node) {
-		return node.textContent || node.innerText ||  node.firstChild ? node.firstChild.nodeValue : '';
+		return node.textContent || node.innerText || (node.firstChild ? node.firstChild.nodeValue : '');
 	}
 	function parse(nodes) {
 		if(!nodes.length) {
