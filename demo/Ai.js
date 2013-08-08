@@ -242,6 +242,10 @@ var require,
 			fetch(module, finishUrl);
 			return;
 		}
+		if(document.currentScript) {
+			fetch(module, document.currentScript.src || location.href.replace(/#.*/, ''));
+			return;
+		}
 		//ie下利用interactive特�?降低并发情况下非�?��性错误几�?
 		if(interactive) {
 			var s = document.head.getElementsByTagName('script'),
@@ -504,7 +508,7 @@ var require,
 				cb.apply(null, args);
 				id.forEach(function(id) {
 					lock[id].shift();
-					if(lock[id].length) {
+					while(lock[id].length) {
 						var w = lock[id][0];
 						if(w.execed) {
 							lock[id].shift();
@@ -513,6 +517,9 @@ var require,
 							w.execed = true;
 							w.apply(null, w.args);
 							lock[id].shift();
+						}
+						else {
+							break;
 						}
 					}
 				});
