@@ -4,7 +4,11 @@ define(function(require, exports, module) {
 		Lexer = require('../lexer/Lexer'),
 		Token = require('../lexer/Token'),
 		Node = require('./Node'),
-		Parser = Class(function(lexer) {
+		S = {},
+		SS = {};
+	S[Token.BLANK] = S[Token.TAB] = S[Token.COMMENT] = S[Token.LINE] = S[Token.ENTER] = true;
+	SS[Token.BLANK] = SS[Token.TAB] = SS[Token.ENTER] = true;
+	var Parser = Class(function(lexer) {
 			this.lexer = lexer;
 			this.look = null;
 			this.tokens = null;
@@ -103,10 +107,16 @@ define(function(require, exports, module) {
 						if(this.look.type() == Token.ID) {
 							for(var i = this.index; i < this.length; i++) {
 								var token = this.tokens[i];
-								if([Token.BLANK, Token.TAB, Token.COMMENT, Token.LINE, Token.ENTER].indexOf(token.type()) != -1) {
+								if(S[token.type()]) {
 									if(token.content() == ':') {
 										return this.labstmt();
 									}
+									else {
+										break;
+									}
+								}
+								else {
+									break;
 								}
 							}
 						}
@@ -1283,7 +1293,7 @@ define(function(require, exports, module) {
 						return;
 					}
 					//´æÏÂºöÂÔµÄtoken
-					if([Token.BLANK, Token.TAB, Token.ENTER, Token.LINE, Token.COMMENT].indexOf(this.look.type()) != -1) {
+					if(S[this.look.type()]) {
 						this.ignores[this.index - 1] = this.look;
 					}
 					//°üÀ¨line
@@ -1319,7 +1329,7 @@ define(function(require, exports, module) {
 					}
 					else {
 						this.col += this.look.content().length;
-						if([Token.BLANK, Token.TAB, Token.ENTER].indexOf(this.look.type()) == -1) {
+						if(!SS[this.look.type()]) {
 							break;
 						}
 					}
