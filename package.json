@@ -1,6 +1,6 @@
 {
   "name": "jsdc",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "transform ecmascript6 to ecmascript5",
   "maintainers": [
     {
@@ -28,6 +28,7 @@
     }
   ],
   "dependencies": {},
+  "main": "./server/jsdc",
   "engines": {
     "node": ">= 0.10.0"
   },
