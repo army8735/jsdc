@@ -982,9 +982,6 @@ var Parser = Class(function(lexer) {
 			if(!this.look) {
 				this.error();
 			}
-			if(this.look.content() == 'function') {
-				return this.fnexpr();
-			}
 			var prmrexpr = this.prmrexpr();
 			function goOn() {
 				while(this.look && ['.', '[', '('].indexOf(this.look.content()) != -1) {
@@ -1049,6 +1046,8 @@ var Parser = Class(function(lexer) {
 				break;
 				default:
 					switch(this.look.content()) {
+                           case 'function':
+                               return this.fnexpr();
 						case 'this':
 						case 'null':
 						case 'true':

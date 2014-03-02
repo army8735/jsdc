@@ -983,9 +983,6 @@ define(function(require, exports, module) {
 				if(!this.look) {
 					this.error();
 				}
-				if(this.look.content() == 'function') {
-					return this.fnexpr();
-				}
 				var prmrexpr = this.prmrexpr();
 				function goOn() {
 					while(this.look && ['.', '[', '('].indexOf(this.look.content()) != -1) {
@@ -1050,6 +1047,8 @@ define(function(require, exports, module) {
 					break;
 					default:
 						switch(this.look.content()) {
+                            case 'function':
+                                return this.fnexpr();
 							case 'this':
 							case 'null':
 							case 'true':
