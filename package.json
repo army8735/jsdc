@@ -1,6 +1,6 @@
 {
   "name": "jsdc",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "transform ecmascript6 to ecmascript5",
   "maintainers": [
     {
@@ -28,12 +28,7 @@
     "ecmascript5"
   ],
   "author": "army8735",
-  "license": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/addyosmani/es6-module-loader/blob/master/LICENSE-MIT"
-    }
-  ],
+  "license": "MIT",
   "dependencies": {
     "homunculus": "^0.2.3"
   },
