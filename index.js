@@ -13,13 +13,22 @@
   var character = require('./dist/util/character');
   var Class = require('./dist/util/Class');
 
+  var Scope = require('./dist/Scope');
+
   function recursion(node, ignore, jsdc) {
     var isToken = node.name() == JsNode.TOKEN;
     var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
     if(isToken) {
       if(!isVirtual) {
         var token = node.token();
-        jsdc.append(token.content());
+        //替换掉let和const为var
+        if(token.content() == 'let'
+          || token.content() == 'const') {
+          jsdc.append('var');
+        }
+        else {
+          jsdc.append(token.content());
+        }
         //加上ignore
         var s;
         while(s = jsdc.next()) {
@@ -28,6 +37,10 @@
       }
     }
     else {
+      //var变量前置，赋值部分删除var，如此可以将block用匿名函数包裹达到局部作用与效果
+      if(node.name() == JsNode.VARSTMT) {
+        jsdc.scope.prepose(node);
+      }
       node.leaves().forEach(function(leaf) {
         recursion(leaf, ignore, jsdc);
       });
@@ -40,6 +53,7 @@
     this.res = '';
     this.node = {};
     this.ignore = {};
+    this.scope = new Scope(this);
     return this;
   }).methods({
     parse: function(code) {
@@ -47,13 +61,16 @@
         this.code = code + '';
       }
       var parser = homunculus.getParser('es6');
-      var node = this.node = parser.parse(code);
-      var ignore = this.ignore = parser.ignore();
-
-      while(ignore[this.index]) {
-        this.append(ignore[this.index++].content());
+      this.node = parser.parse(code);
+      this.ignore = parser.ignore();
+      //开头部分的ignore
+      while(this.ignore[this.index]) {
+        this.append(this.ignore[this.index++].content());
       }
-      recursion(node, ignore, this);
+      //预分析局部变量，将影响的let和const声明查找出来
+      this.scope.parse(this.node);
+      //递归处理
+      recursion(this.node, this.ignore, this);
       return this.res;
     },
     append: function() {
@@ -61,6 +78,14 @@
       var args = Array.prototype.slice.call(arguments, 0);
       args.forEach(function(s) {
         self.res += s;
+      });
+      return this;
+    },
+    prepend: function() {
+      var self = this;
+      var args = Array.prototype.slice.call(arguments, 0);
+      args.reverse().forEach(function(s) {
+        self.res = s + self.res;
       });
       return this;
     },

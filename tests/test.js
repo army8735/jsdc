@@ -10,6 +10,10 @@ describe('api', function() {
     var jsdc = new JSDC();
     expect(jsdc.append).to.be.a(Function);
   });
+  it('#prepend', function() {
+    var jsdc = new JSDC();
+    expect(jsdc.prepend).to.be.a(Function);
+  });
   it('#next', function() {
     var jsdc = new JSDC();
     expect(jsdc.next).to.be.a(Function);
