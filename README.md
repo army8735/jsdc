@@ -1,34 +1,35 @@
-##transform ecmascript6 to ecmascript5
+# Javascript Downcast
+### transform ecmascript6 to ecmascript5
 
-web目录下为书写符合AMD/CMD规范的js文件；
-server目录下为nodejs环境的module模块；
+[![NPM version](https://badge.fury.io/js/jsdc.png)](https://npmjs.org/package/jsdc)
+[![Build Status](https://travis-ci.org/army8735/jsdc.svg?branch=master)](https://travis-ci.org/army8735/jsdc)
+[![Coverage Status](https://coveralls.io/repos/army8735/jsdc/badge.png)](https://coveralls.io/r/army8735/jsdc)
+[![Dependency Status](https://david-dm.org/army8735/jsdc.png)](https://david-dm.org/army8735/jsdc)
 
-如果想直接用npm安装，请执行npm install jsdc
+## INSTALL
+```
+npm install jsdc
+```
 
-语法转换规则参见wiki：https://github.com/army8735/jsdc/wiki/%E8%AF%AD%E6%B3%95%E8%BD%AC%E6%8D%A2%E8%A7%84%E5%88%99
+## 语法转换规则
 
-##使用方法
+https://github.com/army8735/jsdc/wiki/%E8%AF%AD%E6%B3%95%E8%BD%AC%E6%8D%A2%E8%A7%84%E5%88%99
+
+## 使用说明
 
 jsdc仅提供安全兼容的转换接口，并且不改变你的源代码行数一致性，这使得调试极为便利。
+智能识别es5语法，jsdc会保持原样不动地返回它。
+CommonJS/AMD/CMD自适应。
 
-开发者应在开发环境部署web服务器，将需要开发的js映射代理，经由jsdc转换为结果代码。如此便可实现开发调试时书写易读结构化良好的es6代码，等到发布时再转化为兼容代码上线，满足不同环境浏览器运行。
+## API
 
-由于js性能问题，解析大文件会造成耗时，所以良好的做法是解析前先在服务器端检查此js文件有无变更，有之后再调用jsdc，否则读取缓存。并且一些明显的无需转换的全局库文件也应该忽略，如jQuery、YUI。
+### JSDC
+* constructor(code:String = ''):String 传入需要转换的code
+* parse(code:String = null):String 转换code，可以为空，否则会覆盖构造函数里传入的code
 
-##API
+### 静态属性
+* parse(code:String):String 可以直接调用静态方法转换，以省略new一个对象的步骤
 
-jsdc.parse(code:String):String
-
-方法传入源代码，返回解析后的代码，如果出错，返回错误信息。
-
-jsdc.tree():Node
-
-获取解析后的语法树。此为内部接口，一般用不到。
-
-jsdc.token():Array<Token>
-
-获取解析后的词法单元列表。此为内部接口，一般用不到。
-
-# License
+## License
 
 [MIT License]
