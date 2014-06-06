@@ -41,13 +41,27 @@
       if(node.name() == JsNode.VARSTMT) {
         jsdc.scope.prepose(node);
       }
+      else if(node.name() == JsNode.FNBODY) {
+        jsdc.scope.enter(node);
+        jsdc.scope.block(node, true);
+      }
+      else if(node.name() == JsNode.BLOCK) {
+        jsdc.scope.block(node, true);
+      }
       node.leaves().forEach(function(leaf) {
         recursion(leaf, ignore, jsdc);
       });
+      if(node.name() == JsNode.FNBODY) {
+        jsdc.scope.leave(node);
+        jsdc.scope.block(node);
+      }
+      else if(node.name() == JsNode.BLOCK) {
+        jsdc.scope.block(node);
+      }
     }
   }
 
-  var JSDC = Class(function(code) {
+  var Jsdc = Class(function(code) {
     this.code = (code + '') || '';
     this.index = 0;
     this.res = '';
@@ -79,15 +93,9 @@
       args.forEach(function(s) {
         self.res += s;
       });
-      return this;
     },
-    prepend: function() {
-      var self = this;
-      var args = Array.prototype.slice.call(arguments, 0);
-      args.reverse().forEach(function(s) {
-        self.res = s + self.res;
-      });
-      return this;
+    insert: function(s, i) {
+      this.res = this.res.slice(0, i) + s + this.res.slice(i);
     },
     next: function() {
       var i = ++this.index;
@@ -95,9 +103,9 @@
     }
   }).statics({
     parse: function(code) {
-      var jsdc = new JSDC();
+      var jsdc = new Jsdc();
       return jsdc.parse(code);
     }
   });
-  module.exports = JSDC;
+  module.exports = Jsdc;
 });
