@@ -41,7 +41,7 @@ function join(node, ignore) {
 	if(isToken) {
 		if(!isVirtual) {
 			var token = node.token();
-			//ºöÂÔµÄtoken
+			//å¿½ç•¥çš„token
 			if(['var', '...', 'static'].indexOf(token.content()) == -1) {
 				if(token.content() == 'let' || token.content() == 'const') {
 					res += 'var';
@@ -56,11 +56,11 @@ function join(node, ignore) {
 		}
 	}
 	else {
-		//varÇ°ÖÃ×î½ü×÷ÓÃÓò¶¥²¿
+		//varå‰ç½®æœ€è¿‘ä½œç”¨åŸŸé¡¶éƒ¨
 		if(node.name() == Node.VARDECL) {
 			vardecl(true, node);
 		}
-		//¼ÇÂ¼×÷ÓÃÓòË÷ÒıÈëÕ»²¢½«Ä¬ÈÏ²ÎÊıÊ¡ÂÔ¸³ÖµÌí¼ÓÖÁ´Ë
+		//è®°å½•ä½œç”¨åŸŸç´¢å¼•å…¥æ ˆå¹¶å°†é»˜è®¤å‚æ•°çœç•¥èµ‹å€¼æ·»åŠ è‡³æ­¤
 		else if(node.name() == Node.FNBODY) {
 			var i = res.lastIndexOf('{') + 1;
 			env.push(i);
@@ -75,7 +75,7 @@ function join(node, ignore) {
 				restLenght = 0;
 			}
 		}
-		//¼ì²âblock×Ó½ÚµãÊÇ·ñÓĞlet»òconst
+		//æ£€æµ‹blockå­èŠ‚ç‚¹æ˜¯å¦æœ‰letæˆ–const
 		else if(node.name() == Node.BLOCK) {
 			var blockHasLet = false;
 			node.leaves().forEach(function(leaf) {
@@ -84,23 +84,23 @@ function join(node, ignore) {
 				}
 			});
 		}
-		//forÓï¾äÖĞÊÇ·ñÓĞlet
+		//forè¯­å¥ä¸­æ˜¯å¦æœ‰let
 		else if(node.name() == Node.ITERSTMT && node.leaves()[0].token().content() == 'for') {
 			var forHasLet = node.leaves()[2].name() == Node.LETSTMT;
 			if(forHasLet) {
 				forstmt(true, res.length);
 			}
 		}
-		//¼ÇÂ¼fnparamsÀïµÄÄ¬ÈÏ¸³ÖµºÍÊ¡ÂÔ¸³Öµ
+		//è®°å½•fnparamsé‡Œçš„é»˜è®¤èµ‹å€¼å’Œçœç•¥èµ‹å€¼
 		else if(node.name() == Node.FNPARAMS) {
 			bindelement(node);
 			restparam(node);
 		}
-		//Ä¬ÈÏ¸³ÖµÇ°»º´æµ±Ç°½á¹û£¬Ö®ºó»¥»»
+		//é»˜è®¤èµ‹å€¼å‰ç¼“å­˜å½“å‰ç»“æœï¼Œä¹‹åäº’æ¢
 		else if(node.name() == Node.BINDELEMENT) {
 			temp = res;
 		}
-		//class¿ªÊ¼
+		//classå¼€å§‹
 		else if(node.name() == Node.CLASSDECL) {
 			classdecl(true, node);
 		}
@@ -110,43 +110,43 @@ function join(node, ignore) {
 		else if(node.name() == Node.METHOD) {
 			method(true, node);
 		}
-		//Ìæ»»super
+		//æ›¿æ¢super
 		else if(node.name() == Node.SUPERSTMT) {
 			superstmt(true, node);
 		}
 		else if(node.name() == Node.GETFN) {
 			throw new Error('does not support get/set method');
 		}
-		//µİ¹é×Ó½Úµã
+		//é€’å½’å­èŠ‚ç‚¹
 		node.leaves().forEach(function(leaf, i) {
 			if(blockHasLet && i == 1) {
 				block(true);
 			}
 			join(leaf, ignore, index);
 		});
-		//×Ô¶¯Õ¹¿ª¸³Öµ
+		//è‡ªåŠ¨å±•å¼€èµ‹å€¼
 		if(node.name() == Node.VARDECL && fold) {
 			vardecl(false, node);
 		}
-		//fnbody½áÊøºó×÷ÓÃÓò³öÕ»
+		//fnbodyç»“æŸåä½œç”¨åŸŸå‡ºæ ˆ
 		else if(node.name() == Node.FNBODY) {
 			env.pop();
 		}
-		//block½áÊøºóÈçÓĞletºÍconstĞèÓÃÄäÃûfunction°ü¹üÄ£Äâ¿é¼¶×÷ÓÃÓò
+		//blockç»“æŸåå¦‚æœ‰letå’Œconstéœ€ç”¨åŒ¿åfunctionåŒ…è£¹æ¨¡æ‹Ÿå—çº§ä½œç”¨åŸŸ
 		else if(node.name() == Node.BLOCK && blockHasLet) {
 			block(false);
 		}
-		//for½áÊøºóÈçÓĞletÒ²Ğè°ü¹üÄ£Äâ
+		//forç»“æŸåå¦‚æœ‰letä¹Ÿéœ€åŒ…è£¹æ¨¡æ‹Ÿ
 		else if(node.name() == Node.ITERSTMT && forHasLet) {
 			forstmt(false, res.length);
 		}
-		//Ä¬ÈÏ²ÎÊı½áÊøºó
+		//é»˜è®¤å‚æ•°ç»“æŸå
 		else if(node.name() == Node.BINDELEMENT) {
 			var id = bindId.shift();
 			bind += 'if(typeof ' + id + ' == "undefined") ' + id + res.slice(temp.length) + ';';
 			res = temp;
 		}
-		//class½áÊø
+		//classç»“æŸ
 		else if(node.name() == Node.CLASSDECL) {
 			classdecl(false, node);
 		}
@@ -156,7 +156,7 @@ function join(node, ignore) {
 		else if(node.name() == Node.METHOD) {
 			method(false, node);
 		}
-		//Ìæ»»super
+		//æ›¿æ¢super
 		else if(node.name() == Node.SUPERSTMT) {
 			superstmt(false, node);
 		}
@@ -170,7 +170,7 @@ function vardecl(startOrEnd, vardecl) {
 		if(vn.name() == Node.TOKEN) {
 			preVar(vn.token().content());
 		}
-		//×Ô¶¯Õ¹¿ª¸³Öµ
+		//è‡ªåŠ¨å±•å¼€èµ‹å€¼
 		else if(vn.name() == Node.ARRLTR) {
 			fold = [];
 			for(var prms = vn.leaves(), j = 1, l = prms.length - 1; j < l; j += 2) {
@@ -182,7 +182,7 @@ function vardecl(startOrEnd, vardecl) {
 		}
 	}
 	else {
-		//È¥µô[]ÉùÃ÷Óï¾äºÍºóÃæµÄ=
+		//å»æ‰[]å£°æ˜è¯­å¥å’Œåé¢çš„=
 		var end = res.indexOf(']', foldIndex),
 			prefix = res.slice(0, foldIndex),
 			suffix = res.slice(end + 1);
@@ -190,7 +190,7 @@ function vardecl(startOrEnd, vardecl) {
 		prefix += suffix.slice(0, end);
 		suffix = suffix.slice(end + 1);
 		res = prefix + suffix;
-		//Ìí¼ÓforEach
+		//æ·»åŠ forEach
 		end = /([,;\s\r\n])*$/.exec(res)[1];
 		end = res.length - end.length;
 		prefix = res.slice(0, end);
@@ -287,7 +287,7 @@ function classdecl(startOrEnd, node) {
 function classbody(startOrEnd, node) {
 	var nowClass = classes[classes.length - 1];
 	if(startOrEnd) {
-		//¼ÇÂ¼static·½·¨
+		//è®°å½•staticæ–¹æ³•
 		for(var i = 0, len = node.leaves().length; i < len; i++) {
 			var leaf = node.leaves()[i];
 			if(leaf.name() == Node.TOKEN && leaf.token().content() == 'static') {
