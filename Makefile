@@ -4,10 +4,10 @@ gulp:
 test: gulp test-jsdc
 
 test-jsdc:
-	@mocha tests/
+	@mocha tests/test.js -R spec
 
 coveralls:
-	@mocha tests/ --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js
+	@mocha tests/test.js --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js
 
 test-cov:
-	@mocha tests/ --require blanket -R html-cov > tests/covrage.html
+	@mocha tests/test.js --require blanket -R html-cov > tests/covrage.html

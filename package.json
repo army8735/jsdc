@@ -14,7 +14,7 @@
   "config": {
     "blanket": {
       "pattern": [
-        "dist/*"
+        "jsdc/dist"
       ]
     }
   },

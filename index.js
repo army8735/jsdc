@@ -10,8 +10,8 @@
   var JsNode = homunculus.getClass('Node', 'es6');
   var Token = homunculus.getClass('Token');
 
-  var character = require('./src/util/character');
-  var Class = require('./src/util/Class');
+  var character = require('./dist/util/character');
+  var Class = require('./dist/util/Class');
 
   function recursion(node, ignore, jsdc) {
     var isToken = node.name() == JsNode.TOKEN;
