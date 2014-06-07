@@ -75,16 +75,27 @@
       this.index.pop();
     },
     block: function(node, start) {
-      //纯block父节点为blockstmt且祖父节点不是iteratorstmt,ifstmt
-      //try,catch,final已在父节点不是blockstmt排除
       if(node.name() == JsNode.BLOCK) {
-        if(this.hash.hasOwnProperty(node.nid())) {
-          node = node.parent();
-          var pname = node.name();
-          if(pname == JsNode.BLOCKSTMT) {
-            pname = node.parent().name();
-            if(!NOT_ABS_BLOCK.hasOwnProperty(pname)) {
-              this.jsdc.append(start ? '!function() ' : '()');
+        node = node.parent();
+        var pname = node.name();
+        if(pname == JsNode.BLOCKSTMT) {
+          pname = node.parent().name();
+          //纯block父节点为blockstmt且祖父节点不是iteratorstmt,ifstmt
+          //try,catch,final已在父节点不是blockstmt排除
+          if(!NOT_ABS_BLOCK.hasOwnProperty(pname)
+            || this.hash.hasOwnProperty(node.nid())) {
+            if(start) {
+              this.jsdc.append('!function() ');
+            }
+            else {
+              //}后的单行注释会破坏结构，致使append的}被注释掉，需要添加在其之前
+              if(/\/\/[^\r\n\u2028\u2029]*$/.test(this.jsdc.res)) {
+                var i = this.jsdc.res.lastIndexOf('//');
+                this.jsdc.insert('()', i);
+              }
+              else {
+                this.jsdc.append('()');
+              }
             }
           }
         }

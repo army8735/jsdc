@@ -43,6 +43,16 @@ describe('ignore es5', function() {
     var res = Jsdc.parse(s);
     expect(res).to.eql(s);
   });
+  it('forin', function() {
+    var s = 'for(a in b){}';
+    var res = Jsdc.parse(s);
+    expect(res).to.eql(s);
+  });
+  it('function', function() {
+    var s = 'function a(b){}';
+    var res = Jsdc.parse(s);
+    expect(res).to.eql(s);
+  });
 });
 describe('es6', function() {
   describe('scope', function() {
@@ -95,6 +105,26 @@ describe('es6', function() {
       var s = 'function a(){var b;let c;{var d;let e}}';
       var res = Jsdc.parse(s);
       expect(res).to.eql('function a(){var d;var b;var c;!function() {d;var e}()}');
+    });
+    it('empty block', function() {
+      var s = '{}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function() {}()');
+    });
+    it('append comment', function() {
+      var s = '{}//';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function() {}()//');
+    });
+    it('ifstmt append comment', function() {
+      var s = 'if(true){let a}//';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('if(true){!function() {var a}()}//');
+    });
+    it('trystmt append comment', function() {
+      var s = 'try{let a}catch(e){const a}//';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('try{!function() {var a}()}catch(e){!function() {var a}()}//');
     });
   });
   describe('init params', function() {
