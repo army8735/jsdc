@@ -18,6 +18,7 @@
   var Rest = require('./dist/Rest');
   var Template = require('./dist/Template');
   var Forof = require('./dist/Forof');
+  var Klass = require('./dist/Klass');
 
   var Jsdc = Class(function(code) {
     this.code = (code + '') || '';
@@ -30,6 +31,7 @@
     this.rest = new Rest(this);
     this.template = new Template(this);
     this.forof = new Forof(this);
+    this.klass = new Klass(this);
     this.i = 0;
     return this;
   }).methods({
@@ -60,6 +62,7 @@
     appendBefore: function(s) {
       if(this.i < this.res.length) {
         this.insert(s, this.i);
+        this.i += s.length;
       }
       else {
         this.append(s);
@@ -106,6 +109,14 @@
         else if(content == 'of') {
           this.forof.of(node);
         }
+        else if(content == '(') {
+          this.klass.prts(node, true);
+        }
+        else if(token.type() == Token.KEYWORD
+          && content == 'super'){
+          ignore = true;
+          this.append(this.klass.super(node));
+        }
         else if(token.type() == Token.TEMPLATE) {
           ignore = true;
           this.template.parse(token);
@@ -121,7 +132,11 @@
         else if(content == ')') {
           this.forof.prts(node);
         }
+        else if(content == '(') {
+          this.klass.prts(node);
+        }
       }
+      this.i = this.res.length;
       //加上ignore
       var ig;
       while(ig = this.next()) {
@@ -159,6 +174,16 @@
       else if(node.name() == JsNode.ITERSTMT) {
         this.forof.parse(node, true);
       }
+      else if(node.name() == JsNode.CLASSDECL
+        || node.name() == JsNode.CLASSEXPR) {
+        this.klass.parse(node, true);
+      }
+      else if(node.name() == JsNode.CLASSELEM) {
+        this.klass.elem(node, true);
+      }
+      else if(node.name() == JsNode.CLASSBODY) {
+        this.klass.body(node);
+      }
     },
     after: function(node) {
       if(node.name() == JsNode.FNBODY) {
@@ -169,6 +194,13 @@
       }
       else if(node.name() == JsNode.ITERSTMT) {
         this.forof.parse(node);
+      }
+      else if(node.name() == JsNode.CLASSDECL
+        || node.name() == JsNode.CLASSEXPR) {
+        this.klass.parse(node);
+      }
+      else if(node.name() == JsNode.CLASSELEM) {
+        this.klass.elem(node);
       }
     },
     ignore: function(node) {

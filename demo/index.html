@@ -134,6 +134,7 @@ seajs.use(['../index', './jssc'], function(jsdc, jssc) {
         var ast = jsdc.ast();
       } catch(e) {
         res = e;
+        console.error(e.message);
         ast = null;
       }
       var pre = node.parentNode,

@@ -77,7 +77,7 @@ var Scope = Class(function(jsdc) {
         if(!NOT_ABS_BLOCK.hasOwnProperty(pname)
           || this.hash.hasOwnProperty(node.nid())) {
           if(start) {
-            this.jsdc.append('!function() ');
+            this.jsdc.append('!function()');
           }
           else {
             this.jsdc.appendBefore('()');
@@ -93,7 +93,7 @@ var Scope = Class(function(jsdc) {
         node = node.parent();
         if(node.name() != JsNode.BLOCKSTMT
           || NOT_ABS_BLOCK.hasOwnProperty(node.parent().name())) {
-          this.jsdc.append(start ? '!function() {' : '}()');
+          this.jsdc.append(start ? '!function(){' : '}()');
         }
       }
     }

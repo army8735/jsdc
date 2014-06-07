@@ -74,86 +74,86 @@ describe('es6', function() {
     it('let in block', function() {
       var s = '{let b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function() {var b;}()')
+      expect(res).to.eql('!function(){var b;}()')
     });
     it('let and var in block', function() {
       var s = '{var a;let b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;!function() {a;var b;}()');
+      expect(res).to.eql('var a;!function(){a;var b;}()');
     });
     it('let and var in ifstmt', function() {
       var s = 'if(true){var a;let b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;if(true){!function() {a;var b;}()}');
+      expect(res).to.eql('var a;if(true){!function(){a;var b;}()}');
     });
     it('const and var in forstmt', function() {
       var s = 'for(;;){var a;const b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;for(;;){!function() {a;var b;}()}');
+      expect(res).to.eql('var a;for(;;){!function(){a;var b;}()}');
     });
     it('const and var in whilestmt', function() {
       var s = 'while(false){var a;const b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;while(false){!function() {a;var b;}()}');
+      expect(res).to.eql('var a;while(false){!function(){a;var b;}()}');
     });
     it('let and var in trystmt', function() {
       var s = 'try{var a;let b}catch(e){var a;let b}finally{var a;let b}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;try{!function() {a;var b}()}catch(e){!function() {a;var b}()}finally{!function() {a;var b}()}');
+      expect(res).to.eql('var a;try{!function(){a;var b}()}catch(e){!function(){a;var b}()}finally{!function(){a;var b}()}');
     });
     it('let and var in function', function() {
       var s = 'function a(){var b;let c;{var d;let e}}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function a(){var d;var b;var c;!function() {d;var e}()}');
+      expect(res).to.eql('function a(){var d;var b;var c;!function(){d;var e}()}');
     });
     it('empty block', function() {
       var s = '{}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function() {}()');
+      expect(res).to.eql('!function(){}()');
     });
     it('append comment', function() {
       var s = '{}//';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function() {}()//');
+      expect(res).to.eql('!function(){}()//');
     });
     it('append multi comment', function() {
       var s = '{}//\n//';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function() {}()//\n//');
+      expect(res).to.eql('!function(){}()//\n//');
     });
     it('ifstmt append comment', function() {
       var s = 'if(true){let a}//';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('if(true){!function() {var a}()}//');
+      expect(res).to.eql('if(true){!function(){var a}()}//');
     });
     it('trystmt append comment', function() {
       var s = 'try{let a}catch(e){const a}//';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('try{!function() {var a}()}catch(e){!function() {var a}()}//');
+      expect(res).to.eql('try{!function(){var a}()}catch(e){!function(){var a}()}//');
     });
   });
   describe('init params', function() {
     it('only one id', function() {
       var s = 'function a(b = 1){}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function a(b ){if(typeof b == "undefined") b = 1;}')
+      expect(res).to.eql('function a(b ){if(typeof b=="undefined")b = 1;}')
     });
     it('after an id', function() {
       var s = 'function a(b, c = fn()){}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function a(b, c ){if(typeof c == "undefined") c = fn ( );}')
+      expect(res).to.eql('function a(b, c ){if(typeof c=="undefined")c = fn ( );}')
     });
     it('multi', function() {
       var s = 'function a(b = 1, c = []){}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function a(b , c ){if(typeof b == "undefined") b = 1;if(typeof c == "undefined") c = [ ];}')
+      expect(res).to.eql('function a(b , c ){if(typeof b=="undefined")b = 1;if(typeof c=="undefined")c = [ ];}')
     });
   });
   describe('rest params', function() {
     it('fmparams', function() {
       var s = 'function a(...b){}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function a(b){b = [].slice.call(arguments, 0);}')
+      expect(res).to.eql('function a(b){b=[].slice.call(arguments, 0);}')
     });
     it('callexpr single spread', function() {
       var s = 'Math.max(...a)';
@@ -229,5 +229,37 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('for(var a in {}){a={}[a];a}');
     });
+  });
+  describe('class', function() {
+    it('empty', function() {
+      var s = 'class A{}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function A(){}');
+    });
+    it('normal', function() {
+      var s = 'class A{constructor(){}}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function A(){}');
+    });
+    it('extends', function() {
+      var s = 'class A extends B{\nconstructor(){super()}\na(){}\n}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();\nfunction A(){B.call(this)}\nA.prototype.a = function(){}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
+    });
+    it('getter/setter', function() {
+      var s = 'class A extends B{\na(){}\nget b(){}\nset c(d){}\n}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();\nfunction A(){}A.prototype.a = function(){}\nA.prototype.b={get b(){}}["b"];\nA.prototype.c={set c(d){}}["c"];\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
+    });
+    it('static', function() {
+      var s = 'class A extends B{\nstatic a(){super.b}\n}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();\nfunction A(){}A.a=function(){B.b}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
+    });
+    it(';', function() {
+      var s = 'class A{;}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function A(){};');
+    })
   });
 });

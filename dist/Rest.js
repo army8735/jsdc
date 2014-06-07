@@ -36,7 +36,7 @@
         var o = this.hash[fnbody.nid()];
         var index = o.index;
         var id = o.token.content();
-        this.jsdc.append(id + ' = [].slice.call(arguments, ' + index + ');');
+        this.jsdc.append(id + '=[].slice.call(arguments, ' + index + ');');
       }
     },
     expr: function(node) {
