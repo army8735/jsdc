@@ -30,15 +30,18 @@
           if(token.content() == '}') {
             jsdc.scope.block(node);
           }
-          jsdc.append(token.content());
+          //替换操作会设置ignore属性将其忽略
+          if(!token.ignore) {
+            jsdc.append(token.content());
+          }
           if(token.content() == '{') {
             jsdc.scope.block(node, true);
           }
         }
         //加上ignore
-        var s;
-        while(s = jsdc.next()) {
-          jsdc.append(s);
+        var ig;
+        while(ig = jsdc.next()) {
+          !ig.ignore && jsdc.append(ig.content());
         }
       }
     }
@@ -103,7 +106,7 @@
     },
     next: function() {
       var i = ++this.index;
-      return this.ignore.hasOwnProperty(i) ? this.ignore[i].content() : null;
+      return this.ignore.hasOwnProperty(i) ? this.ignore[i] : null;
     }
   }).statics({
     parse: function(code) {

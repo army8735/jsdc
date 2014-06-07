@@ -89,7 +89,12 @@ describe('es6', function() {
     it('let and var in trystmt', function() {
       var s = 'try{var a;let b}catch(e){var a;let b}finally{var a;let b}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;var a;var a;try{!function() { a;var b}()}catch(e){!function() { a;var b}()}finally{!function() { a;var b}()}');
+      expect(res).to.eql('var a;try{!function() { a;var b}()}catch(e){!function() { a;var b}()}finally{!function() { a;var b}()}');
+    });
+    it('let and var in function', function() {
+      var s = 'function a(){var b;let c;{var d;let e}}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function a(){var d;var b;var c;!function() { d;var e}()}');
     });
   });
 });
