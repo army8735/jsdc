@@ -116,6 +116,11 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('!function() {}()//');
     });
+    it('append multi comment', function() {
+      var s = '{}//\n//';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function() {}()//\n//');
+    });
     it('ifstmt append comment', function() {
       var s = 'if(true){let a}//';
       var res = Jsdc.parse(s);
@@ -208,6 +213,11 @@ describe('es6', function() {
       var s = 'for(a of b);//';
       var res = Jsdc.parse(s);
       expect(res).to.eql('for(a in b){a=b[a];;}//');
+    });
+    it('without blockstmt and append mulit comment', function() {
+      var s = 'for(a of b);/**/\n//\n';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(a in b){a=b[a];;}/**/\n//\n');
     });
     it('varstmt', function() {
       var s = 'for(var a of {}){a}';

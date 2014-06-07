@@ -30,6 +30,7 @@
     this.rest = new Rest(this);
     this.template = new Template(this);
     this.forof = new Forof(this);
+    this.i = 0;
     return this;
   }).methods({
     parse: function(code) {
@@ -52,12 +53,17 @@
     ast: function() {
       return this.node;
     },
-    append: function() {
-      var self = this;
-      var args = Array.prototype.slice.call(arguments, 0);
-      args.forEach(function(s) {
-        self.res += s;
-      });
+    append: function(s) {
+      this.res += s;
+      this.i = this.res.length;
+    },
+    appendBefore: function(s) {
+      if(this.i < this.res.length) {
+        this.insert(s, this.i);
+      }
+      else {
+        this.append(s);
+      }
     },
     insert: function(s, i) {
       this.res = this.res.slice(0, i) + s + this.res.slice(i);
@@ -120,7 +126,7 @@
       var ig;
       while(ig = this.next()) {
         if(!ignore || ig.type() != Token.BLANK) {
-          this.append(ig.content());
+          this.res += ig.content();
         }
       }
     },

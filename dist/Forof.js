@@ -29,14 +29,7 @@
       else if(this.hash.hasOwnProperty(node.nid())) {
         var last = node.last();
         if(last.name() != JsNode.BLOCKSTMT) {
-          //forstmt后的单行注释会破坏结构，致使append的}被注释掉，需要添加在其之前
-          if(/\/\/[^\r\n\u2028\u2029]*$/.test(this.jsdc.res)) {
-            var i = this.jsdc.res.lastIndexOf('//');
-            this.jsdc.insert('}', i);
-          }
-          else {
-            this.jsdc.append('}');
-          }
+          this.jsdc.appendBefore('}');
         }
       }
     },
