@@ -14,6 +14,7 @@
   var Class = require('./dist/util/Class');
 
   var Scope = require('./dist/Scope');
+  var Default = require('./dist/Default');
   var Rest = require('./dist/Rest');
 
   var Jsdc = Class(function(code) {
@@ -23,6 +24,7 @@
     this.node = {};
     this.ignores = {};
     this.scope = new Scope(this);
+    this.default = new Default(this);
     this.rest = new Rest(this);
     return this;
   }).methods({
@@ -112,13 +114,24 @@
       }
       else if(node.name() == JsNode.FNBODY) {
         this.scope.enter(node);
+        this.default.enter(node);
         this.rest.enter(node);
       }
       else if(node.name() == JsNode.BLOCK) {
         this.scope.block(node, true);
       }
       else if(node.name() == JsNode.FMPARAMS) {
-        this.rest.parse(node);
+        this.default.param(node);
+        this.rest.param(node);
+      }
+      else if(node.name() == JsNode.CALLEXPR) {
+        this.rest.expr(node);
+      }
+      else if(node.name() == JsNode.ARGS) {
+        this.rest.args(node);
+      }
+      else if(node.name() == JsNode.ARGLIST) {
+        this.rest.arglist(node);
       }
     },
     after: function(node) {

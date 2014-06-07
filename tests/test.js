@@ -108,5 +108,32 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('function a(b, c ){if(typeof c == "undefined") c = fn ( );}')
     });
+    it('multi', function() {
+      var s = 'function a(b = 1, c = []){}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function a(b , c ){if(typeof b == "undefined") b = 1;if(typeof c == "undefined") c = [ ];}')
+    });
+  });
+  describe('rest params', function() {
+    it('fmparams', function() {
+      var s = 'function a(...b){}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function a(b){b = [].slice.call(arguments, 0);}')
+    });
+    it('callexpr single spread', function() {
+      var s = 'Math.max(...a)';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('Math.max.apply(Math, [].concat(a))')
+    });
+    it('callexpr mult spread', function() {
+      var s = 'Math.max(a, ...b)';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('Math.max.apply(Math, [a].concat(b))')
+    });
+    it('callexpr with prmrexpr', function() {
+      var s = 'fn(a, b, ...c)';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('fn.apply(this, [a,b].concat(c))')
+    });
   });
 });
