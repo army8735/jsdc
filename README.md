@@ -12,11 +12,11 @@ npm install jsdc
 ```
 
 ## 语法转换规则
-https://github.com/army8735/jsdc/wiki/%E8%AF%AD%E6%B3%95%E8%BD%AC%E6%8D%A2%E8%A7%84%E5%88%99
+https://github.com/army8735/jsdc/wiki/%E8%BD%AC%E6%8D%A2%E8%A7%84%E5%88%99
 
 ## 使用说明
 * jsdc仅提供安全兼容的转换接口，并且不改变你的源代码行数一致性，这使得调试极为便利。
-* 智能识别es5语法，jsdc会原封不动地返回它。
+* 智能识别es5语法，jsdc不会修改es5的部分。
 * CommonJS/AMD/CMD自适应。
 
 ## API

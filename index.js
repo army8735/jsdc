@@ -15,59 +15,6 @@
 
   var Scope = require('./dist/Scope');
 
-  function recursion(node, ignore, jsdc) {
-    var isToken = node.name() == JsNode.TOKEN;
-    var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
-    if(isToken) {
-      if(!isVirtual) {
-        var token = node.token();
-        //替换掉let和const为var
-        if(token.content() == 'let'
-          || token.content() == 'const') {
-          jsdc.append('var');
-        }
-        else {
-          if(token.content() == '}') {
-            jsdc.scope.block(node);
-          }
-          //替换操作会设置ignore属性将其忽略
-          if(!token.ignore) {
-            jsdc.append(token.content());
-          }
-          if(token.content() == '{') {
-            jsdc.scope.block(node, true);
-          }
-        }
-        //加上ignore
-        var ig;
-        while(ig = jsdc.next()) {
-          !ig.ignore && jsdc.append(ig.content());
-        }
-      }
-    }
-    else {
-      //var变量前置，赋值部分删除var，如此可以将block用匿名函数包裹达到局部作用与效果
-      if(node.name() == JsNode.VARSTMT) {
-        jsdc.scope.prepose(node);
-      }
-      else if(node.name() == JsNode.FNBODY) {
-        jsdc.scope.enter(node);
-      }
-      else if(node.name() == JsNode.BLOCK) {
-        jsdc.scope.block(node, true);
-      }
-      node.leaves().forEach(function(leaf) {
-        recursion(leaf, ignore, jsdc);
-      });
-      if(node.name() == JsNode.FNBODY) {
-        jsdc.scope.leave(node);
-      }
-      else if(node.name() == JsNode.BLOCK) {
-        jsdc.scope.block(node);
-      }
-    }
-  }
-
   var Jsdc = Class(function(code) {
     this.code = (code + '') || '';
     this.index = 0;
@@ -91,7 +38,7 @@
       //预分析局部变量，将影响的let和const声明查找出来
       this.scope.parse(this.node);
       //递归处理
-      recursion(this.node, this.ignore, this);
+      this.recursion(this.node);
       return this.res;
     },
     append: function() {
@@ -107,11 +54,72 @@
     next: function() {
       var i = ++this.index;
       return this.ignore.hasOwnProperty(i) ? this.ignore[i] : null;
+    },
+    recursion: function(node) {
+      var self = this;
+      var isToken = node.name() == JsNode.TOKEN;
+      var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
+      if(isToken) {
+        if(!isVirtual) {
+          self.token(node);
+        }
+      }
+      else {
+        self.before(node);
+        node.leaves().forEach(function(leaf) {
+          self.recursion(leaf);
+        });
+        self.after(node);
+      }
+    },
+    token: function(node) {
+      var token = node.token();
+      //替换掉let和const为var
+      if(token.content() == 'let'
+        || token.content() == 'const') {
+        this.append('var');
+      }
+      else {
+        if(token.content() == '}') {
+          this.scope.block(node);
+        }
+        //替换操作会设置ignore属性将其忽略
+        if(!token.ignore) {
+          this.append(token.content());
+        }
+        if(token.content() == '{') {
+          this.scope.block(node, true);
+        }
+      }
+      //加上ignore
+      var ig;
+      while(ig = this.next()) {
+        !ig.ignore && this.append(ig.content());
+      }
+    },
+    before: function(node) {
+      //var变量前置，赋值部分删除var，如此可以将block用匿名函数包裹达到局部作用与效果
+      if(node.name() == JsNode.VARSTMT) {
+        this.scope.prepose(node);
+      }
+      else if(node.name() == JsNode.FNBODY) {
+        this.scope.enter(node);
+      }
+      else if(node.name() == JsNode.BLOCK) {
+        this.scope.block(node, true);
+      }
+    },
+    after: function(node) {
+      if(node.name() == JsNode.FNBODY) {
+        this.scope.leave(node);
+      }
+      else if(node.name() == JsNode.BLOCK) {
+        this.scope.block(node);
+      }
     }
   }).statics({
     parse: function(code) {
-      var jsdc = new Jsdc();
-      return jsdc.parse(code);
+      return new Jsdc().parse(code);
     }
   });
   module.exports = Jsdc;
