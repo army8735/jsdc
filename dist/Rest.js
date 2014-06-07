@@ -76,7 +76,7 @@
       }
     },
     join: function(node) {
-      var res = { s: ''};
+      var res = { s: '' };
       this.recursion(node, res);
       return res.s;
     },

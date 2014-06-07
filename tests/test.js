@@ -163,4 +163,31 @@ describe('es6', function() {
       expect(res).to.eql('"\\"a\\"b\'c"');
     });
   });
+  describe('forof', function() {
+    it('normal', function() {
+      var s = 'for(a of {}){}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(a in {}){a={}[a];}');
+    });
+    it('without blockstmt', function() {
+      var s = 'for(a of b);';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(a in b){a=b[a];;}');
+    });
+    it('without blockstmt and append comment', function() {
+      var s = 'for(a of b);//';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(a in b){a=b[a];;}//');
+    });
+    it('varstmt', function() {
+      var s = 'for(var a of {}){a}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(var a in {}){a={}[a];a}');
+    });
+    it('varstmt without blockstmt', function() {
+      var s = 'for(var a of {})a';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(var a in {}){a={}[a];a}');
+    });
+  });
 });

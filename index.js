@@ -17,6 +17,7 @@
   var Default = require('./dist/Default');
   var Rest = require('./dist/Rest');
   var Template = require('./dist/Template');
+  var Forof = require('./dist/Forof');
 
   var Jsdc = Class(function(code) {
     this.code = (code + '') || '';
@@ -28,6 +29,7 @@
     this.default = new Default(this);
     this.rest = new Rest(this);
     this.template = new Template(this);
+    this.forof = new Forof(this);
     return this;
   }).methods({
     parse: function(code) {
@@ -85,25 +87,33 @@
       var token = node.token();
       var ignore = token.ignore;
       delete token.ignore;
+      var content = token.content();
       //替换掉let和const为var
-      if(token.content() == 'let'
-        || token.content() == 'const') {
+      if(content == 'let'
+        || content == 'const') {
         this.append('var');
       }
       else {
-        if(token.content() == '}') {
+        if(content == '}') {
           this.scope.block(node);
         }
-        if(token.type() == Token.TEMPLATE) {
+        else if(content == 'of') {
+          this.forof.of(node);
+        }
+        else if(token.type() == Token.TEMPLATE) {
           ignore = true;
           this.template.parse(token);
         }
         //替换操作会设置ignore属性将其忽略
         if(!ignore) {
-          this.append(token.content());
+          this.append(content);
         }
-        if(token.content() == '{') {
+        if(content == '{') {
           this.scope.block(node, true);
+          this.forof.block(node);
+        }
+        else if(content == ')') {
+          this.forof.prts(node);
         }
       }
       //加上ignore
@@ -140,6 +150,9 @@
       else if(node.name() == JsNode.ARGLIST) {
         this.rest.arglist(node);
       }
+      else if(node.name() == JsNode.ITERSTMT) {
+        this.forof.parse(node, true);
+      }
     },
     after: function(node) {
       if(node.name() == JsNode.FNBODY) {
@@ -147,6 +160,9 @@
       }
       else if(node.name() == JsNode.BLOCK) {
         this.scope.block(node);
+      }
+      else if(node.name() == JsNode.ITERSTMT) {
+        this.forof.parse(node);
       }
     },
     ignore: function(node) {
