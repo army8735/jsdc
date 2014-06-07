@@ -19,6 +19,7 @@
     parse: function(node, start) {
       if(node.name() == JsNode.CLASSDECL) {
         if(start) {
+          this.body(node.last().prev());
           var o = {};
           this.jsdc.ignore(node.leaf(0));
           this.jsdc.ignore(node.leaf(1));
@@ -31,11 +32,11 @@
             this.jsdc.ignore(node.leaf(3));
             this.jsdc.ignore(node.leaf(5));
             o.extend = this.join(node.leaf(2).last());
-            this.jsdc.appendBefore('!function(){');
-            this.jsdc.appendBefore('var _=Object.create(' + o.extend + '.prototype);');
-            this.jsdc.appendBefore('_.constructor=' + o.name + ';');
-            this.jsdc.appendBefore(o.name + '.prototype=_;');
-            this.jsdc.appendBefore('}();');
+            this.jsdc.append('!function(){');
+            this.jsdc.append('var _=Object.create(' + o.extend + '.prototype);');
+            this.jsdc.append('_.constructor=' + o.name + ';');
+            this.jsdc.append(o.name + '.prototype=_;');
+            this.jsdc.append('}();');
           }
           this.hash[node.nid()] = o;
         }

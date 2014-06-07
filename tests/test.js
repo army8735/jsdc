@@ -249,12 +249,12 @@ describe('es6', function() {
     it('getter/setter', function() {
       var s = 'class A extends B{\na(){}\nget b(){}\nset c(d){}\n}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();\nfunction A(){}A.prototype.a = function(){}\nA.prototype.b={get b(){}}["b"];\nA.prototype.c={set c(d){}}["c"];\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
+      expect(res).to.eql('function A(){}!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();\nA.prototype.a = function(){}\nA.prototype.b={get b(){}}["b"];\nA.prototype.c={set c(d){}}["c"];\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
     });
     it('static', function() {
       var s = 'class A extends B{\nstatic a(){super.b}\n}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();\nfunction A(){}A.a=function(){B.b}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
+      expect(res).to.eql('function A(){}!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();\nA.a=function(){B.b}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
     });
     it(';', function() {
       var s = 'class A{;}';

@@ -181,9 +181,6 @@
       else if(node.name() == JsNode.CLASSELEM) {
         this.klass.elem(node, true);
       }
-      else if(node.name() == JsNode.CLASSBODY) {
-        this.klass.body(node);
-      }
     },
     after: function(node) {
       if(node.name() == JsNode.FNBODY) {
