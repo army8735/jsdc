@@ -49,7 +49,7 @@ var Scope = Class(function(jsdc) {
           self.jsdc.insert('var ' + id + ';', i);
         }
       });
-      varstmt.first().token().ignore = true;
+      self.jsdc.ignore(varstmt.first().token());
     };
   },
   join: function(node) {

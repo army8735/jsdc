@@ -14,14 +14,16 @@
   var Class = require('./dist/util/Class');
 
   var Scope = require('./dist/Scope');
+  var Rest = require('./dist/Rest');
 
   var Jsdc = Class(function(code) {
     this.code = (code + '') || '';
     this.index = 0;
     this.res = '';
     this.node = {};
-    this.ignore = {};
+    this.ignores = {};
     this.scope = new Scope(this);
+    this.rest = new Rest(this);
     return this;
   }).methods({
     parse: function(code) {
@@ -30,10 +32,10 @@
       }
       var parser = homunculus.getParser('es6');
       this.node = parser.parse(code);
-      this.ignore = parser.ignore();
+      this.ignores = parser.ignore();
       //开头部分的ignore
-      while(this.ignore[this.index]) {
-        this.append(this.ignore[this.index++].content());
+      while(this.ignores[this.index]) {
+        this.append(this.ignores[this.index++].content());
       }
       //预分析局部变量，将影响的let和const声明查找出来
       this.scope.parse(this.node);
@@ -53,7 +55,7 @@
     },
     next: function() {
       var i = ++this.index;
-      return this.ignore.hasOwnProperty(i) ? this.ignore[i] : null;
+      return this.ignores.hasOwnProperty(i) ? this.ignores[i] : null;
     },
     recursion: function(node) {
       var self = this;
@@ -74,6 +76,7 @@
     },
     token: function(node) {
       var token = node.token();
+      var ignore = token.ignore;
       //替换掉let和const为var
       if(token.content() == 'let'
         || token.content() == 'const') {
@@ -84,7 +87,7 @@
           this.scope.block(node);
         }
         //替换操作会设置ignore属性将其忽略
-        if(!token.ignore) {
+        if(!ignore) {
           this.append(token.content());
         }
         if(token.content() == '{') {
@@ -94,7 +97,9 @@
       //加上ignore
       var ig;
       while(ig = this.next()) {
-        !ig.ignore && this.append(ig.content());
+        if(!ignore || ig.type() != Token.BLANK) {
+          this.append(ig.content());
+        }
       }
     },
     before: function(node) {
@@ -104,6 +109,7 @@
       }
       else if(node.name() == JsNode.FNBODY) {
         this.scope.enter(node);
+        this.rest.parse(node);
       }
       else if(node.name() == JsNode.BLOCK) {
         this.scope.block(node, true);
@@ -115,6 +121,20 @@
       }
       else if(node.name() == JsNode.BLOCK) {
         this.scope.block(node);
+      }
+    },
+    ignore: function(node) {
+      var self = this;
+      if(node instanceof Token) {
+        node.ignore = true;
+      }
+      else if(node.name() == JsNode.TOKEN && node.token().type() != Token.VIRTUAL) {
+        node.token().ignore = true;
+      }
+      else {
+        node.leaves().forEach(function(leaf) {
+          self.ignore(leaf);
+        });
       }
     }
   }).statics({

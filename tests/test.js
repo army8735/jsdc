@@ -69,32 +69,32 @@ describe('es6', function() {
     it('let and var in block', function() {
       var s = '{var a;let b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;!function() { a;var b;}()');
+      expect(res).to.eql('var a;!function() {a;var b;}()');
     });
     it('let and var in ifstmt', function() {
       var s = 'if(true){var a;let b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;if(true){!function() { a;var b;}()}');
+      expect(res).to.eql('var a;if(true){!function() {a;var b;}()}');
     });
     it('const and var in forstmt', function() {
       var s = 'for(;;){var a;const b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;for(;;){!function() { a;var b;}()}');
+      expect(res).to.eql('var a;for(;;){!function() {a;var b;}()}');
     });
     it('const and var in whilestmt', function() {
       var s = 'while(false){var a;const b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;while(false){!function() { a;var b;}()}');
+      expect(res).to.eql('var a;while(false){!function() {a;var b;}()}');
     });
     it('let and var in trystmt', function() {
       var s = 'try{var a;let b}catch(e){var a;let b}finally{var a;let b}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;try{!function() { a;var b}()}catch(e){!function() { a;var b}()}finally{!function() { a;var b}()}');
+      expect(res).to.eql('var a;try{!function() {a;var b}()}catch(e){!function() {a;var b}()}finally{!function() {a;var b}()}');
     });
     it('let and var in function', function() {
       var s = 'function a(){var b;let c;{var d;let e}}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function a(){var d;var b;var c;!function() { d;var e}()}');
+      expect(res).to.eql('function a(){var d;var b;var c;!function() {d;var e}()}');
     });
   });
 });
