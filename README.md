@@ -21,8 +21,8 @@ https://github.com/army8735/jsdc/wiki/%E8%BD%AC%E6%8D%A2%E8%A7%84%E5%88%99
 
 ## API
 
-### JSDC
-* constructor(code:String = ''):String 传入需要转换的code
+### Jsdc
+* constructor(code:String = '') 传入需要转换的code
 * parse(code:String = null):String 转换code，可以为空，否则会覆盖构造函数里传入的code
 
 ### 静态属性
