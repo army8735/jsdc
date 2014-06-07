@@ -22,8 +22,7 @@
         if(sgname.name() == JsNode.SINGLENAME && sgname.size() == 2) {
           var init = sgname.last();
           if(init.name() == JsNode.INITLZ) {
-            this.jsdc.ignore(sgname);
-            this.jsdc.ignore(sgname.prev());
+            this.jsdc.ignore(init);
             this.hash[fmparams.next().next().next().nid()] = sgname;
           }
         }

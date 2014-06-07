@@ -98,10 +98,15 @@ describe('es6', function() {
     });
   });
   describe('init params', function() {
-    it('is id', function() {
-      var s = 'function a(b, c = 1){}';
+    it('only one id', function() {
+      var s = 'function a(b = 1){}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function a(b){if(typeof c == "undefined") c = 1;}')
+      expect(res).to.eql('function a(b ){if(typeof b == "undefined") b = 1;}')
+    });
+    it('after an id', function() {
+      var s = 'function a(b, c = fn()){}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function a(b, c ){if(typeof c == "undefined") c = fn ( );}')
     });
   });
 });
