@@ -16,6 +16,7 @@
   var Scope = require('./dist/Scope');
   var Default = require('./dist/Default');
   var Rest = require('./dist/Rest');
+  var Template = require('./dist/Template');
 
   var Jsdc = Class(function(code) {
     this.code = (code + '') || '';
@@ -26,6 +27,7 @@
     this.scope = new Scope(this);
     this.default = new Default(this);
     this.rest = new Rest(this);
+    this.template = new Template(this);
     return this;
   }).methods({
     parse: function(code) {
@@ -82,6 +84,7 @@
     token: function(node) {
       var token = node.token();
       var ignore = token.ignore;
+      delete token.ignore;
       //替换掉let和const为var
       if(token.content() == 'let'
         || token.content() == 'const') {
@@ -90,6 +93,10 @@
       else {
         if(token.content() == '}') {
           this.scope.block(node);
+        }
+        if(token.type() == Token.TEMPLATE) {
+          ignore = true;
+          this.template.parse(token);
         }
         //替换操作会设置ignore属性将其忽略
         if(!ignore) {
