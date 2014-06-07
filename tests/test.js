@@ -28,6 +28,21 @@ describe('ignore es5', function() {
     var res = Jsdc.parse(s);
     expect(res).to.eql(s);
   });
+  it('forstmt', function() {
+    var s = 'for(;;){var a}';
+    var res = Jsdc.parse(s);
+    expect(res).to.eql(s);
+  });
+  it('whilestmt', function() {
+    var s = 'while(false){var a}';
+    var res = Jsdc.parse(s);
+    expect(res).to.eql(s);
+  });
+  it('trystmt', function() {
+    var s = 'try{var a}catch(e){var b}finally{var c}';
+    var res = Jsdc.parse(s);
+    expect(res).to.eql(s);
+  });
 });
 describe('es6', function() {
   describe('scope', function() {
@@ -55,6 +70,26 @@ describe('es6', function() {
       var s = '{var a;let b;}';
       var res = Jsdc.parse(s);
       expect(res).to.eql('var a;!function() { a;var b;}()');
+    });
+    it('let and var in ifstmt', function() {
+      var s = 'if(true){var a;let b;}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a;if(true){!function() { a;var b;}()}');
+    });
+    it('const and var in forstmt', function() {
+      var s = 'for(;;){var a;const b;}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a;for(;;){!function() { a;var b;}()}');
+    });
+    it('const and var in whilestmt', function() {
+      var s = 'while(false){var a;const b;}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a;while(false){!function() { a;var b;}()}');
+    });
+    it('let and var in trystmt', function() {
+      var s = 'try{var a;let b}catch(e){var a;let b}finally{var a;let b}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a;var a;var a;try{!function() { a;var b}()}catch(e){!function() { a;var b}()}finally{!function() { a;var b}()}');
     });
   });
 });

@@ -27,7 +27,13 @@
           jsdc.append('var');
         }
         else {
+          if(token.content() == '}') {
+            jsdc.scope.block(node);
+          }
           jsdc.append(token.content());
+          if(token.content() == '{') {
+            jsdc.scope.block(node, true);
+          }
         }
         //加上ignore
         var s;
@@ -43,7 +49,6 @@
       }
       else if(node.name() == JsNode.FNBODY) {
         jsdc.scope.enter(node);
-        jsdc.scope.block(node, true);
       }
       else if(node.name() == JsNode.BLOCK) {
         jsdc.scope.block(node, true);
@@ -53,7 +58,6 @@
       });
       if(node.name() == JsNode.FNBODY) {
         jsdc.scope.leave(node);
-        jsdc.scope.block(node);
       }
       else if(node.name() == JsNode.BLOCK) {
         jsdc.scope.block(node);
