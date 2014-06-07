@@ -43,6 +43,9 @@
       this.recursion(this.node);
       return this.res;
     },
+    ast: function() {
+      return this.node;
+    },
     append: function() {
       var self = this;
       var args = Array.prototype.slice.call(arguments, 0);
@@ -109,10 +112,13 @@
       }
       else if(node.name() == JsNode.FNBODY) {
         this.scope.enter(node);
-        this.rest.parse(node);
+        this.rest.enter(node);
       }
       else if(node.name() == JsNode.BLOCK) {
         this.scope.block(node, true);
+      }
+      else if(node.name() == JsNode.FMPARAMS) {
+        this.rest.parse(node);
       }
     },
     after: function(node) {
@@ -139,8 +145,13 @@
     }
   }).statics({
     parse: function(code) {
-      return new Jsdc().parse(code);
+      jsdc = new Jsdc();
+      return jsdc.parse(code);
+    },
+    ast: function() {
+      return jsdc.ast();
     }
   });
+  var jsdc = null;
   module.exports = Jsdc;
 });

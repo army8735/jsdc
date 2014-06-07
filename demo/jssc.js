@@ -1,7 +1,7 @@
 define(function(require, exports) {
-	var factory = require('../web/lexer/factory'),
-		Token = require('../web/lexer/Token'),
-		render = require('../web/util/render'),
+  var factory = require('./factory'),
+    Token = require('./lexer/Token'),
+    render = require('./render'),
 		cacheLine = 0,
 		cacheTime = 0,
 		find;
@@ -25,7 +25,7 @@ define(function(require, exports) {
 			tab = (array = /tab\s*\:\s*(\d+)/i.exec(node.className)) == null ? 4 : parseInt(array[1]),
 			cache = (array = /cache\s*\:\s*(\d+)/i.exec(node.className)) === null ? null : parseInt(array[1]),
 			newClass = (array = /class-name\s*?\:\s*?(\w+)/i.exec(node.className)) === null ? null : array[1];
-		//¼æÈİshµÄfirst-line
+		//å…¼å®¹shçš„first-line
 		if(start < 1) {
 			start = (array = /first-line\s*?\:\s*?(\w+)/i.exec(node.className)) === null ? 0 : parseInt(array[1]);
 		}
@@ -42,7 +42,7 @@ define(function(require, exports) {
 		}
 		lexer.cache(cache !== null ? cache : cacheLine);
 		function join(tokens) {
-			//ÁĞÊıÖØĞÂ¼ÆËã
+			//åˆ—æ•°é‡æ–°è®¡ç®—
 			if(lexer.col() > lastCol) {
 				lastCol = lexer.col();
 				var s = [],
@@ -64,13 +64,13 @@ define(function(require, exports) {
 				}
 				col.innerHTML = s.join('');
 			}
-			//äÖÈ¾ĞÂµÄ´úÂëĞĞ
+			//æ¸²æŸ“æ–°çš„ä»£ç è¡Œ
 			if(!lexer.finish() && tokens[tokens.length - 1].type() == Token.LINE) {
 				tokens.pop();
 			}
 			var df = render(tokens, tabBlank);
 			ol.appendChild(df);
-			//×ó±ß¾à
+			//å·¦è¾¹è·
 			var pLeft = (String(lexer.line()).length - 1) * 9 + 30 + 'px';
 			col.style.paddingLeft = pLeft;
 			ol.style.paddingLeft = pLeft;
@@ -86,7 +86,7 @@ define(function(require, exports) {
 		}
 		node.parentNode.insertBefore(div, node);
 		node.style.display = 'none';
-		//¸ù¾İÍê³É¶ÈÑ¡Ôñ¼ÌĞø·ÖÎö»¹ÊÇ³ÖĞø·ÖÎö»º´æ
+		//æ ¹æ®å®Œæˆåº¦é€‰æ‹©ç»§ç»­åˆ†æè¿˜æ˜¯æŒç»­åˆ†æç¼“å­˜
 		function parseNext() {
 			if(lexer.finish()) {
 				setTimeout(function() {

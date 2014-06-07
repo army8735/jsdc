@@ -97,4 +97,11 @@ describe('es6', function() {
       expect(res).to.eql('function a(){var d;var b;var c;!function() {d;var e}()}');
     });
   });
+  describe('init params', function() {
+    it('is id', function() {
+      var s = 'function a(b, c = 1){}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function a(b){if(typeof c == "undefined") c = 1;}')
+    });
+  });
 });
