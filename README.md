@@ -33,6 +33,7 @@ https://github.com/army8735/jsdc/wiki/%E8%BD%AC%E6%8D%A2%E8%A7%84%E5%88%99
 * extends类继承
 * module模块
 * ArrayComprehension数组推导
+* ArrowFunction箭头函数
 
 ## API
 
