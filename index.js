@@ -20,6 +20,7 @@
   var Forof = require('./dist/Forof');
   var Klass = require('./dist/Klass');
   var Num = require('./dist/Num');
+  var Module = require('./dist/Module');
 
   var Jsdc = Class(function(code) {
     this.code = (code + '') || '';
@@ -34,6 +35,7 @@
     this.forof = new Forof(this);
     this.klass = new Klass(this);
     this.num = new Num(this);
+    this.module = new Module(this);
     this.i = 0;
     return this;
   }).methods({
@@ -97,12 +99,11 @@
     token: function(node) {
       var token = node.token();
       var ignore = token.ignore;
-      delete token.ignore;
       var content = token.content();
       //替换掉let和const为var
       if(content == 'let'
         || content == 'const') {
-        this.append('var');
+        !token.ignore && this.append('var');
       }
       else {
         if(content == '}') {
@@ -116,15 +117,15 @@
         }
         else if(token.type() == Token.KEYWORD
           && content == 'super'){
-          ignore = true;
+          token.ignore = ignore = true;
           this.append(this.klass.super(node));
         }
         else if(token.type() == Token.TEMPLATE) {
-          ignore = true;
+          token.ignore = ignore = true;
           this.template.parse(token);
         }
         else if(!ignore && token.type() == Token.NUMBER) {
-          ignore = true;
+          token.ignore = ignore = true;
           this.num.parse(token);
         }
         //替换操作会设置ignore属性将其忽略
@@ -153,58 +154,77 @@
       }
     },
     before: function(node) {
-      //var变量前置，赋值部分删除var，如此可以将block用匿名函数包裹达到局部作用与效果
-      if(node.name() == JsNode.VARSTMT) {
-        this.scope.prepose(node);
-      }
-      else if(node.name() == JsNode.FNBODY) {
-        this.scope.enter(node);
-        this.default.enter(node);
-        this.rest.enter(node);
-      }
-      else if(node.name() == JsNode.BLOCK) {
-        this.scope.block(node, true);
-      }
-      else if(node.name() == JsNode.FMPARAMS) {
-        this.default.param(node);
-        this.rest.param(node);
-      }
-      else if(node.name() == JsNode.CALLEXPR) {
-        this.rest.expr(node);
-      }
-      else if(node.name() == JsNode.ARGS) {
-        this.rest.args(node);
-      }
-      else if(node.name() == JsNode.ARGLIST) {
-        this.rest.arglist(node);
-      }
-      else if(node.name() == JsNode.ITERSTMT) {
-        this.forof.parse(node, true);
-      }
-      else if(node.name() == JsNode.CLASSDECL
-        || node.name() == JsNode.CLASSEXPR) {
-        this.klass.parse(node, true);
-      }
-      else if(node.name() == JsNode.CLASSELEM) {
-        this.klass.elem(node, true);
+      switch(node.name()) {
+        //var变量前置，赋值部分删除var，如此可以将block用匿名函数包裹达到局部作用与效果
+        case JsNode.VARSTMT:
+          this.scope.prepose(node);
+          break;
+        case JsNode.FNBODY:
+          this.scope.enter(node);
+          this.default.enter(node);
+          this.rest.enter(node);
+          break;
+        case JsNode.BLOCK:
+          this.scope.block(node, true);
+          break;
+        case JsNode.FMPARAMS:
+          this.default.param(node);
+          this.rest.param(node);
+          break;
+        case JsNode.CALLEXPR:
+          this.rest.expr(node);
+          break;
+        case JsNode.ARGS:
+          this.rest.args(node);
+          break;
+        case JsNode.ARGLIST:
+          this.rest.arglist(node);
+          break;
+        case JsNode.ITERSTMT:
+          this.forof.parse(node, true);
+          break;
+        case JsNode.CLASSDECL:
+        case JsNode.CLASSEXPR:
+          this.klass.parse(node, true);
+          break;
+        case JsNode.CLASSELEM:
+          this.klass.elem(node, true);
+          break;
+        case JsNode.MODULEBODY:
+          this.module.enter(node);
+          break;
+        case JsNode.MODULEIMPORT:
+          this.module.module(node);
+          break;
+        case JsNode.IMPORTDECL:
+          this.module.import(node);
+          break;
+        case JsNode.EXPORTDECL:
+          this.module.export(node);
+          break;
       }
     },
     after: function(node) {
-      if(node.name() == JsNode.FNBODY) {
-        this.scope.leave(node);
-      }
-      else if(node.name() == JsNode.BLOCK) {
-        this.scope.block(node);
-      }
-      else if(node.name() == JsNode.ITERSTMT) {
-        this.forof.parse(node);
-      }
-      else if(node.name() == JsNode.CLASSDECL
-        || node.name() == JsNode.CLASSEXPR) {
-        this.klass.parse(node);
-      }
-      else if(node.name() == JsNode.CLASSELEM) {
-        this.klass.elem(node);
+      switch(node.name()) {
+        case JsNode.FNBODY:
+          this.scope.leave(node);
+          break;
+        case JsNode.BLOCK:
+          this.scope.block(node);
+          break;
+        case JsNode.ITERSTMT:
+          this.forof.parse(node);
+          break;
+        case JsNode.CLASSDECL:
+        case JsNode.CLASSEXPR:
+          this.klass.parse(node);
+          break;
+        case JsNode.CLASSELEM:
+          this.klass.elem(node);
+          break;
+        case JsNode.MODULEBODY:
+          this.module.leave(node);
+          break;
       }
     },
     ignore: function(node) {
@@ -212,7 +232,7 @@
       if(node instanceof Token) {
         node.ignore = true;
       }
-      else if(node.name() == JsNode.TOKEN && node.token().type() != Token.VIRTUAL) {
+      else if(node.name() == JsNode.TOKEN) {
         node.token().ignore = true;
       }
       else {
@@ -220,6 +240,12 @@
           self.ignore(leaf);
         });
       }
+    },
+    uid: function() {
+      return '__' + uid++ + '__';
+    },
+    reset: function() {
+      uid = 0;
     }
   }).statics({
     parse: function(code) {
@@ -228,8 +254,15 @@
     },
     ast: function() {
       return jsdc.ast();
+    },
+    uid: function() {
+      return '__' + uid++ + '__';
+    },
+    reset: function() {
+      uid = 0;
     }
   });
   var jsdc = null;
   module.exports = Jsdc;
 });
+var uid = 0;

@@ -284,4 +284,82 @@ describe('es6', function() {
       expect(res).to.eql('parseInt("777", 8)');
     });
   });
+  describe('module', function() {
+    it('module from', function() {
+      var s = 'module circle from "a"';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('define(function(require,exports,module){var circle=require("a");});');
+    });
+    it('import string', function() {
+      var s = 'import "a"';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('define(function(require,exports,module){require("a");});');
+    });
+    it('import id', function() {
+      var s = 'import a from "a"';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('define(function(require,exports,module){var a;!function(){var __0__=require("a");a=__0__.a;}();});');
+    });
+    it('import multi id', function() {
+      var s = 'import a,b from "a"';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('define(function(require,exports,module){var a;var b;!function(){var __0__=require("a");a=__0__.a;b=__0__.b;}();});');
+    });
+    it('import {}', function() {
+      var s = 'import {a,b} from "a"';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('define(function(require,exports,module){var a;var b;!function(){var __0__=require("a");a=__0__.a;b=__0__.b;}();});');
+    });
+    it('import {} as', function() {
+      var s = 'import {a,b as c} from "a"';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('define(function(require,exports,module){var a;var c;!function(){var __0__=require("a");a=__0__.a;c=__0__.b;}();});');
+    });
+    it('export *', function() {
+      var s = 'export * from "a"';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('define(function(require,exports,module){module.exports=require("a");});');
+    });
+    it('export var', function() {
+      var s = 'export var a';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('define(function(require,exports,module){var a;exports.a=a});');
+    });
+    it('export lexdecl', function() {
+      var s = 'export let a = 1';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('define(function(require,exports,module){var a;exports.a=a = 1});');
+    });
+    it('export function decl', function() {
+      var s = 'export function a(){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('define(function(require,exports,module){exports.a=a;function a(){}});');
+    });
+  });
+  it('export function decl', function() {
+    var s = 'export function a(){}';
+    Jsdc.reset();
+    var res = Jsdc.parse(s);
+    expect(res).to.eql('define(function(require,exports,module){exports.a=a;function a(){}});');
+  });
+  it('export class decl', function() {
+    var s = 'export class A{}';
+    Jsdc.reset();
+    var res = Jsdc.parse(s);
+    expect(res).to.eql('define(function(require,exports,module){exports.A=A;function A(){}});');
+  });
+  it('export default', function() {
+    var s = 'export default a';
+    Jsdc.reset();
+    var res = Jsdc.parse(s);
+    expect(res).to.eql('define(function(require,exports,module){module.exports=a});');
+  });
 });
