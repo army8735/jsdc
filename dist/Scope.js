@@ -38,15 +38,20 @@
             self.hash[parent.nid()] = true;
           }
         }
+        else if(node.name() == JsNode.BLOCKSTMT
+          && !NOT_ABS_BLOCK.hasOwnProperty(node.parent().name())) {
+          self.hash[node.first().nid()] = true;
+        }
         node.leaves().forEach(function(leaf) {
           self.recursion(leaf);
         });
       }
     },
-    prepose: function(varstmt) {
+    prevar: function(varstmt) {
       var self = this;
       var parent = self.closest(varstmt);
-      if(parent && self.hash[parent.nid()]) {
+      if(parent
+          && self.hash[parent.nid()]) {
         //插入声明的变量到作用域开始，并删除这个var
         var i = self.index[self.index.length - 1];
         self.history[i] = self.history[i] || {};
@@ -58,6 +63,23 @@
           }
         });
         self.jsdc.ignore(varstmt.first().token());
+      };
+    },
+    prefn: function(fndecl) {
+      var parent = this.closest(fndecl);
+      if(parent
+        && this.hash[parent.nid()]) {
+        //插入声明的变量到作用域开始，并改写为var形式
+        var i = this.index[this.index.length - 1];
+        this.history[i] = this.history[i] || {};
+        var his = this.history[i];
+        var id = fndecl.leaf(1).first().token().content();
+        if(!his.hasOwnProperty(id)) {
+          his[id] = true;
+          this.jsdc.insert('var ' + id + ';', i);
+        }
+        this.jsdc.ignore(fndecl.leaf(1));
+        this.jsdc.append(id + '=');
       };
     },
     join: function(node) {
@@ -88,7 +110,7 @@
               this.jsdc.append('!function()');
             }
             else {
-              this.jsdc.appendBefore('()');
+              this.jsdc.appendBefore('();');
             }
           }
         }
@@ -101,7 +123,7 @@
           node = node.parent();
           if(node.name() != JsNode.BLOCKSTMT
             || NOT_ABS_BLOCK.hasOwnProperty(node.parent().name())) {
-            this.jsdc.append(start ? '!function(){' : '}()');
+            this.jsdc.append(start ? '!function(){' : '}();');
           }
         }
       }

@@ -4,7 +4,7 @@ var Token = homunculus.getClass('Token');
 
 var Class = require('./util/Class');
 
-var Default = Class(function(jsdc) {
+var DefaultValue = Class(function(jsdc) {
   this.jsdc = jsdc;
   this.hash = {};
 }).methods({
@@ -52,4 +52,4 @@ var Default = Class(function(jsdc) {
   }
 });
 
-module.exports = Default;
+module.exports = DefaultValue;

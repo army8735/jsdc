@@ -14,7 +14,7 @@
   var Class = require('./dist/util/Class');
 
   var Scope = require('./dist/Scope');
-  var Default = require('./dist/Default');
+  var DefaultValue = require('./dist/DefaultValue');
   var Rest = require('./dist/Rest');
   var Template = require('./dist/Template');
   var Forof = require('./dist/Forof');
@@ -30,7 +30,7 @@
     this.node = {};
     this.ignores = {};
     this.scope = new Scope(this);
-    this.default = new Default(this);
+    this.default = new DefaultValue(this);
     this.rest = new Rest(this);
     this.template = new Template(this);
     this.forof = new Forof(this);
@@ -160,7 +160,10 @@
       switch(node.name()) {
         //var变量前置，赋值部分删除var，如此可以将block用匿名函数包裹达到局部作用与效果
         case JsNode.VARSTMT:
-          this.scope.prepose(node);
+          this.scope.prevar(node);
+          break;
+        case JsNode.FNDECL:
+          this.scope.prefn(node);
           break;
         case JsNode.FNBODY:
           this.scope.enter(node);

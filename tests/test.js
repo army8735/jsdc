@@ -10,6 +10,10 @@ describe('api', function() {
     var jsdc = new Jsdc();
     expect(jsdc.append).to.be.a(Function);
   });
+  it('#appendBefore', function() {
+    var jsdc = new Jsdc();
+    expect(jsdc.appendBefore).to.be.a(Function);
+  });
   it('#insert', function() {
     var jsdc = new Jsdc();
     expect(jsdc.insert).to.be.a(Function);
@@ -18,8 +22,44 @@ describe('api', function() {
     var jsdc = new Jsdc();
     expect(jsdc.next).to.be.a(Function);
   });
+  it('#before', function() {
+    var jsdc = new Jsdc();
+    expect(jsdc.before).to.be.a(Function);
+  });
+  it('#token', function() {
+    var jsdc = new Jsdc();
+    expect(jsdc.token).to.be.a(Function);
+  });
+  it('#recursion', function() {
+    var jsdc = new Jsdc();
+    expect(jsdc.recursion).to.be.a(Function);
+  });
+  it('#ignore', function() {
+    var jsdc = new Jsdc();
+    expect(jsdc.ignore).to.be.a(Function);
+  });
+  it('#uid', function() {
+    var jsdc = new Jsdc();
+    expect(jsdc.uid).to.be.a(Function);
+  });
+  it('#define', function() {
+    var jsdc = new Jsdc();
+    expect(jsdc.define).to.be.a(Function);
+  });
   it('static #parse', function() {
     expect(Jsdc.parse).to.be.a(Function);
+  });
+  it('static #uid', function() {
+    expect(Jsdc.uid).to.be.a(Function);
+  });
+  it('static #reset', function() {
+    expect(Jsdc.reset).to.be.a(Function);
+  });
+  it('static #define', function() {
+    expect(Jsdc.define).to.be.a(Function);
+  });
+  it('static #ast', function() {
+    expect(Jsdc.ast).to.be.a(Function);
   });
 });
 describe('ignore es5', function() {
@@ -74,62 +114,92 @@ describe('es6', function() {
     it('let in block', function() {
       var s = '{let b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){var b;}()')
+      expect(res).to.eql('!function(){var b;}();')
     });
     it('let and var in block', function() {
       var s = '{var a;let b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;!function(){a;var b;}()');
+      expect(res).to.eql('var a;!function(){a;var b;}();');
     });
     it('let and var in ifstmt', function() {
       var s = 'if(true){var a;let b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;if(true){!function(){a;var b;}()}');
+      expect(res).to.eql('var a;if(true){!function(){a;var b;}();}');
     });
     it('const and var in forstmt', function() {
       var s = 'for(;;){var a;const b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;for(;;){!function(){a;var b;}()}');
+      expect(res).to.eql('var a;for(;;){!function(){a;var b;}();}');
     });
     it('const and var in whilestmt', function() {
       var s = 'while(false){var a;const b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;while(false){!function(){a;var b;}()}');
+      expect(res).to.eql('var a;while(false){!function(){a;var b;}();}');
     });
     it('let and var in trystmt', function() {
       var s = 'try{var a;let b}catch(e){var a;let b}finally{var a;let b}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;try{!function(){a;var b}()}catch(e){!function(){a;var b}()}finally{!function(){a;var b}()}');
+      expect(res).to.eql('var a;try{!function(){a;var b}();}catch(e){!function(){a;var b}();}finally{!function(){a;var b}();}');
     });
     it('let and var in function', function() {
       var s = 'function a(){var b;let c;{var d;let e}}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function a(){var d;var b;var c;!function(){d;var e}()}');
+      expect(res).to.eql('function a(){var d;var b;var c;!function(){d;var e}();}');
     });
     it('empty block', function() {
       var s = '{}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){}()');
+      expect(res).to.eql('!function(){}();');
+    });
+    it('empty block with function decl', function() {
+      var s = '{function a(){}}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a;!function(){a=function (){}}();');
+    });
+    it('empty block with varstmt', function() {
+      var s = '{var a}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a;!function(){a}();');
+    });
+    it('empty block with var and fn with same name', function() {
+      var s = '{var a;function a(){}}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a;!function(){a;a=function (){}}();');
+    });
+    it('var in method', function() {
+      var s = 'class A{m(){var a}}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function A(){}A.prototype.m = function(){var a}');
+    });
+    it('let in method', function() {
+      var s = 'class A{m(){let a}}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function A(){}A.prototype.m = function(){var a}');
+    });
+    it('var and let in method', function() {
+      var s = 'class A{m(){let a;var b}}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function A(){}A.prototype.m = function(){var a;var b}');
     });
     it('append comment', function() {
       var s = '{}//';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){}()//');
+      expect(res).to.eql('!function(){}();//');
     });
     it('append multi comment', function() {
       var s = '{}//\n//';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){}()//\n//');
+      expect(res).to.eql('!function(){}();//\n//');
     });
     it('ifstmt append comment', function() {
       var s = 'if(true){let a}//';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('if(true){!function(){var a}()}//');
+      expect(res).to.eql('if(true){!function(){var a}();}//');
     });
     it('trystmt append comment', function() {
       var s = 'try{let a}catch(e){const a}//';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('try{!function(){var a}()}catch(e){!function(){var a}()}//');
+      expect(res).to.eql('try{!function(){var a}();}catch(e){!function(){var a}();}//');
     });
   });
   describe('init params', function() {
