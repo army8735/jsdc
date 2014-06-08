@@ -19,7 +19,6 @@ var ArrCmph = Class(function(jsdc) {
       self.jsdc.ignore(node.first());
       self.jsdc.ignore(node.last());
       self.jsdc.append('function(){');
-      var hash = {};
       //forbinding的变量要提出来声明
       var leaves = node.leaf(1).leaves();
       for(var i = 0; i < leaves.length - 1; i++) {
@@ -27,13 +26,12 @@ var ArrCmph = Class(function(jsdc) {
         if(leaf.name() == JsNode.CMPHFOR) {
           var id = leaf.leaf(2).first().token().content();
           self.jsdc.append('var ' + id + ';');
-          hash[id] = true;
           self.hash[node.nid()].f++;
         }
       }
       var id;
       while(id = this.jsdc.uid()) {
-        if(!hash.hasOwnProperty(id)) {
+        if(!this.jsdc.ids.hasOwnProperty(id)) {
           break;
         }
       }

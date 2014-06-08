@@ -33,7 +33,7 @@ var Module = Class(function(jsdc) {
       var temp;
       //防止冲突
       while(temp = self.jsdc.uid()) {
-        if(!ids.hasOwnProperty(temp)) {
+        if(!self.jsdc.ids.hasOwnProperty(temp)) {
           break;
         }
       }

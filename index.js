@@ -23,6 +23,7 @@
   var Module = require('./dist/Module');
   var ArrCmph = require('./dist/ArrCmph');
   var ArrowFn = require('./dist/ArrowFn');
+  var Genarator = require('./dist/Genarator');
 
   var Jsdc = Class(function(code) {
     this.code = (code + '') || '';
@@ -30,6 +31,7 @@
     this.res = '';
     this.node = {};
     this.ignores = {};
+
     this.scope = new Scope(this);
     this.default = new DefaultValue(this);
     this.rest = new Rest(this);
@@ -40,25 +42,36 @@
     this.module = new Module(this);
     this.arrCmph = new ArrCmph(this);
     this.arrowFn = new ArrowFn(this);
+    this.gen = new Genarator(this);
+
     this.i = 0;
+    this.ids = {};
     return this;
   }).methods({
     parse: function(code) {
+      var self = this;
       if(!character.isUndefined(code)) {
-        this.code = code + '';
+        self.code = code + '';
       }
       var parser = homunculus.getParser('es6');
-      this.node = parser.parse(code);
-      this.ignores = parser.ignore();
+      self.node = parser.parse(code);
+      self.ignores = parser.ignore();
+      //记录所有id
+      var lexer = parser.lexer;
+      lexer.tokens().forEach(function(token) {
+        if(token.type() == Token.ID) {
+          self.ids[token.content()] = true;
+        }
+      });
       //开头部分的ignore
-      while(this.ignores[this.index]) {
-        this.append(this.ignores[this.index++].content());
+      while(self.ignores[self.index]) {
+        self.append(self.ignores[self.index++].content());
       }
       //预分析局部变量，将影响的let和const声明查找出来
-      this.scope.parse(this.node);
+      self.scope.parse(self.node);
       //递归处理
-      this.recursion(this.node);
-      return this.res;
+      self.recursion(self.node);
+      return self.res;
     },
     ast: function() {
       return this.node;
@@ -169,6 +182,10 @@
           break;
         case JsNode.FNDECL:
           this.scope.prefn(node);
+          break;
+        case JsNode.GENDECL:
+          this.scope.pregen(node);
+          this.gen.parse(node);
           break;
         case JsNode.FNBODY:
           this.scope.enter(node);
