@@ -19,6 +19,7 @@
   var Template = require('./dist/Template');
   var Forof = require('./dist/Forof');
   var Klass = require('./dist/Klass');
+  var Num = require('./dist/Num');
 
   var Jsdc = Class(function(code) {
     this.code = (code + '') || '';
@@ -32,6 +33,7 @@
     this.template = new Template(this);
     this.forof = new Forof(this);
     this.klass = new Klass(this);
+    this.num = new Num(this);
     this.i = 0;
     return this;
   }).methods({
@@ -121,6 +123,10 @@
           ignore = true;
           this.template.parse(token);
         }
+        else if(!ignore && token.type() == Token.NUMBER) {
+          ignore = true;
+          this.num.parse(token);
+        }
         //替换操作会设置ignore属性将其忽略
         if(!ignore) {
           this.append(content);
@@ -142,6 +148,7 @@
       while(ig = this.next()) {
         if(!ignore || ig.type() != Token.BLANK) {
           this.res += ig.content();
+          ignore = false;
         }
       }
     },

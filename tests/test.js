@@ -262,4 +262,26 @@ describe('es6', function() {
       expect(res).to.eql('function A(){};');
     })
   });
+  describe('number', function() {
+    it('0b binary', function() {
+      var s = '0b010';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('parseInt("010", 2)');
+    });
+    it('0B binary', function() {
+      var s = '0B101';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('parseInt("101", 2)');
+    });
+    it('0o octonary', function() {
+      var s = '0o456';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('parseInt("456", 8)');
+    });
+    it('0O octonary', function() {
+      var s = '0o777';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('parseInt("777", 8)');
+    });
+  });
 });
