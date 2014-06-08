@@ -107,14 +107,14 @@
       }
     },
     super: function(node) {
+      this.jsdc.ignore(node);
       var top = this.closest(node);
       if(this.hash.hasOwnProperty(top.nid())) {
-        var res = this.hash[top.nid()].extend;
+        this.jsdc.append(this.hash[top.nid()].extend);
         if(node.next()
           && node.next().name() == JsNode.ARGS) {
-          res += '.call';
+          this.jsdc.append('.call');
         }
-        return res;
       }
     },
     prts: function(node, start) {

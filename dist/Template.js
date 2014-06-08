@@ -16,6 +16,7 @@
     this.jsdc = jsdc;
   }).methods({
     parse: function(t) {
+      this.jsdc.ignore(t);
       var s = t.content();
       var res = '"';
       var has = false;

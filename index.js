@@ -137,15 +137,12 @@
         }
         else if(token.type() == Token.KEYWORD
           && content == 'super'){
-          token.ignore = true;
-          this.append(this.klass.super(node));
+          this.klass.super(node);
         }
         else if(token.type() == Token.TEMPLATE) {
-          token.ignore = true;
           this.template.parse(token);
         }
         else if(!token.ignore && token.type() == Token.NUMBER) {
-          token.ignore = true;
           this.num.parse(token);
         }
         //替换操作会设置ignore属性将其忽略
@@ -185,12 +182,13 @@
           break;
         case JsNode.GENDECL:
           this.scope.pregen(node);
-          this.gen.parse(node);
+          this.gen.parse(node, true);
           break;
         case JsNode.FNBODY:
           this.scope.enter(node);
           this.default.enter(node);
           this.rest.enter(node);
+          this.gen.body(node, true);
           break;
         case JsNode.BLOCK:
           this.scope.block(node, true);
@@ -248,12 +246,16 @@
         case JsNode.CNCSBODY:
           this.arrowFn.body(node, true);
           break;
+        case JsNode.YIELDEXPR:
+          this.gen.yield(node, true);
+          break;
       }
     },
     after: function(node) {
       switch(node.name()) {
         case JsNode.FNBODY:
           this.scope.leave(node);
+          this.gen.body(node);
           break;
         case JsNode.BLOCK:
           this.scope.block(node);
@@ -286,6 +288,12 @@
         case JsNode.CNCSBODY:
           this.arrowFn.body(node);
           break;
+        case JsNode.GENDECL:
+          this.gen.parse(node);
+          break;
+        case JsNode.YIELDEXPR:
+          this.gen.yield(node);
+          break;
       }
     },
     ignore: function(node) {
@@ -302,8 +310,28 @@
         });
       }
     },
+    unIgnore: function(node) {
+      var self = this;
+      if(node instanceof Token) {
+        delete node.ignore;
+      }
+      else if(node.name() == JsNode.TOKEN) {
+        delete node.token().ignore;
+      }
+      else {
+        node.leaves().forEach(function(leaf) {
+          self.unIgnore(leaf);
+        });
+      }
+    },
     uid: function() {
-      return Jsdc.uid();
+      var temp;
+      while(temp = '__' + uid++ + '__') {
+        if(!this.ids.hasOwnProperty(temp)) {
+          break;
+        }
+      }
+      return temp;
     },
     define: function(d) {
       return Jsdc.define(d);
@@ -315,9 +343,6 @@
     },
     ast: function() {
       return jsdc.ast();
-    },
-    uid: function() {
-      return '__' + uid++ + '__';
     },
     reset: function() {
       uid = 0;

@@ -49,9 +49,6 @@ describe('api', function() {
   it('static #parse', function() {
     expect(Jsdc.parse).to.be.a(Function);
   });
-  it('static #uid', function() {
-    expect(Jsdc.uid).to.be.a(Function);
-  });
   it('static #reset', function() {
     expect(Jsdc.reset).to.be.a(Function);
   });
@@ -499,6 +496,26 @@ describe('es6', function() {
       Jsdc.reset();
       var res = Jsdc.parse(s);
       expect(res).to.eql('var a = function(b, c) {return b - c}');
+    });
+  });
+  describe('generator function', function() {
+    it('empty', function() {
+      var s = 'function *a(){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:a}};function a(){switch(__0__++){case 0:}}}();');
+    });
+    it('normal', function() {
+      var s = 'function *a(){yield 1;}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:a}};function a(){switch(__0__++){case 0:return 1;}}}();');
+    });
+    it('multi yield', function() {
+      var s = 'function *a(){yield 1;yield 2}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:a}};function a(){switch(__0__++){case 0:return 1;case 1:return 2}}}();');
     });
   });
 });

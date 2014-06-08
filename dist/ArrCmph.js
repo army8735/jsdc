@@ -37,12 +37,7 @@
             self.hash[node.nid()].f++;
           }
         }
-        var id;
-        while(id = this.jsdc.uid()) {
-          if(!this.jsdc.ids.hasOwnProperty(id)) {
-            break;
-          }
-        }
+        var id = this.jsdc.uid();
         self.hash[node.nid()].id = id;
         self.jsdc.append('var ' + id + '=[];');
       }

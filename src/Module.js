@@ -30,13 +30,7 @@ var Module = Class(function(jsdc) {
     }
     else {
       var ids = getIds(one);
-      var temp;
-      //防止冲突
-      while(temp = self.jsdc.uid()) {
-        if(!self.jsdc.ids.hasOwnProperty(temp)) {
-          break;
-        }
-      }
+      var temp = self.jsdc.uid();
       Object.keys(ids).forEach(function(k) {
         self.jsdc.append('var ' + k + ';');
       });
