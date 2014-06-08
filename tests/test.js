@@ -198,7 +198,7 @@ describe('es6', function() {
       expect(res).to.eql('"\\"a\\"b\'c"');
     });
   });
-  describe('forof', function() {
+  describe('for of', function() {
     it('normal', function() {
       var s = 'for(a of {}){}';
       var res = Jsdc.parse(s);
@@ -372,11 +372,37 @@ describe('es6', function() {
       expect(res).to.eql('var __0__;!function(){var __1__=require("a");__0__=__1__.a;}();');
     });
     it('set no define', function() {
-      var s = 'export default a';
+      var s = 'import {a,b as c} from "a"';
       Jsdc.reset();
       Jsdc.define(false);
-      var res = Jsdc.parse('import {a,b as c} from "a"');
+      var res = Jsdc.parse(s);
       expect(res).to.eql('var a;var c;!function(){var __0__=require("a");a=__0__.a;c=__0__.b;}();');
+    });
+  });
+  describe('array comprehension', function() {
+    it('normal', function() {
+      var s = 'var a = [for(k of o)k]';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a = function(){var k;var __0__=[];for(k in o){k=o[k];__0__.push(k)}return __0__}();');
+    });
+    it('with cmphif', function() {
+      var s = 'var a = [for(k of o)if(k)k]';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a = function(){var k;var __0__=[];for(k in o){k=o[k];if(k)__0__.push(k)}return __0__}();');
+    });
+    it('multi cmphfor', function() {
+      var s = 'var a = [for(a of b)for(c of a)c]';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a = function(){var a;var c;var __0__=[];for(a in b){a=b[a];for(c in a){c=a[c];__0__.push(c)}}return __0__}();');
+    });
+    it('multi cmphfor with cmphif', function() {
+      var s = 'var a = [for(a of b)for(c of a)if(c)c]';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a = function(){var a;var c;var __0__=[];for(a in b){a=b[a];for(c in a){c=a[c];if(c)__0__.push(c)}}return __0__}();');
     });
   });
 });

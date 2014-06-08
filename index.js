@@ -21,6 +21,7 @@
   var Klass = require('./dist/Klass');
   var Num = require('./dist/Num');
   var Module = require('./dist/Module');
+  var ArrCmph = require('./dist/ArrCmph');
 
   var Jsdc = Class(function(code) {
     this.code = (code + '') || '';
@@ -36,6 +37,7 @@
     this.klass = new Klass(this);
     this.num = new Num(this);
     this.module = new Module(this);
+    this.arrCmph = new ArrCmph(this);
     this.i = 0;
     return this;
   }).methods({
@@ -98,7 +100,6 @@
     },
     token: function(node) {
       var token = node.token();
-      var ignore = token.ignore;
       var content = token.content();
       //替换掉let和const为var
       if(content == 'let'
@@ -111,25 +112,26 @@
         }
         else if(content == 'of') {
           this.forof.of(node);
+          this.arrCmph.of(node);
         }
         else if(content == '(') {
           this.klass.prts(node, true);
         }
         else if(token.type() == Token.KEYWORD
           && content == 'super'){
-          token.ignore = ignore = true;
+          token.ignore = true;
           this.append(this.klass.super(node));
         }
         else if(token.type() == Token.TEMPLATE) {
-          token.ignore = ignore = true;
+          token.ignore = true;
           this.template.parse(token);
         }
-        else if(!ignore && token.type() == Token.NUMBER) {
-          token.ignore = ignore = true;
+        else if(!token.ignore && token.type() == Token.NUMBER) {
+          token.ignore = true;
           this.num.parse(token);
         }
         //替换操作会设置ignore属性将其忽略
-        if(!ignore) {
+        if(!token.ignore) {
           this.append(content);
         }
         if(content == '{') {
@@ -143,6 +145,7 @@
           this.klass.prts(node);
         }
       }
+      var ignore = token.ignore;
       this.i = this.res.length;
       //加上ignore
       var ig;
@@ -202,6 +205,15 @@
         case JsNode.EXPORTDECL:
           this.module.export(node);
           break;
+        case JsNode.ARRCMPH:
+          this.arrCmph.parse(node, true);
+          break;
+        case JsNode.CMPHFOR:
+          this.arrCmph.for(node, true);
+          break;
+        case JsNode.CMPHIF:
+          this.arrCmph.if(node, true);
+          break;
       }
     },
     after: function(node) {
@@ -224,6 +236,15 @@
           break;
         case JsNode.MODULEBODY:
           this.module.leave(node);
+          break;
+        case JsNode.ARRCMPH:
+          this.arrCmph.parse(node);
+          break;
+        case JsNode.CMPHFOR:
+          this.arrCmph.for(node);
+          break;
+        case JsNode.CMPHIF:
+          this.arrCmph.if(node);
           break;
       }
     },
