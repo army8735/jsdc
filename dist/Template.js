@@ -47,7 +47,7 @@
         res += c;
       }
       res += '"';
-      this.jsdc.append(res.replace(/^""\s\+\s/, '').replace(/\s\+\s""$/, ''));
+      this.jsdc.append('(' + res.replace(/^""\s\+\s/, '').replace(/\s\+\s""$/, '') + ')');
     }
   });
   
