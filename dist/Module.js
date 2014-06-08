@@ -102,10 +102,18 @@
       }
     },
     enter: function() {
-      this.jsdc.append('define(function(require,exports,module){');
-    },
+      if(this.jsdc.define()) {
+        var s = /(?:\/\/.*\r?\n)?([\s]+)$/.exec(this.jsdc.res);
+        if(s) {
+          this.jsdc.insert('define(function(require,exports,module){', this.jsdc.res.length - s[1].length);
+        }
+        else {
+          this.jsdc.append('define(function(require,exports,module){');
+        }
+      }
+  },
     leave: function() {
-      this.jsdc.append('});');
+      this.jsdc.define() && this.jsdc.append('});');
     }
   });
   

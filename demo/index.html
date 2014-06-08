@@ -126,6 +126,7 @@ seajs.config({
   }]
 });
 seajs.use(['../index', './jssc'], function(jsdc, jssc) {
+  jsdc.define(true);
 	function init() {
 		var nodes = Array.prototype.slice.call(document.getElementsByTagName('code'), 0);
 		nodes.forEach(function(node, i) {

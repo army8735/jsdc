@@ -285,6 +285,9 @@ describe('es6', function() {
     });
   });
   describe('module', function() {
+    before(function() {
+      Jsdc.define(true);
+    });
     it('module from', function() {
       var s = 'module circle from "a"';
       var res = Jsdc.parse(s);
@@ -360,6 +363,20 @@ describe('es6', function() {
       Jsdc.reset();
       var res = Jsdc.parse(s);
       expect(res).to.eql('define(function(require,exports,module){module.exports=a});');
+    });
+    it('avoid of id __\d__', function() {
+      var s = 'import {a as __0__} from "a"';
+      Jsdc.reset();
+      Jsdc.define(false);
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var __0__;!function(){var __1__=require("a");__0__=__1__.a;}();');
+    });
+    it('set no define', function() {
+      var s = 'export default a';
+      Jsdc.reset();
+      Jsdc.define(false);
+      var res = Jsdc.parse('import {a,b as c} from "a"');
+      expect(res).to.eql('var a;var c;!function(){var __0__=require("a");a=__0__.a;c=__0__.b;}();');
     });
   });
 });

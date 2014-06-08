@@ -242,10 +242,10 @@
       }
     },
     uid: function() {
-      return '__' + uid++ + '__';
+      return Jsdc.uid();
     },
-    reset: function() {
-      uid = 0;
+    define: function(d) {
+      return Jsdc.define(d);
     }
   }).statics({
     parse: function(code) {
@@ -260,9 +260,16 @@
     },
     reset: function() {
       uid = 0;
+    },
+    define: function(d) {
+      if(!character.isUndefined(d)) {
+        def = d;
+      }
+      return def;
     }
   });
   var jsdc = null;
+  var uid = 0;
+  var def = false;
   module.exports = Jsdc;
 });
-var uid = 0;
