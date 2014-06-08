@@ -21,6 +21,19 @@ https://github.com/army8735/jsdc/wiki/%E8%BD%AC%E6%8D%A2%E8%A7%84%E5%88%99
 * as simple as possible。
 * 仅转换可实现的语言部分，扩展库（如`Set`和`Map`）请使用`es6-shim`之类的库。
 
+### 已实现的bufen
+* 二进制和八进制的Number扩展
+* block局部作用域
+* let/const关键字
+* 默认参数赋值
+* rest扩展参数和spread扩展参数调用
+* template模板
+* for of循环
+* class类实现
+* extends类继承
+* module模块
+* ArrayComprehension数组推导
+
 ## API
 
 ### Jsdc
@@ -31,6 +44,10 @@ https://github.com/army8735/jsdc/wiki/%E8%BD%AC%E6%8D%A2%E8%A7%84%E5%88%99
 ### 静态属性
 * parse(code:String):String 可以直接调用静态方法转换，以省略new一个对象的步骤
 * define(d:Boolean):Boolean 读取/设置转换module为CommonJS时是否包裹define（即转为AMD/CMD），默认false
+
+## Demo
+* demo目录下是一个web端的实时转换例子，本地浏览需要`npm install`安装依赖
+* 在线地址：http://army8735.me/jsdc/demo/
 
 ## License
 [MIT License]
