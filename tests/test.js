@@ -343,23 +343,23 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('define(function(require,exports,module){exports.a=a;function a(){}});');
     });
-  });
-  it('export function decl', function() {
-    var s = 'export function a(){}';
-    Jsdc.reset();
-    var res = Jsdc.parse(s);
-    expect(res).to.eql('define(function(require,exports,module){exports.a=a;function a(){}});');
-  });
-  it('export class decl', function() {
-    var s = 'export class A{}';
-    Jsdc.reset();
-    var res = Jsdc.parse(s);
-    expect(res).to.eql('define(function(require,exports,module){exports.A=A;function A(){}});');
-  });
-  it('export default', function() {
-    var s = 'export default a';
-    Jsdc.reset();
-    var res = Jsdc.parse(s);
-    expect(res).to.eql('define(function(require,exports,module){module.exports=a});');
+    it('export function decl', function() {
+      var s = 'export function a(){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('define(function(require,exports,module){exports.a=a;function a(){}});');
+    });
+    it('export class decl', function() {
+      var s = 'export class A{}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('define(function(require,exports,module){exports.A=A;function A(){}});');
+    });
+    it('export default', function() {
+      var s = 'export default a';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('define(function(require,exports,module){module.exports=a});');
+    });
   });
 });
