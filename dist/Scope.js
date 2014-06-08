@@ -49,6 +49,10 @@
     },
     prevar: function(varstmt) {
       var self = this;
+      //genarator的忽略
+      if(varstmt.gen) {
+        return;
+      }
       var parent = self.closest(varstmt);
       if(parent
           && self.hash[parent.nid()]) {
@@ -66,6 +70,10 @@
       };
     },
     prefn: function(fndecl) {
+      //genarator的忽略
+      if(fndecl.gen) {
+        return;
+      }
       var parent = this.closest(fndecl);
       if(parent
         && this.hash[parent.nid()]) {
@@ -85,7 +93,7 @@
     pregen: function(gendecl) {
       var parent = this.closest(gendecl);
       if(parent
-        && this.hash[parent.nid()]) {
+        && this.hash[parent.nid()]) {console.log(1)
         //插入声明的变量到作用域开始，并改写为var形式
         var i = this.index[this.index.length - 1];
         this.history[i] = this.history[i] || {};

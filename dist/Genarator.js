@@ -22,21 +22,26 @@
         var id = token.content();
         //有可能被scope前置过
         var hasPre = token.ignore;
+        //忽略本身
+        this.jsdc.ignore(node.first());
+        this.jsdc.ignore(token);
         if(!hasPre) {
-          this.jsdc.unIgnore(node.leaf(2));
           this.jsdc.append('var ');
           this.jsdc.append(node.leaf(2).first().token().content());
           this.jsdc.append('=');
         }
         var state = this.jsdc.uid();
+        var temp = this.jsdc.uid();
         this.hash[node.nid()] = {
           state: state,
-          index: 0
+          index: 0,
+          temp: temp
         };
         this.jsdc.append('function(){');
         this.jsdc.append('var ' + state + '=0;');
         this.jsdc.append('return ');
-        this.jsdc.append('function (){return {next:' + id + '}};');
+        this.jsdc.append('function (){return {next:' + temp + '}};');
+        this.jsdc.append('function ' + temp);
       }
       else {
         this.jsdc.appendBefore('}();');
@@ -74,6 +79,14 @@
           return parent;
         }
       }
+    },
+    prevar: function(node) {
+      //防止被scope前置
+  //    node.gen = true;
+    },
+    prefn: function(node) {
+      //防止被scope前置
+  //    node.gen = true;
     }
   });
   

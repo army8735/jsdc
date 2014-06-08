@@ -33,7 +33,7 @@
     this.ignores = {};
 
     this.scope = new Scope(this);
-    this.default = new DefaultValue(this);
+    this.defaultValue = new DefaultValue(this);
     this.rest = new Rest(this);
     this.template = new Template(this);
     this.forof = new Forof(this);
@@ -175,9 +175,11 @@
       switch(node.name()) {
         //var变量前置，赋值部分删除var，如此可以将block用匿名函数包裹达到局部作用与效果
         case JsNode.VARSTMT:
+          this.gen.prevar(node);
           this.scope.prevar(node);
           break;
         case JsNode.FNDECL:
+          this.gen.prefn(node);
           this.scope.prefn(node);
           break;
         case JsNode.GENDECL:
@@ -186,7 +188,7 @@
           break;
         case JsNode.FNBODY:
           this.scope.enter(node);
-          this.default.enter(node);
+          this.defaultValue.enter(node);
           this.rest.enter(node);
           this.gen.body(node, true);
           break;
@@ -194,7 +196,7 @@
           this.scope.block(node, true);
           break;
         case JsNode.FMPARAMS:
-          this.default.param(node);
+          this.defaultValue.param(node);
           this.rest.param(node);
           break;
         case JsNode.CALLEXPR:
