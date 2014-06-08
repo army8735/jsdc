@@ -175,7 +175,7 @@ describe('es6', function() {
     it('normal', function() {
       var s = '`temp`';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('("temp")');
+      expect(res).to.eql('"temp"');
     });
     it('with varable 1', function() {
       var s = '`${a}b`';
@@ -190,12 +190,12 @@ describe('es6', function() {
     it('escape varable', function() {
       var s = '`\\${b}`';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('("\\${b}")');
+      expect(res).to.eql('"\\${b}"');
     });
     it('escape quote', function() {
       var s = '`"a"b\'c`';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('("\\"a\\"b\'c")');
+      expect(res).to.eql('"\\"a\\"b\'c"');
     });
   });
   describe('forof', function() {

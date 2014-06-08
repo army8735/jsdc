@@ -10,6 +10,7 @@ var Template = Class(function(jsdc) {
   parse: function(t) {
     var s = t.content();
     var res = '"';
+    var has = false;
     outer:
     for(var i = 1; i < s.length - 1; i++) {
       var c = s.charAt(i);
@@ -23,6 +24,7 @@ var Template = Class(function(jsdc) {
       }
       else if(c == '$') {
         if(s.charAt(i + 1) == '{') {
+          has = true;
           res += '" + ';
           for(i = i + 2; i < s.length - 1; i++) {
             c = s.charAt(i);
@@ -39,7 +41,9 @@ var Template = Class(function(jsdc) {
       res += c;
     }
     res += '"';
-    this.jsdc.append('(' + res.replace(/^""\s\+\s/, '').replace(/\s\+\s""$/, '') + ')');
+    this.jsdc.append((has ? '(' : '')
+      + res.replace(/^""\s\+\s/, '').replace(/\s\+\s""$/, '')
+      + (has ? ')' : ''));
   }
 });
 
