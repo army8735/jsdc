@@ -475,4 +475,30 @@ describe('es6', function() {
       expect(res).to.eql('var a = function(){var a;var c;var __0__=[];for(a in b){a=b[a];for(c in a){c=a[c];if(c)__0__.push(c)}}return __0__}();');
     });
   });
+  describe('arrow function', function() {
+    it('only a assignexpr', function() {
+      var s = 'var a = v => v';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a = function(v) {return v}');
+    });
+    it('empty param', function() {
+      var s = 'var a = () => 5';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a = function() {return 5}');
+    });
+    it('multi params', function() {
+      var s = 'var a = (b, c) => b + c';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a = function(b, c) {return b + c}');
+    });
+    it('with a block', function() {
+      var s = 'var a = (b, c) => {return b - c}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a = function(b, c) {return b - c}');
+    });
+  });
 });

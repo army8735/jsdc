@@ -22,6 +22,7 @@
   var Num = require('./dist/Num');
   var Module = require('./dist/Module');
   var ArrCmph = require('./dist/ArrCmph');
+  var ArrowFn = require('./dist/ArrowFn');
 
   var Jsdc = Class(function(code) {
     this.code = (code + '') || '';
@@ -38,6 +39,7 @@
     this.num = new Num(this);
     this.module = new Module(this);
     this.arrCmph = new ArrCmph(this);
+    this.arrowFn = new ArrowFn(this);
     this.i = 0;
     return this;
   }).methods({
@@ -116,6 +118,9 @@
         }
         else if(content == '(') {
           this.klass.prts(node, true);
+        }
+        else if(content == '=>') {
+          this.arrowFn.arrow(token);
         }
         else if(token.type() == Token.KEYWORD
           && content == 'super'){
@@ -217,6 +222,15 @@
         case JsNode.CMPHIF:
           this.arrCmph.if(node, true);
           break;
+        case JsNode.ARROWFN:
+          this.arrowFn.parse(node);
+          break;
+        case JsNode.ARROWPARAMS:
+          this.arrowFn.params(node, true);
+          break;
+        case JsNode.CNCSBODY:
+          this.arrowFn.body(node, true);
+          break;
       }
     },
     after: function(node) {
@@ -248,6 +262,12 @@
           break;
         case JsNode.CMPHIF:
           this.arrCmph.if(node);
+          break;
+        case JsNode.ARROWPARAMS:
+          this.arrowFn.params(node);
+          break;
+        case JsNode.CNCSBODY:
+          this.arrowFn.body(node);
           break;
       }
     },
