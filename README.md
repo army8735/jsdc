@@ -21,7 +21,7 @@ https://github.com/army8735/jsdc/wiki/%E8%BD%AC%E6%8D%A2%E8%A7%84%E5%88%99
 * as simple as possible。
 * 仅转换可实现的语言部分，扩展库（如`Set`和`Map`）请使用`es6-shim`之类的库。
 
-### 已实现的bufen
+### 已实现的部分
 * 二进制和八进制的Number扩展
 * block局部作用域
 * let/const关键字
