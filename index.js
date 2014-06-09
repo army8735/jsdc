@@ -24,6 +24,7 @@
   var ArrCmph = require('./dist/ArrCmph');
   var ArrowFn = require('./dist/ArrowFn');
   var Genarator = require('./dist/Genarator');
+  var Destruct = require('./dist/Destruct');
 
   var Jsdc = Class(function(code) {
     this.code = (code + '') || '';
@@ -44,6 +45,7 @@
     this.arrCmph = new ArrCmph(this);
     this.arrowFn = new ArrowFn(this);
     this.gen = new Genarator(this);
+    this.destruct = new Destruct(this);
 
     this.i = 0;
     this.ids = {};

@@ -172,17 +172,22 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('!function(){}();');
     });
-    it('empty block with function decl', function() {
+    it('block with function decl', function() {
       var s = '{function a(){}}';
       var res = Jsdc.parse(s);
       expect(res).to.eql('var a;!function(){a=function (){}}();');
     });
-    it('empty block with varstmt', function() {
+    it('block with varstmt', function() {
       var s = '{var a}';
       var res = Jsdc.parse(s);
       expect(res).to.eql('var a;!function(){a}();');
     });
-    it('empty block with var and fn with same name', function() {
+    it('block with multi vardecl', function() {
+      var s = '{var a,b}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var b;var a;!function(){a,b}();');
+    });
+    it('block with var and fn with same name', function() {
       var s = '{var a;function a(){}}';
       var res = Jsdc.parse(s);
       expect(res).to.eql('var a;!function(){a;a=function (){}}();');

@@ -62,11 +62,16 @@
         var i = self.index[self.index.length - 1];
         self.history[i] = self.history[i] || {};
         var his = self.history[i];
-        self.join(varstmt.leaf(1)).forEach(function(id) {
-          if(!his.hasOwnProperty(id)) {
-            his[id] = true;
-            self.jsdc.insert('var ' + id + ';', i);
-          }
+        var vardecls = varstmt.leaves().filter(function(o, i) {
+          return i % 2 == 1;
+        });
+        vardecls.forEach(function(vardecl) {
+          self.join(vardecl).forEach(function(id) {
+            if(!his.hasOwnProperty(id)) {
+              his[id] = true;
+              self.jsdc.insert('var ' + id + ';', i);
+            }
+          });
         });
         self.jsdc.ignore(varstmt.first().token());
       };
