@@ -45,6 +45,7 @@ npm install jsdc
 
 ## Demo
 * demo目录下是一个web端的实时转换例子，本地浏览需要`npm install`安装依赖
+* 依赖的语法解析器来自于`homunculus`：https://github.com/army8735/homunculus
 * 在线地址：http://army8735.me/jsdc/demo/
 
 ## License
@@ -130,7 +131,7 @@ if(true) {
 ```js
 if(true) {!function() {
   let a = 1;
-}()}
+}();}
 ```
 > 示例中`let`尚未做处理，后面会提到。
 
@@ -249,7 +250,7 @@ for(var a of b){}
 for(var a in b){a = b[a];}
 ```
 
-### class类
+### class类声明
 将类声明改为`function`声明：
 ```js
 class A{}
@@ -343,6 +344,22 @@ function A(){}!function(){var _=Object.create(B.prototype);_.constructor=A;A.pro
 function A(){B.a()}
 Object.keys(B).forEach(function(k){A[k]=B[k]});
 ```
+
+### class表达式
+和函数表达式一样，class也可以有表达式：
+```js
+var o = class{
+  method(){}
+}
+```
+```js
+var o = function(){function __0__(){}
+  __0__.prototype.method = function(){}
+return __0__}()
+```
+> 由于表达式没有名字（也可以有），所以需要封装成立即执行的匿名函数并返回一个`class`声明
+
+> 有名字的话就用原有名字，否则依然临时唯一id
 
 ### module
 只要出现了module/import/export语句，就认为文件是个模块，用`define`封装成AMD/CMD模块：

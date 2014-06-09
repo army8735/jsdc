@@ -138,7 +138,12 @@ var Scope = Class(function(jsdc) {
         node = node.parent();
         if(node.name() != JsNode.BLOCKSTMT
           || NOT_ABS_BLOCK.hasOwnProperty(node.parent().name())) {
-          this.jsdc.append(start ? '!function(){' : '}();');
+          if(start) {
+            this.jsdc.append('!function(){');
+          }
+          else {
+            this.jsdc.appendBefore('}();');
+          }
         }
       }
     }
@@ -161,6 +166,7 @@ var Scope = Class(function(jsdc) {
         case JsNode.FNEXPR:
         case JsNode.CLASSDECL:
         case JsNode.CLASSEXPR:
+        case JsNode.METHOD:
           return false;
       }
     }

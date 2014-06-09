@@ -19,12 +19,12 @@
     parse: function(node, start) {
       if(node.name() == JsNode.CLASSDECL) {
         if(start) {
-          this.body(node.last().prev());
           var o = {};
+          o.name = node.leaf(1).first().token().content();
+          this.body(node.last().prev(), o.name);
           this.jsdc.ignore(node.leaf(0));
           this.jsdc.ignore(node.leaf(1));
           this.jsdc.ignore(node.leaf(2));
-          o.name = node.leaf(1).first().token().content();
           if(node.leaf(3).name() == JsNode.CLASSBODY) {
             this.jsdc.ignore(node.leaf(4));
           }
@@ -35,7 +35,7 @@
             this.jsdc.append('!function(){');
             this.jsdc.append('var _=Object.create(' + o.extend + '.prototype);');
             this.jsdc.append('_.constructor=' + o.name + ';');
-            this.jsdc.append(o.name + '.prototype=_;');
+            this.jsdc.append(o.name + '.prototype=_');
             this.jsdc.append('}();');
           }
           this.hash[node.nid()] = o;
@@ -45,6 +45,63 @@
           if(o.extend) {
             this.jsdc.appendBefore('Object.keys(' + o.extend + ').forEach(function(k){' + o.name + '[k]=' + o.extend + '[k]});');
           }
+        }
+      }
+      //classexpr由于没有类名，需要封装成一个返回class的fnexpr
+      else {
+        if(start) {
+          this.jsdc.append('function(){');
+          var o = {};
+          this.jsdc.ignore(node.leaf(0));
+          this.jsdc.ignore(node.leaf(1));
+          if(node.leaf(2).name() == JsNode.TOKEN
+            && node.leaf(2).token().content() == '{') {
+            this.jsdc.ignore(node.leaf(2));
+            if(node.leaf(1).name() == JsNode.HERITAGE) {
+              o.extend = this.join(node.leaf(1).last());
+              o.name = this.jsdc.uid();
+            }
+            else {
+              o.name = node.leaf(1).first().token().content();
+            }
+          }
+          else if(node.leaf(3).name() == JsNode.TOKEN
+            && node.leaf(3).token().content() == '{') {
+            this.jsdc.ignore(node.leaf(3));
+            o.name = node.leaf(1).first().token().content();
+            o.extend = this.join(node.leaf(2).last());
+          }
+          else {
+            o.name = this.jsdc.uid();
+            this.jsdc.ignore(node.leaf(1));
+            if(node.leaf(2).name() == JsNode.HERITAGE) {
+              o.extend = this.join(node.leaf(2).last());
+            }
+          }
+          this.jsdc.ignore(node.last());
+          var classbody = node.last().prev();
+          this.body(classbody, o.name);
+          if(o.extend) {
+            this.jsdc.append('!function(){');
+            this.jsdc.append('var _=Object.create(' + o.extend + '.prototype);');
+            this.jsdc.append('_.constructor=' + o.name + ';');
+            this.jsdc.append(o.name + '.prototype=_');
+            this.jsdc.append('}();');
+          }
+          this.hash[node.nid()] = o;
+        }
+        else {
+          var o = this.hash[node.nid()];
+          if(o.extend) {
+            this.jsdc.appendBefore('Object.keys(' + o.extend + ').forEach(function(k){' + o.name + '[k]=' + o.extend + '[k]});');
+          }
+          this.jsdc.appendBefore('return ' + o.name);
+          this.jsdc.appendBefore('}()');
+          //特别注意这里的()没有结尾分号，需要只能判断：
+          //父节点是vardecl且后面是,
+          //(expr)且后面是,
+          //如上情况即后面是逗号则不能添加分号
+          // TODO
         }
       }
     },
@@ -59,7 +116,6 @@
             var token = first.first().first().token();
             this.jsdc.ignore(token);
             if(token.content() == 'constructor') {
-              this.jsdc.ignore(token);
               this.jsdc.append('function ');
               this.jsdc.append(o.name);
             }
@@ -138,7 +194,7 @@
         }
       }
     },
-    body: function(node) {
+    body: function(node, id) {
       var noCons = true;
       var leaves = node.leaves();
       for(var i = 0; i < leaves.length; i++) {
@@ -152,7 +208,6 @@
         }
       }
       if(noCons) {
-        var id = node.parent().leaf(1).first().token().content();
         this.jsdc.append('function ' + id + '(){}');
       }
     },

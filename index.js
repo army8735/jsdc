@@ -31,6 +31,7 @@
     this.res = '';
     this.node = {};
     this.ignores = {};
+    this.ts = [];
 
     this.scope = new Scope(this);
     this.defaultValue = new DefaultValue(this);
@@ -63,6 +64,7 @@
           self.ids[token.content()] = true;
         }
       });
+      self.ts = lexer.tokens();
       //开头部分的ignore
       while(self.ignores[self.index]) {
         self.append(self.ignores[self.index++].content());
@@ -75,6 +77,9 @@
     },
     ast: function() {
       return this.node;
+    },
+    tokens: function() {
+      return this.ts;
     },
     append: function(s) {
       this.res += s;
@@ -161,6 +166,8 @@
         }
       }
       var ignore = token.ignore;
+      //firefox的奇怪bug，调试时不显示，重新赋值就好了
+      token.ignore = token.ignore;
       this.i = this.res.length;
       //加上ignore
       var ig;
@@ -303,7 +310,7 @@
         node.ignore = true;
       }
       else if(node.name() == JsNode.TOKEN) {
-        node.token().ignore = true;
+        node.token().ignore = true;console.log(arguments.callee.caller)
       }
       else {
         node.leaves().forEach(function(leaf) {
@@ -311,7 +318,7 @@
         });
       }
     },
-    unIgnore: function(node) {
+    unIgnore: function(node) {return;
       var self = this;
       if(node instanceof Token) {
         delete node.ignore;
@@ -344,6 +351,9 @@
     },
     ast: function() {
       return jsdc.ast();
+    },
+    tokens: function() {
+      return jsdc.tokens();
     },
     reset: function() {
       uid = 0;

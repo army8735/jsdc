@@ -311,23 +311,65 @@ describe('es6', function() {
     it('extends', function() {
       var s = 'class A extends B{\nconstructor(){super()}\na(){}\n}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();\nfunction A(){B.call(this)}\nA.prototype.a = function(){}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
+      expect(res).to.eql('!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_}();\nfunction A(){B.call(this)}\nA.prototype.a = function(){}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
     });
     it('getter/setter', function() {
       var s = 'class A extends B{\na(){}\nget b(){}\nset c(d){}\n}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function A(){}!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();\nA.prototype.a = function(){}\nA.prototype.b={get b(){}}["b"];\nA.prototype.c={set c(d){}}["c"];\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
+      expect(res).to.eql('function A(){}!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_}();\nA.prototype.a = function(){}\nA.prototype.b={get b(){}}["b"];\nA.prototype.c={set c(d){}}["c"];\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
     });
     it('static', function() {
       var s = 'class A extends B{\nstatic a(){super.b}\n}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function A(){}!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();\nA.a=function(){B.b}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
+      expect(res).to.eql('function A(){}!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_}();\nA.a=function(){B.b}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
     });
     it(';', function() {
       var s = 'class A{;}';
       var res = Jsdc.parse(s);
       expect(res).to.eql('function A(){};');
-    })
+    });
+    it('classexpr', function() {
+      var s = '!class {}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){function __0__(){}return __0__}()');
+    });
+    it('classexpr withname', function() {
+      var s = '!class A{}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){function A(){}return A}()');
+    });
+    it('classexpr method', function() {
+      var s = '!class {a(){}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){function __0__(){}__0__.prototype.a = function(){}return __0__}()');
+    });
+    it('classexpr extends', function() {
+      var s = '!class extends A{}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){function __0__(){}!function(){var _=Object.create(A.prototype);_.constructor=__0__;__0__.prototype=_}();Object.keys(A).forEach(function(k){__0__[k]=A[k]});return __0__}()');
+    });
+    it('classexpr constructor', function() {
+      var s = '!class {constructor(){}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){function __0__(){}return __0__}()');
+    });
+    it('classexpr withname constructor', function() {
+      var s = '!class A{constructor(){}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){function A(){}return A}()');
+    });
+    it('classexpr super', function() {
+      var s = '!class extends A{constructor(){super()}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){!function(){var _=Object.create(A.prototype);_.constructor=__0__;__0__.prototype=_}();function __0__(){A.call(this)}Object.keys(A).forEach(function(k){__0__[k]=A[k]});return __0__}()');
+    });
   });
   describe('number', function() {
     it('0b binary', function() {

@@ -133,10 +133,12 @@ seajs.use(['../index', './jssc'], function(jsdc, jssc) {
       try {
         var res = jsdc.parse(node.textContent || node.innerText || node.firstChild.nodeValue);
         var ast = jsdc.ast();
+        var tokens = jsdc.tokens();
       } catch(e) {
         res = e;
         console.error(e.message);
         ast = null;
+        tokens = null;
       }
       var pre = node.parentNode,
         ncode = document.createElement('code'),
@@ -148,6 +150,9 @@ seajs.use(['../index', './jssc'], function(jsdc, jssc) {
 			if(ast) {
 				draw(i, ast, npre.nextSibling);
 			}
+      if(tokens) {
+        console.table(tokens);
+      }
 		});
 		jssc.exec();
 	}
