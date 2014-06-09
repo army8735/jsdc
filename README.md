@@ -31,6 +31,7 @@ npm install jsdc
 * module模块
 * ArrayComprehension数组推导
 * ArrowFunction箭头函数
+* Genarator生成器函数
 
 ## API
 
@@ -38,10 +39,14 @@ npm install jsdc
 * constructor(code:String = '') 传入需要转换的code
 * parse(code:String = null):String 转换code，可以为空，否则会覆盖构造函数里传入的code
 * define(d:Boolean):Boolean 读取/设置转换module为CommonJS时是否包裹define（即转为AMD/CMD），默认false
+* ast():Object 返回解析后的语法树
+* tokens():Array<Object> 返回解析后的词法单元序列
 
 ### 静态属性
 * parse(code:String):String 可以直接调用静态方法转换，以省略new一个对象的步骤
 * define(d:Boolean):Boolean 读取/设置转换module为CommonJS时是否包裹define（即转为AMD/CMD），默认false
+* ast():Object 返回解析后的语法树
+* tokens():Array<Object> 返回解析后的词法单元序列
 
 ## Demo
 * demo目录下是一个web端的实时转换例子，本地浏览需要`npm install`安装依赖
@@ -360,6 +365,8 @@ return __0__}()
 > 由于表达式没有名字（也可以有），所以需要封装成立即执行的匿名函数并返回一个`class`声明
 
 > 有名字的话就用原有名字，否则依然临时唯一id
+
+> 注意匿名函数的结尾没有分号，因为本身是个`assignmentexpr`
 
 ### module
 只要出现了module/import/export语句，就认为文件是个模块，用`define`封装成AMD/CMD模块：

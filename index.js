@@ -174,6 +174,7 @@
       while(ig = this.next()) {
         if(!ignore || ig.type() != Token.BLANK) {
           this.res += ig.content();
+          ignore && (ig.ignore = true);
           ignore = false;
         }
       }
@@ -310,7 +311,7 @@
         node.ignore = true;
       }
       else if(node.name() == JsNode.TOKEN) {
-        node.token().ignore = true;console.log(arguments.callee.caller)
+        node.token().ignore = true;
       }
       else {
         node.leaves().forEach(function(leaf) {

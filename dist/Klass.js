@@ -96,12 +96,8 @@
             this.jsdc.appendBefore('Object.keys(' + o.extend + ').forEach(function(k){' + o.name + '[k]=' + o.extend + '[k]});');
           }
           this.jsdc.appendBefore('return ' + o.name);
+          //特别注意这里的()没有结尾分号，因为是表达式
           this.jsdc.appendBefore('}()');
-          //特别注意这里的()没有结尾分号，需要只能判断：
-          //父节点是vardecl且后面是,
-          //(expr)且后面是,
-          //如上情况即后面是逗号则不能添加分号
-          // TODO
         }
       }
     },

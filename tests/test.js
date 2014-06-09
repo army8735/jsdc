@@ -1,4 +1,7 @@
 var expect = require('expect.js');
+var fs = require('fs');
+var path = require('path');
+
 var Jsdc = require('../');
 
 describe('api', function() {
@@ -46,6 +49,14 @@ describe('api', function() {
     var jsdc = new Jsdc();
     expect(jsdc.define).to.be.a(Function);
   });
+  it('#ast', function() {
+    var jsdc = new Jsdc();
+    expect(jsdc.ast).to.be.a(Function);
+  });
+  it('#tokens', function() {
+    var jsdc = new Jsdc();
+    expect(jsdc.tokens).to.be.a(Function);
+  });
   it('static #parse', function() {
     expect(Jsdc.parse).to.be.a(Function);
   });
@@ -57,6 +68,9 @@ describe('api', function() {
   });
   it('static #ast', function() {
     expect(Jsdc.ast).to.be.a(Function);
+  });
+  it('static #tokens', function() {
+    expect(Jsdc.tokens).to.be.a(Function);
   });
 });
 describe('ignore es5', function() {
@@ -88,6 +102,16 @@ describe('ignore es5', function() {
   it('function', function() {
     var s = 'function a(b){}';
     var res = Jsdc.parse(s);
+    expect(res).to.eql(s);
+  });
+  it('jquery', function() {
+    var s = fs.readFileSync(path.join(__dirname, './lib/jquery.js'), { encoding: 'utf-8' });
+    var res = Jsdc.parse(s);
+    expect(res).to.eql(s);
+  });
+  it('use new', function() {
+    var s = 'function a(b){}';
+    var res = new Jsdc().parse(s);
     expect(res).to.eql(s);
   });
 });
@@ -197,6 +221,11 @@ describe('es6', function() {
       var s = 'try{let a}catch(e){const a}//';
       var res = Jsdc.parse(s);
       expect(res).to.eql('try{!function(){var a}();}catch(e){!function(){var a}();}//');
+    });
+    it('use new', function() {
+      var s = '{const a}';
+      var res = new Jsdc().parse(s);
+      expect(res).to.eql('!function(){var a}();')
     });
   });
   describe('init params', function() {
@@ -559,11 +588,29 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:return 1;case 1:return 2}}}();');
     });
-    it('orevar', function() {
+    it('with var state', function() {
       var s = 'function *a(){var a = 1;yield a++;yield a++}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
       expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};var a;function __1__(){switch(__0__++){case 0:a = 1;return a++;case 1:return a++}}}();');
+    });
+    it('scope in genaretor', function() {
+      var s = 'function *a(){{var a}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};var a;function __1__(){switch(__0__++){case 0:!function(){a}();}}}();');
+    });
+    it('let scope', function() {
+      var s = 'function *a(){{let a}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:!function(){var a}();}}}();');
+    });
+    it('ignore fndecl', function() {
+      var s = 'function *a(){function a(){}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:function a(){}}}}();');
     });
   });
 });
