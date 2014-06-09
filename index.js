@@ -175,11 +175,10 @@
       switch(node.name()) {
         //var变量前置，赋值部分删除var，如此可以将block用匿名函数包裹达到局部作用与效果
         case JsNode.VARSTMT:
-          this.gen.prevar(node);
           this.scope.prevar(node);
+          this.gen.prevar(node);
           break;
         case JsNode.FNDECL:
-          this.gen.prefn(node);
           this.scope.prefn(node);
           break;
         case JsNode.GENDECL:

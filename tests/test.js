@@ -517,5 +517,11 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:return 1;case 1:return 2}}}();');
     });
+    it('orevar', function() {
+      var s = 'function *a(){var a = 1;yield a++;yield a++}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};var a;function __1__(){switch(__0__++){case 0:a = 1;return a++;case 1:return a++}}}();');
+    });
   });
 });

@@ -32,7 +32,7 @@
         }
         var state = this.jsdc.uid();
         var temp = this.jsdc.uid();
-        this.hash[node.nid()] = {
+        var o = this.hash[node.nid()] = {
           state: state,
           index: 0,
           temp: temp
@@ -41,6 +41,7 @@
         this.jsdc.append('var ' + state + '=0;');
         this.jsdc.append('return ');
         this.jsdc.append('function (){return {next:' + temp + '}};');
+        o.pos = this.jsdc.res.length;
         this.jsdc.append('function ' + temp);
       }
       else {
@@ -80,13 +81,12 @@
         }
       }
     },
-    prevar: function(node) {
-      //防止被scope前置
-  //    node.gen = true;
-    },
-    prefn: function(node) {
-      //防止被scope前置
-  //    node.gen = true;
+    prevar: function(varstmt) {
+      var top = varstmt.gen;
+      if(top) {
+        this.jsdc.ignore(varstmt.first());
+        this.jsdc.insert('var ' + varstmt.leaf(1).first().first().token().content() + ';', this.hash[top.nid()].pos);
+      }
     }
   });
   

@@ -496,16 +496,33 @@ function *a() {
 > `Generator`语句本身尚未做处理，后面会提到。
 
 ### Generator生成器函数
-它的实现比较复杂，首先是改写为普通函数并包裹：
+它的实现比较复杂，首先是改写为普通函数：
 ```js
 function *a(){
+yield 1
+yield 2
+}
+```
+```js
+function a(){
+return 1
+return 2
+}
+```
+然后包裹：
+```js
+function *a(){
+yield 1
+yield 2
 }
 ```
 ```js
 var a=function(){return function (){return {next:a}};function a(){
+return 1
+return 2
 }}();
 ```
-> 这样每次调用它便能得到像`es6`中一样的一个具有`next()`方法的对象
+> 这样每次调用它便能得到像es6中一样的一个具有`next()`方法的对象。
 
 内部的a变量需要改写为一个唯一临时id（为什么后面会提到）：
 ```js
@@ -543,9 +560,26 @@ yield 2
 ```js
 var a=function(){var __1__=0;return function (){return {next:__0__}};function __0__(){
 switch(__1__++){case 0:return 1
-case 1:return 2
+case 1:return 2}
 }}();
 ```
+同时函数里面的`var`声明需要前置：
+```js
+function *a(){
+var a = 1;
+yield a++;
+yield a++;
+}
+```
+```js
+var a=function(){var __1__=0;return function (){return {next:__0__}};var a;function __0__(){
+switch(__1__++){case 0:return 1
+case 1:return 2}
+}}();
+```
+> 以免每次调用`next()`方法时变量又重新声明一遍失去了原先的状态，函数则不需要前置。
+> 注意函数内有个同名变量`a`，这就是前面为什么要改函数名的原因。
+
 待续……
 
 
