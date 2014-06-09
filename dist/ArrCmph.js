@@ -47,7 +47,7 @@
         while(self.hash[node.nid()].f--) {
           self.jsdc.appendBefore('}');
         }
-        self.jsdc.appendBefore('return ' + self.hash[node.nid()].id + '}();');
+        self.jsdc.appendBefore('return ' + self.hash[node.nid()].id + '}()');
       }
     },
     for: function(node, start) {

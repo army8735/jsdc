@@ -463,7 +463,7 @@ module.exports=a
 var a = [for(k of o)k]
 ```
 ```js
-var a = function(){var k;var __0__=[];for(k in o){k=o[k];__0__.push(k)}return __0__}();
+var a = function(){var k;var __0__=[];for(k in o){k=o[k];__0__.push(k)}return __0__}()
 ```
 > 注意再次出现的临时变量`__0__`和上面提到的一致，不会冲突。
 
@@ -472,14 +472,14 @@ var a = function(){var k;var __0__=[];for(k in o){k=o[k];__0__.push(k)}return __
 var a = [for(k of o)if(k)k]
 ```
 ```js
-var a = function(){var k;var __0__=[];for(k in o){k=o[k];if(k)__0__.push(k)}return __0__}();
+var a = function(){var k;var __0__=[];for(k in o){k=o[k];if(k)__0__.push(k)}return __0__}()
 ```
 嵌套组合使用也是可以的：
 ```js
 var a = [for(a of b)for(c of a)if(c)c]
 ```
 ```js
-var a = function(){var a;var c;var __0__=[];for(a in b){a=b[a];for(c in a){c=a[c];if(c)__0__.push(c)}}return __0__}();
+var a = function(){var a;var c;var __0__=[];for(a in b){a=b[a];for(c in a){c=a[c];if(c)__0__.push(c)}}return __0__}()
 ```
 
 ### ArrowFunction箭头函数
@@ -587,7 +587,7 @@ var a=function(){var __1__=0;return function (){return {next:__0__}};function __
   case 1:return 2}
 }}();
 ```
-同时函数里面的`var`声明需要前置：
+同时函数里面的`var`声明需要前置，以免每次调用`next()`方法时又重新声明一遍失去了状态：
 ```js
 function *a(){
   var a = 1;
@@ -602,8 +602,7 @@ var a=function(){var __1__=0;return function (){return {next:__0__}};var a;funct
   case 1:return a++;}
 }}();
 ```
-> 以免每次调用`next()`方法时变量又重新声明一遍失去了原先的状态，函数则不需要前置。
-
+> 函数则不需要前置。
 > 注意函数内有个同名变量`a`，这就是前面为什么要改函数名的原因。
 
 待续……
