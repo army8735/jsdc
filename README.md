@@ -61,14 +61,14 @@ npm install jsdc
 var i = 0b010, j = 0B101
 ```
 ```js
-var i = parseInt("010", 2), j = parseInt("101", 2)
+var i = parseInt("0b010", 2), j = parseInt("0B101", 2)
 ```
 `0o`或`0O`开头的八进制也是如此（有人会用大写的字母O吗，和数字0根本看不出来区别）：
 ```js
 var i = 0o456, j = 0O777
 ```
 ```js
-var i = parseInt("456", 8), j = parseInt("777", 8)
+var i = parseInt("0o456", 8), j = parseInt("0O777", 8)
 ```
 
 ### var和函数迁移
@@ -290,7 +290,7 @@ class A{
 ```
 ```js
 function A(){}
-A.prototype.b={get b(){}}["b"];
+  A.prototype.b={get b(){}}["b"];
   A.prototype.c={set c(d){}}["c"];
 
 ```
@@ -496,5 +496,57 @@ function *a() {
 > `Generator`语句本身尚未做处理，后面会提到。
 
 ### Generator生成器函数
+它的实现比较复杂，首先是改写为普通函数并包裹：
+```js
+function *a(){
+}
+```
+```js
+var a=function(){return function (){return {next:a}};function a(){
+}}();
+```
+> 这样每次调用它便能得到像`es6`中一样的一个具有`next()`方法的对象
+
+内部的a变量需要改写为一个唯一临时id（为什么后面会提到）：
+```js
+function *a(){
+yield 1
+yield 2
+}
+```
+```js
+var a=function(){return function (){return {next:__0__}};function __0__(){
+return 1
+return 2
+}}();
+```
+再次添加一个唯一临时id作为state标识，来为实现`yield`功能做准备：
+```js
+function *a(){
+yield 1
+yield 2
+}
+```
+```js
+var a=function(){var __1__=0;return function (){return {next:__0__}};function __0__(){
+return 1
+return 2
+}}();
+```
+当出现`yield`语句时，添加`switch`语句来模拟顺序执行：
+```js
+function *a(){
+yield 1
+yield 2
+}
+```
+```js
+var a=function(){var __1__=0;return function (){return {next:__0__}};function __0__(){
+switch(__1__++){case 0:return 1
+case 1:return 2
+}}();
+```
+待续……
+
 
 ### destructure解构
