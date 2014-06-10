@@ -48,25 +48,26 @@ var Scope = Class(function(jsdc) {
       return;
     }
     var parent = self.closest(varstmt);
-    if(parent
-        && self.hash[parent.nid()]) {
-      //插入声明的变量到作用域开始，并删除这个var
-      var i = self.index[self.index.length - 1];
-      self.history[i] = self.history[i] || {};
-      var his = self.history[i];
-      var vardecls = varstmt.leaves().filter(function(o, i) {
-        return i % 2 == 1;
-      });
-      vardecls.forEach(function(vardecl) {
+    //插入声明的变量到作用域开始，并删除这个var
+    var i = self.index[self.index.length - 1];
+    self.history[i] = self.history[i] || {};
+    var his = self.history[i];
+    var vardecls = varstmt.leaves().filter(function(o, i) {
+      return i % 2 == 1;
+    });
+    vardecls.forEach(function(vardecl) {
+      if(vardecl.first().name() != JsNode.BINDID
+        || parent
+          && self.hash[parent.nid()]) {
         self.join(vardecl).forEach(function(id) {
           if(!his.hasOwnProperty(id)) {
             his[id] = true;
             self.jsdc.insert('var ' + id + ';', i);
           }
         });
-      });
-      self.jsdc.ignore(varstmt.first().token());
-    };
+        self.jsdc.ignore(varstmt.first().token());
+      }
+    });
   },
   prefn: function(fndecl) {
     var parent = this.closest(fndecl);
@@ -83,7 +84,7 @@ var Scope = Class(function(jsdc) {
       }
       this.jsdc.ignore(fndecl.leaf(1));
       this.jsdc.append(id + '=');
-    };
+    }
   },
   pregen: function(gendecl) {
     var parent = this.closest(gendecl);
@@ -100,7 +101,7 @@ var Scope = Class(function(jsdc) {
       }
       this.jsdc.ignore(gendecl.leaf(2));
       this.jsdc.append(id + '=');
-    };
+    }
   },
   join: function(node) {
     var first = node.first();
@@ -108,6 +109,10 @@ var Scope = Class(function(jsdc) {
     switch(first.name()) {
       case JsNode.BINDID:
         res.push(first.first().token().content());
+        break;
+      case JsNode.ARRBINDPAT:
+      case JsNode.OBJBINDPAT:
+        res = res.concat(this.jsdc.destruct.getIds(first));
         break;
     }
     return res;

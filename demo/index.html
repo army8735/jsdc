@@ -131,7 +131,7 @@ seajs.use(['../index', './jssc'], function(jsdc, jssc) {
 		var nodes = Array.prototype.slice.call(document.getElementsByTagName('code'), 0);
 		nodes.forEach(function(node, i) {
       try {
-        var res = jsdc.parse(node.textContent || node.innerText || node.firstChild.nodeValue);
+        var res = jsdc.parse(node.textContent || node.innerText || node.firstChild && node.firstChild.nodeValue);
         var ast = jsdc.ast();
         var tokens = jsdc.tokens();
       } catch(e) {
@@ -156,9 +156,8 @@ seajs.use(['../index', './jssc'], function(jsdc, jssc) {
 		});
 		jssc.exec();
 	}
-	var ta = document.getElementById('ta'),
-		input = document.getElementById('btn');
-	ta.value = document.getElementsByTagName('code')[0].innerHTML.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+	var ta = document.getElementById('ta');
+	var input = document.getElementById('btn');
 	input.onclick = function() {
 		var s = ta.value;
 		Array.prototype.slice.call(document.getElementsByTagName('div'), 0).forEach(function(o) {

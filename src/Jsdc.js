@@ -180,6 +180,9 @@ var Jsdc = Class(function(code) {
         this.scope.prevar(node);
         this.gen.prevar(node);
         break;
+      case JsNode.VARDECL:
+        this.destruct.decl(node, true);
+        break;
       case JsNode.FNDECL:
         this.scope.prefn(node);
         break;
@@ -256,6 +259,9 @@ var Jsdc = Class(function(code) {
   },
   after: function(node) {
     switch(node.name()) {
+      case JsNode.VARDECL:
+        this.destruct.decl(node);
+        break;
       case JsNode.FNBODY:
         this.scope.leave(node);
         this.gen.body(node);
