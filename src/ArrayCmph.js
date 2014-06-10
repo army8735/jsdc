@@ -4,7 +4,7 @@ var Token = homunculus.getClass('Token');
 
 var Class = require('./util/Class');
 
-var ArrCmph = Class(function(jsdc) {
+var ArrayCmph = Class(function(jsdc) {
   this.jsdc = jsdc;
   this.hash = {};
 }).methods({
@@ -98,4 +98,4 @@ var ArrCmph = Class(function(jsdc) {
   }
 });
 
-module.exports = ArrCmph;
+module.exports = ArrayCmph;

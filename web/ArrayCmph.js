@@ -5,7 +5,7 @@ define(function(require, exports, module) {
   
   var Class = require('./util/Class');
   
-  var ArrCmph = Class(function(jsdc) {
+  var ArrayCmph = Class(function(jsdc) {
     this.jsdc = jsdc;
     this.hash = {};
   }).methods({
@@ -99,6 +99,6 @@ define(function(require, exports, module) {
     }
   });
   
-  module.exports = ArrCmph;
+  module.exports = ArrayCmph;
   
 });

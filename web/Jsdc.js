@@ -14,9 +14,9 @@ define(function(require, exports, module) {
   var Klass = require('./Klass');
   var Num = require('./Num');
   var Module = require('./Module');
-  var ArrCmph = require('./ArrCmph');
+  var ArrayCmph = require('./ArrayCmph');
   var ArrowFn = require('./ArrowFn');
-  var Genarator = require('./Genarator');
+  var Generator = require('./Generator');
   var Destruct = require('./Destruct');
   
   var Jsdc = Class(function(code) {
@@ -35,9 +35,9 @@ define(function(require, exports, module) {
     this.klass = new Klass(this);
     this.num = new Num(this);
     this.module = new Module(this);
-    this.arrCmph = new ArrCmph(this);
+    this.arrCmph = new ArrayCmph(this);
     this.arrowFn = new ArrowFn(this);
-    this.gen = new Genarator(this);
+    this.gen = new Generator(this);
     this.destruct = new Destruct(this);
   
     this.i = 0;

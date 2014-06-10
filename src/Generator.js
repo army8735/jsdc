@@ -3,7 +3,7 @@ var JsNode = homunculus.getClass('Node', 'es6');
 
 var Class = require('./util/Class');
 
-var Genarator = Class(function(jsdc) {
+var Generator = Class(function(jsdc) {
   this.jsdc = jsdc;
   this.hash = {};
 }).methods({
@@ -82,4 +82,4 @@ var Genarator = Class(function(jsdc) {
   }
 });
 
-module.exports = Genarator;
+module.exports = Generator;

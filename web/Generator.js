@@ -4,7 +4,7 @@ define(function(require, exports, module) {
   
   var Class = require('./util/Class');
   
-  var Genarator = Class(function(jsdc) {
+  var Generator = Class(function(jsdc) {
     this.jsdc = jsdc;
     this.hash = {};
   }).methods({
@@ -83,6 +83,6 @@ define(function(require, exports, module) {
     }
   });
   
-  module.exports = Genarator;
+  module.exports = Generator;
   
 });
