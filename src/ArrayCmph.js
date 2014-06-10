@@ -76,12 +76,8 @@ var ArrayCmph = Class(function(jsdc) {
       this.jsdc.append('in ');
     }
   },
-  join: function(node) {
-    var res = { s: '' };
-    this.recursion(node, res);
-    return res.s;
-  },
-  recursion: function(node, res) {
+  join: function(node, res) {
+    res = res || { s: '' };
     var self = this;
     var isToken = node.name() == JsNode.TOKEN;
     var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
@@ -92,9 +88,10 @@ var ArrayCmph = Class(function(jsdc) {
     }
     else {
       node.leaves().forEach(function(leaf) {
-        self.recursion(leaf, res);
+        self.join(leaf, res);
       });
     }
+    return res.s;
   }
 });
 

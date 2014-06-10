@@ -89,6 +89,12 @@ var Destruct = Class(function(jsdc) {
               case JsNode.SINGLENAME:
                 var id = leaf.first().first().token().content();
                 self.jsdc.appendBefore(id + '=' + temp + '[' + i + '];');
+                //初始化赋值
+                if(leaf.size() == 2) {
+                  var init = leaf.last();
+                  self.jsdc.appendBefore('if(' + id + '===void 0)')
+                  self.jsdc.appendBefore(id + self.join(init) + ';');
+                }
                 break;
               case JsNode.BINDELEM:
                 self.destruct(leaf.first(), {
@@ -118,6 +124,12 @@ var Destruct = Class(function(jsdc) {
               case JsNode.SINGLENAME:
                 var id = leaf.first().first().token().content();
                 self.jsdc.appendBefore(id + '=' + temp + '["' + id + '"];');
+                //初始化赋值
+                if(leaf.size() == 2) {
+                  var init = leaf.last();
+                  self.jsdc.appendBefore('if(' + id + '===void 0)')
+                  self.jsdc.appendBefore(id + self.join(init) + ';');
+                }
                 break;
               case JsNode.PROPTNAME:
                 var last = leaf.next().next();
@@ -161,6 +173,12 @@ var Destruct = Class(function(jsdc) {
             case JsNode.SINGLENAME:
               var id = leaf.first().first().token().content();
               self.jsdc.appendBefore(id + '=' + temp + '[' + i + '];');
+              //初始化赋值
+              if(leaf.size() == 2) {
+                var init = leaf.last();
+                self.jsdc.appendBefore('if(' + id + '===void 0)')
+                self.jsdc.appendBefore(id + self.join(init) + ';');
+              }
               break;
             case JsNode.BINDELEM:
               self.destruct(leaf.first(), {
@@ -187,6 +205,12 @@ var Destruct = Class(function(jsdc) {
             case JsNode.SINGLENAME:
               var id = leaf.first().first().token().content();
               self.jsdc.appendBefore(id + '=' + temp + '["' + id + '"];');
+              //初始化赋值
+              if(leaf.size() == 2) {
+                var init = leaf.last();
+                self.jsdc.appendBefore('if(' + id + '===void 0)')
+                self.jsdc.appendBefore(id + self.join(init) + ';');
+              }
               break;
             case JsNode.PROPTNAME:
               var last = leaf.next().next();
@@ -237,6 +261,12 @@ var Destruct = Class(function(jsdc) {
                 var id = leaf.token().content();
                 self.jsdc.appendBefore(id + '=' + temp + '[' + i + '];');
                 break;
+              case JsNode.PRMREXPR:
+                var id = leaf.first().token().content();
+                self.jsdc.appendBefore(id + '=' + temp + '[' + i + '];');
+                self.jsdc.appendBefore('if(' + id + '===void 0)')
+                self.jsdc.appendBefore(id + '=' + self.join(leaf.next().next()) + ';');
+                break;
               case JsNode.ARRLTR:
               case JsNode.OBJLTR:
                 self.destructExpr(leaf, {
@@ -250,7 +280,7 @@ var Destruct = Class(function(jsdc) {
         break;
       case JsNode.OBJLTR:
         if(start) {
-          this.jsdc.ignore(first);
+          self.jsdc.ignore(first);
           self.jsdc.append('!function(){var ');
           var temp = self.jsdc.uid();
           self.hash[first.nid()] = temp;
@@ -266,6 +296,11 @@ var Destruct = Class(function(jsdc) {
               case JsNode.TOKEN:
                 var id = leaf.token().content();
                 self.jsdc.appendBefore(id + '=' + temp + '["' + id + '"];');
+                if(leaf.next()) {
+                  var init = leaf.next();
+                  self.jsdc.appendBefore('if(' + id + '===void 0)')
+                  self.jsdc.appendBefore(id + self.join(init) + ';');
+                }
                 break;
               case JsNode.PROPTNAME:
                 var last = leaf.next().next().first();
@@ -315,6 +350,12 @@ var Destruct = Class(function(jsdc) {
               var id = leaf.token().content();
               self.jsdc.appendBefore(id + '=' + temp + '[' + i + '];');
               break;
+            case JsNode.PRMREXPR:
+              var id = leaf.first().token().content();
+              self.jsdc.appendBefore(id + '=' + temp + '[' + i + '];');
+              self.jsdc.appendBefore('if(' + id + '===void 0)')
+              self.jsdc.appendBefore(id + '=' + self.join(leaf.next().next()) + ';');
+              break;
             case JsNode.ARRLTR:
             case JsNode.OBJLTR:
               self.destructExpr(leaf, {
@@ -340,6 +381,11 @@ var Destruct = Class(function(jsdc) {
             case JsNode.TOKEN:
               var id = leaf.token().content();
               self.jsdc.appendBefore(id + '=' + temp + '["' + id + '"];');
+              if(leaf.next()) {
+                var init = leaf.next();
+                self.jsdc.appendBefore('if(' + id + '===void 0)')
+                self.jsdc.appendBefore(id + self.join(init) + ';');
+              }
               break;
             case JsNode.PROPTNAME:
               var last = leaf.next().next().first();
@@ -385,6 +431,23 @@ var Destruct = Class(function(jsdc) {
     return leaves.filter(function(leaf, i) {
       return i % 2 == 1;
     });
+  },
+  join: function(node, res) {
+    res = res || { s: '' };
+    var self = this;
+    var isToken = node.name() == JsNode.TOKEN;
+    var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
+    if(isToken) {
+      if(!isVirtual) {
+        res.s += node.token().content();
+      }
+    }
+    else {
+      node.leaves().forEach(function(leaf) {
+        self.join(leaf, res);
+      });
+    }
+    return res.s;
   }
 });
 

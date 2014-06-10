@@ -326,13 +326,13 @@ define(function(require, exports, module) {
         });
       }
     },
-    unIgnore: function(node) {return;
+    unIgnore: function(node) {
       var self = this;
       if(node instanceof Token) {
-        delete node.ignore;
+        node.ignore && (node.ignore = false);
       }
       else if(node.name() == JsNode.TOKEN) {
-        delete node.token().ignore;
+        node.token().ignore && (node.token().ignore = false);
       }
       else {
         node.leaves().forEach(function(leaf) {

@@ -32,6 +32,7 @@ npm install jsdc
 * module模块
 * ArrayComprehension数组推导
 * ArrowFunction箭头函数
+* yield语句
 * Generator生成器函数
 
 ## API
@@ -646,4 +647,17 @@ var [a,{b},{c:[d]} = [1,{"b":2},{"c":[3]}
 ```js
 var d;var b;var a;!function(){var __0__= [1,{"b":2},{"c":[3]}];a=__0__[0];var __1__=__0__[1];b=__1__["b"];var __2__=__0__[2];var __3__=__2__["c"];d=__3__[0];}()
 ```
-未完持续……
+解构还允许在未定义的情况下默认赋值：
+```js
+var [a=1] = []
+```
+```js
+var a;!function(){var __0__= [];a=__0__[0];if(a===void 0)a=1;}()
+```
+表达式赋值也可以：
+```js
+({a=1} = {})
+```
+```js
+(!function(){var __1__= {};a=__1__["a"];if(a===void 0)a=1;}())
+```
