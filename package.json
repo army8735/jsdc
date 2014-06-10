@@ -42,7 +42,7 @@
   "author": "army8735",
   "license": "MIT",
   "dependencies": {
-    "homunculus": "^0.2.6-4"
+    "homunculus": "^0.2.6-5"
   },
   "devDependencies": {
     "blanket": "^1.1.6",

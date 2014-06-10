@@ -9,9 +9,6 @@ var Destruct = Class(function(jsdc) {
   this.hash = {};
   this.idCache = {};
 }).methods({
-  parse: function(node, start) {
-    //
-  },
   getIds: function(node) {
     if(this.idCache.hasOwnProperty(node.nid())) {
       return this.idCache[node.nid()];
@@ -72,9 +69,9 @@ var Destruct = Class(function(jsdc) {
     this.idCache[node.nid()] = res;
     return res;
   },
-  decl: function(node, start) {
-    var first = node.first();
+  parse: function(node, start) {
     var self = this;
+    var first = node.first();
     switch(first.name()) {
       case JsNode.ARRBINDPAT:
         if(start) {
@@ -150,7 +147,7 @@ var Destruct = Class(function(jsdc) {
     var self = this;
     switch(node.name()) {
       case JsNode.ARRBINDPAT:
-        self.jsdc.appendBefore('!function(){var ');
+        self.jsdc.appendBefore('var ');
         var temp = self.jsdc.uid();
         if(data.name) {
           self.jsdc.appendBefore(temp + '=' + data.temp + '["' + data.name + '"];');
@@ -173,10 +170,9 @@ var Destruct = Class(function(jsdc) {
               break;
           }
         });
-        self.jsdc.appendBefore('}();');
         break;
       case JsNode.OBJBINDPAT:
-        self.jsdc.appendBefore('!function(){var ');
+        self.jsdc.appendBefore('var ');
         var temp = self.jsdc.uid();
         if(data.name) {
           self.jsdc.appendBefore(temp + '=' + data.temp + '["' + data.name + '"];');
@@ -211,7 +207,160 @@ var Destruct = Class(function(jsdc) {
               break;
           }
         });
-        self.jsdc.appendBefore('}();');
+        break;
+    }
+  },
+  expr: function(assignexpr, start) {
+    var self = this;
+    var first = assignexpr.first();
+    first = first.first();
+    switch(first.name()) {
+      case JsNode.ARRLTR:
+        if(start) {
+          this.jsdc.ignore(first);
+          self.jsdc.append('!function(){var ');
+          var temp = self.jsdc.uid();
+          self.hash[first.nid()] = temp;
+          self.jsdc.append(temp);
+        }
+        else {
+          self.jsdc.appendBefore(';');
+          var temp = self.hash[first.nid()];
+          var target = self.getArray(first.leaves());
+          target.forEach(function(leaf, i) {
+            if(leaf.name() == JsNode.TOKEN) {
+              return;
+            }
+            leaf = leaf.first();
+            switch(leaf.name()) {
+              case JsNode.TOKEN:
+                var id = leaf.token().content();
+                self.jsdc.appendBefore(id + '=' + temp + '[' + i + '];');
+                break;
+              case JsNode.ARRLTR:
+              case JsNode.OBJLTR:
+                self.destructExpr(leaf, {
+                  temp: temp,
+                  index: i
+                });
+            }
+          });
+          self.jsdc.appendBefore('}()');
+        }
+        break;
+      case JsNode.OBJLTR:
+        if(start) {
+          this.jsdc.ignore(first);
+          self.jsdc.append('!function(){var ');
+          var temp = self.jsdc.uid();
+          self.hash[first.nid()] = temp;
+          self.jsdc.append(temp);
+        }
+        else {
+          self.jsdc.appendBefore(';');
+          var temp = self.hash[first.nid()];
+          var target = self.getName(first.leaves());
+          target.forEach(function(leaf) {
+            leaf = leaf.first();
+            switch(leaf.name()) {
+              case JsNode.TOKEN:
+                var id = leaf.token().content();
+                self.jsdc.appendBefore(id + '=' + temp + '["' + id + '"];');
+                break;
+              case JsNode.PROPTNAME:
+                var last = leaf.next().next().first();
+                var name = leaf.first().first().token().content();
+                switch(last.name()) {
+                  case JsNode.TOKEN:
+                    var id = last.token().content();
+                    self.jsdc.appendBefore(id + '=' + temp + '["' + name + '"];');
+                    break;
+                  case JsNode.ARRLTR:
+                  case JsNode.OBJLTR:
+                    self.destructExpr(last, {
+                      temp: temp,
+                      name: name,
+                      index: 0
+                    });
+                    break;
+                }
+                break;
+            }
+          });
+          self.jsdc.appendBefore('}()');
+        }
+        break;
+    }
+  },
+  destructExpr: function(node, data) {
+    var self = this;
+    switch(node.name()) {
+      case JsNode.ARRLTR:
+        self.jsdc.appendBefore('var ');
+        var temp = self.jsdc.uid();
+        if(data.name) {
+          self.jsdc.appendBefore(temp + '=' + data.temp + '["' + data.name + '"];');
+        }
+        else {
+          self.jsdc.appendBefore(temp + '=' + data.temp + '[' + data.index + '];');
+        }
+        var target = self.getArray(node.leaves());
+        target.forEach(function(leaf, i) {
+          if(leaf.name() == JsNode.TOKEN) {
+            return;
+          }
+          leaf = leaf.first();
+          switch(leaf.name()) {
+            case JsNode.TOKEN:
+              var id = leaf.token().content();
+              self.jsdc.appendBefore(id + '=' + temp + '[' + i + '];');
+              break;
+            case JsNode.ARRLTR:
+            case JsNode.OBJLTR:
+              self.destructExpr(leaf, {
+                temp: temp,
+                index: i
+              });
+          }
+        });
+        break;
+      case JsNode.OBJLTR:
+        self.jsdc.appendBefore('var ');
+        var temp = self.jsdc.uid();
+        if(data.name) {
+          self.jsdc.appendBefore(temp + '=' + data.temp + '["' + data.name + '"];');
+        }
+        else {
+          self.jsdc.appendBefore(temp + '=' + data.temp + '[' + data.index + '];');
+        }
+        var target = self.getArray(node.leaves());
+        target.forEach(function(leaf) {
+          leaf = leaf.first();
+          switch(leaf.name()) {
+            case JsNode.TOKEN:
+              var id = leaf.token().content();
+              self.jsdc.appendBefore(id + '=' + temp + '["' + id + '"];');
+              break;
+            case JsNode.PROPTNAME:
+              var last = leaf.next().next().first();
+              var name = leaf.first().first().token().content();
+              switch(last.name()) {
+                case JsNode.TOKEN:
+                  var id = last.token().content();
+                  self.jsdc.appendBefore(id + '=' + temp + '["' + name + '"];');
+                  break;
+                case JsNode.ARRLTR:
+                case JsNode.OBJLTR:
+                  self.destructExpr(last, {
+                    temp: temp,
+                    name: name,
+                    index: 0
+                  });
+                  break;
+              }
+              break;
+          }
+        });
         break;
     }
   },

@@ -182,7 +182,10 @@ define(function(require, exports, module) {
           this.gen.prevar(node);
           break;
         case JsNode.VARDECL:
-          this.destruct.decl(node, true);
+          this.destruct.parse(node, true);
+          break;
+        case JsNode.ASSIGNEXPR:
+          this.destruct.expr(node, true);
           break;
         case JsNode.FNDECL:
           this.scope.prefn(node);
@@ -261,7 +264,10 @@ define(function(require, exports, module) {
     after: function(node) {
       switch(node.name()) {
         case JsNode.VARDECL:
-          this.destruct.decl(node);
+          this.destruct.parse(node);
+          break;
+        case JsNode.ASSIGNEXPR:
+          this.destruct.expr(node);
           break;
         case JsNode.FNBODY:
           this.scope.leave(node);
