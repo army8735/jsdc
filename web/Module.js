@@ -58,9 +58,14 @@ define(function(require, exports, module) {
         case JsNode.TOKEN:
           s = node.leaf(1).token().content();
           if(s == '*') {
-            this.jsdc.append('module.exports=require(');
+            var temp = this.jsdc.uid();
+            this.jsdc.append('!function(){');
+            this.jsdc.append('var ' + temp + '=require(');
             this.jsdc.append(node.leaf(2).last().token().content());
             this.jsdc.append(');');
+            this.jsdc.append('Object.keys(' + temp + ').forEach(function(k){');
+            this.jsdc.append('module.exports[k]=' + temp + '[k];');
+            this.jsdc.append('});}();');
             this.jsdc.ignore(node);
           }
           else if(s == 'default') {

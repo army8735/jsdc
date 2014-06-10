@@ -314,7 +314,7 @@ A.a=function(){}
 
 ```
 
-### extends类继承
+### extends类继承和super关键字
 采用最广泛的寄生组合式继承：
 ```js
 class A extends B{
@@ -428,12 +428,12 @@ import {a,b as c} from "a"
 ```js
 var a;var c;!function(){var __0__=require("a");a=__0__.a;c=__0__.b;}();
 ```
-`export *`会赋给module.exports：
+`export * from ""`会将模块的导出赋给module.exports：
 ```js
 export * from "a"
 ```
 ```js
-module.exports=require("a");
+!function(){var __0__=require("a");Object.keys(__0__).forEach(function(k){module.exports[k]=temp[k];});}();
 ```
 `export`一个`var`语句时会自动赋值同名变量：
 ```js

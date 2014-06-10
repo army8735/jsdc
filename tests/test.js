@@ -469,7 +469,7 @@ describe('es6', function() {
       var s = 'export * from "a"';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('define(function(require,exports,module){module.exports=require("a");});');
+      expect(res).to.eql('define(function(require,exports,module){!function(){var __0__=require("a");Object.keys(__0__).forEach(function(k){module.exports[k]=__0__[k];});}();});');
     });
     it('export var', function() {
       var s = 'export var a';
