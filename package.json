@@ -1,6 +1,6 @@
 {
   "name": "jsdc",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "transform ecmascript6 to ecmascript5",
   "maintainers": [
     {
@@ -14,7 +14,7 @@
   "config": {
     "blanket": {
       "pattern": [
-        "jsdc/dist"
+        "jsdc/src"
       ]
     }
   },
@@ -30,7 +30,7 @@
   "author": "army8735",
   "license": "MIT",
   "dependencies": {
-    "homunculus": "^0.2.6-1"
+    "homunculus": "^0.2.6-2"
   },
   "devDependencies": {
     "blanket": "^1.1.6",

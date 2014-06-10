@@ -14,6 +14,7 @@ npm install jsdc
 ## 使用说明
 * jsdc仅提供安全兼容的转换接口，并且不改变你的源代码行数一致性，这使得调试极为便利
 * 智能识别es5语法，jsdc不会修改es5的部分
+* 无需预置script脚本，绝不更改任何变量
 * CommonJS/AMD/CMD自适应
 * as simple as possible
 * 仅转换可实现的语言部分，扩展库（如`Set`和`Map`）请使用`es6-shim`之类的库

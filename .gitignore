@@ -136,13 +136,13 @@ Desktop.ini
 # Packages
 *.egg
 *.egg-info
-build
-eggs
-parts
-bin
-var
-sdist
-develop-eggs
+build/
+dist/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
 .installed.cfg
 
 # Installer logs

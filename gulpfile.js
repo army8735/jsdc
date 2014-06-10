@@ -14,23 +14,23 @@ function mkdir(dir) {
   }
 }
 
-gulp.task('clean-dist', function() {
-  return gulp.src('./dist/*')
+gulp.task('clean-web', function() {
+  return gulp.src('./web/*')
     .pipe(clean());
 });
 
 function cb(file, enc, cb) {
-  var target = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'dist' + path.sep);
+  var target = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'web' + path.sep);
   mkdir(path.dirname(target));
   util.log(path.relative(file.cwd, file.path), '->', path.relative(file.cwd, target));
   var content = file._contents;
   content = content.toString('utf-8');
-  content = "(function(factory) {\n  if(typeof define === 'function' && (define.amd || define.cmd)) {\n    define(factory);\n  }\n  else {\n    factory(require, exports, module);\n  }\n})(function(require, exports, module) {\n  " + content.replace(/\n/g, '\n  ') + '\n});';
+  content = "define(function(require, exports, module) {\n  " + content.replace(/\n/g, '\n  ') + '\n});';
   fs.writeFileSync(target, content, { encoding: 'utf-8' });
   cb(null, file);
 }
 
-gulp.task('default', ['clean-dist'], function() {
+gulp.task('default', ['clean-web'], function() {
   gulp.src('./src/**/*.js')
     .pipe(function() {
       return through2.obj(cb);

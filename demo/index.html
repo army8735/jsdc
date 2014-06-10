@@ -122,7 +122,7 @@ seajs.config({
     'homunculus': seajs.resolve('../node_modules/homunculus/index.js', seajs.data.cwd)
   },
   map: [function(url) {
-    return url.replace('demo/lexer/', 'node_modules/homunculus/dist/lexer/');
+    return url.replace('demo/lexer/', 'node_modules/homunculus/web/lexer/');
   }]
 });
 seajs.use(['../index', './jssc'], function(jsdc, jssc) {

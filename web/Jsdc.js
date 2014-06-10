@@ -1,31 +1,24 @@
-(function(factory) {
-  if(typeof define === 'function' && (define.amd || define.cmd)) {
-    define(factory);
-  }
-  else {
-    factory(require, exports, module);
-  }
-})(function(require, exports, module) {
+define(function(require, exports, module) {
   var homunculus = require('homunculus');
   var JsNode = homunculus.getClass('Node', 'es6');
   var Token = homunculus.getClass('Token');
-
-  var character = require('./dist/util/character');
-  var Class = require('./dist/util/Class');
-
-  var Scope = require('./dist/Scope');
-  var DefaultValue = require('./dist/DefaultValue');
-  var Rest = require('./dist/Rest');
-  var Template = require('./dist/Template');
-  var Forof = require('./dist/Forof');
-  var Klass = require('./dist/Klass');
-  var Num = require('./dist/Num');
-  var Module = require('./dist/Module');
-  var ArrCmph = require('./dist/ArrCmph');
-  var ArrowFn = require('./dist/ArrowFn');
-  var Genarator = require('./dist/Genarator');
-  var Destruct = require('./dist/Destruct');
-
+  
+  var character = require('./util/character');
+  var Class = require('./util/Class');
+  
+  var Scope = require('./Scope');
+  var DefaultValue = require('./DefaultValue');
+  var Rest = require('./Rest');
+  var Template = require('./Template');
+  var Forof = require('./Forof');
+  var Klass = require('./Klass');
+  var Num = require('./Num');
+  var Module = require('./Module');
+  var ArrCmph = require('./ArrCmph');
+  var ArrowFn = require('./ArrowFn');
+  var Genarator = require('./Genarator');
+  var Destruct = require('./Destruct');
+  
   var Jsdc = Class(function(code) {
     this.code = (code + '') || '';
     this.index = 0;
@@ -33,7 +26,7 @@
     this.node = {};
     this.ignores = {};
     this.ts = [];
-
+  
     this.scope = new Scope(this);
     this.defaultValue = new DefaultValue(this);
     this.rest = new Rest(this);
@@ -46,7 +39,7 @@
     this.arrowFn = new ArrowFn(this);
     this.gen = new Genarator(this);
     this.destruct = new Destruct(this);
-
+  
     this.i = 0;
     this.ids = {};
     return this;
