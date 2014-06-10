@@ -32,7 +32,7 @@ npm install jsdc
 * module模块
 * ArrayComprehension数组推导
 * ArrowFunction箭头函数
-* Genarator生成器函数
+* Generator生成器函数
 
 ## API
 
