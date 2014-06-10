@@ -54,38 +54,40 @@ define(function(require, exports, module) {
     },
     export: function(node) {
       var s = node.leaf(1).name();
-      if(s == JsNode.TOKEN) {
-        s = node.leaf(1).token().content();
-        if(s == '*') {
-          this.jsdc.append('module.exports=require(');
-          this.jsdc.append(node.leaf(2).last().token().content());
-          this.jsdc.append(');');
-          this.jsdc.ignore(node);
-        }
-        else if(s == 'default') {
-          this.jsdc.append('module.exports=');
-          this.jsdc.ignore(node.leaf(0));
-          this.jsdc.ignore(node.leaf(1));
-        }
-      }
-      else if(s == JsNode.VARSTMT
-        || s == JsNode.LEXDECL) {
-        var varstmt = node.leaf(1);
-        var vardecl = varstmt.leaf(1);
-        this.jsdc.append('var ');
-        var id = vardecl.first().first().token().content();
-        this.jsdc.append(id);
-        this.jsdc.append(';exports.' + id + '=');
-        this.jsdc.ignore(varstmt.first());
-        this.jsdc.ignore(node.first());
-      }
-      else if(s == JsNode.FNDECL
-        || s == JsNode.CLASSDECL) {
-        var id = node.last().leaf(1).first().token().content();
-        this.jsdc.append('exports.' + id + '=');
-        this.jsdc.append(id);
-        this.jsdc.append(';');
-        this.jsdc.ignore(node.first());
+      switch(s) {
+        case JsNode.TOKEN:
+          s = node.leaf(1).token().content();
+          if(s == '*') {
+            this.jsdc.append('module.exports=require(');
+            this.jsdc.append(node.leaf(2).last().token().content());
+            this.jsdc.append(');');
+            this.jsdc.ignore(node);
+          }
+          else if(s == 'default') {
+            this.jsdc.append('module.exports=');
+            this.jsdc.ignore(node.leaf(0));
+            this.jsdc.ignore(node.leaf(1));
+          }
+          break;
+        case JsNode.VARSTMT:
+        case JsNode.LEXDECL:
+          var varstmt = node.leaf(1);
+          var vardecl = varstmt.leaf(1);
+          this.jsdc.append('var ');
+          var id = vardecl.first().first().token().content();
+          this.jsdc.append(id);
+          this.jsdc.append(';exports.' + id + '=');
+          this.jsdc.ignore(varstmt.first());
+          this.jsdc.ignore(node.first());
+          break;
+        case JsNode.FNDECL:
+        case JsNode.CLASSDECL:
+          var id = node.last().leaf(1).first().token().content();
+          this.jsdc.append('exports.' + id + '=');
+          this.jsdc.append(id);
+          this.jsdc.append(';');
+          this.jsdc.ignore(node.first());
+          break;
       }
     },
     enter: function() {

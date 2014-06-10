@@ -106,8 +106,10 @@ define(function(require, exports, module) {
     join: function(node) {
       var first = node.first();
       var res = [];
-      if(first.name() == JsNode.BINDID) {
-        res.push(first.first().token().content());
+      switch(first.name()) {
+        case JsNode.BINDID:
+          res.push(first.first().token().content());
+          break;
       }
       return res;
     },
@@ -118,40 +120,42 @@ define(function(require, exports, module) {
       this.index.pop();
     },
     block: function(node, start) {
-      if(node.name() == JsNode.BLOCK) {
-        node = node.parent();
-        var pname = node.name();
-        if(pname == JsNode.BLOCKSTMT) {
-          pname = node.parent().name();
-          //纯block父节点为blockstmt且祖父节点不是iteratorstmt,ifstmt
-          //try,catch,final已在父节点不是blockstmt排除
-          if(!NOT_ABS_BLOCK.hasOwnProperty(pname)
-            || this.hash.hasOwnProperty(node.nid())) {
-            if(start) {
-              this.jsdc.append('!function()');
-            }
-            else {
-              this.jsdc.appendBefore('();');
-            }
-          }
-        }
-      }
-      //{和}需要添加匿名函数，排除纯block，即父节点不为blockstmt或祖父节点不为iteratorstmt,ifstmt
-      else if(node.name() == JsNode.TOKEN) {
-        node = node.parent();
-        if(node.name() == JsNode.BLOCK
-          && this.hash.hasOwnProperty(node.nid())) {
+      switch(node.name()) {
+        case JsNode.BLOCK:
           node = node.parent();
-          if(node.name() != JsNode.BLOCKSTMT
-            || NOT_ABS_BLOCK.hasOwnProperty(node.parent().name())) {
-            if(start) {
-              this.jsdc.append('!function(){');
-            }
-            else {
-              this.jsdc.appendBefore('}();');
+          var pname = node.name();
+          if(pname == JsNode.BLOCKSTMT) {
+            pname = node.parent().name();
+            //纯block父节点为blockstmt且祖父节点不是iteratorstmt,ifstmt
+            //try,catch,final已在父节点不是blockstmt排除
+            if(!NOT_ABS_BLOCK.hasOwnProperty(pname)
+              || this.hash.hasOwnProperty(node.nid())) {
+              if(start) {
+                this.jsdc.append('!function()');
+              }
+              else {
+                this.jsdc.appendBefore('();');
+              }
             }
           }
-        }
+          break;
+        //{和}需要添加匿名函数，排除纯block，即父节点不为blockstmt或祖父节点不为iteratorstmt,ifstmt
+        case JsNode.TOKEN:
+          node = node.parent();
+          if(node.name() == JsNode.BLOCK
+            && this.hash.hasOwnProperty(node.nid())) {
+            node = node.parent();
+            if(node.name() != JsNode.BLOCKSTMT
+              || NOT_ABS_BLOCK.hasOwnProperty(node.parent().name())) {
+              if(start) {
+                this.jsdc.append('!function(){');
+              }
+              else {
+                this.jsdc.appendBefore('}();');
+              }
+            }
+          }
+          break;
       }
     },
     closest: function(node) {

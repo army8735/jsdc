@@ -11,7 +11,7 @@ var Forof = Class(function(jsdc) {
   parse: function(node, start) {
     if(start) {
       var of = node.leaf(3);
-      if (node.first().token().content() == 'for'
+      if(node.first().token().content() == 'for'
         && of.name() == JsNode.TOKEN
         && of.token().content() == 'of') {
         this.hash[node.nid()] = true;
