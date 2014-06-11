@@ -52,10 +52,12 @@ describe('api', function() {
   it('#ast', function() {
     var jsdc = new Jsdc();
     expect(jsdc.ast).to.be.a(Function);
+    expect(jsdc.ast()).to.be.a(Object);
   });
   it('#tokens', function() {
     var jsdc = new Jsdc();
     expect(jsdc.tokens).to.be.a(Function);
+    expect(jsdc.tokens()).to.be.a(Array);
   });
   it('static #parse', function() {
     expect(Jsdc.parse).to.be.a(Function);
@@ -67,10 +69,17 @@ describe('api', function() {
     expect(Jsdc.define).to.be.a(Function);
   });
   it('static #ast', function() {
+    Jsdc.parse('');
     expect(Jsdc.ast).to.be.a(Function);
+    expect(Jsdc.ast()).to.be.a(Object);
   });
   it('static #tokens', function() {
+    Jsdc.parse('');
     expect(Jsdc.tokens).to.be.a(Function);
+    expect(Jsdc.tokens()).to.be.a(Array);
+  });
+  it('syntax error', function() {
+    expect(Jsdc.parse('var')).to.eql('Error: SyntaxError: missing variable name line 1 col 4');
   });
 });
 describe('ignore es5', function() {
@@ -399,10 +408,16 @@ describe('es6', function() {
       expect(res).to.eql('!function(){function A(){}return A}()');
     });
     it('classexpr super', function() {
-      var s = '!class extends A{constructor(){super()}}';
+      var s = '!class A extends B{constructor(){super()}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){!function(){var _=Object.create(A.prototype);_.constructor=__0__;__0__.prototype=_}();function __0__(){A.call(this)}Object.keys(A).forEach(function(k){__0__[k]=A[k]});return __0__}()');
+      expect(res).to.eql('!function(){!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_}();extends Bfunction A(){B.call(this)}Object.keys(B).forEach(function(k){A[k]=B[k]});return A}()');
+    });
+    it('classexpr extends', function() {
+      var s = '!class extends A{}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){function __0__(){A.call(this)}!function(){var _=Object.create(A.prototype);_.constructor=__0__;__0__.prototype=_}();Object.keys(A).forEach(function(k){__0__[k]=A[k]});return __0__}()');
     });
   });
   describe('number', function() {
@@ -521,6 +536,13 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('var a;var c;!function(){var __0__=require("a");a=__0__.a;c=__0__.b;}();');
     });
+    it('insert define before blank but not comment', function() {
+      var s = '/**/\n//\n\nexport default a';
+      Jsdc.reset();
+      Jsdc.define(true);
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('/**/\n//\ndefine(function(require,exports,module){\nmodule.exports=a});');
+    });
   });
   describe('array comprehension', function() {
     it('normal', function() {
@@ -623,6 +645,12 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:function a(){}}}}();');
     });
+    it('in block', function() {
+      var s = '{function *a(){}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a;!function(){a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:}}}();}();');
+    });
   });
   describe('destructor', function() {
     it('single in array', function() {
@@ -679,6 +707,12 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('var b;var a;!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__[0]}()');
     });
+    it('array in array 2', function() {
+      var s = 'var [a,[b,[c]]] = o';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var c;var b;var a;!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__[0];var __2__=__1__[1];c=__2__[0]}()');
+    });
     it('object in array', function() {
       var s = 'var [a,{b}] = o';
       Jsdc.reset();
@@ -696,6 +730,18 @@ describe('es6', function() {
       Jsdc.reset();
       var res = Jsdc.parse(s);
       expect(res).to.eql('var c;var a;!function(){var __0__= o;a=__0__["a"];var __1__=__0__["b"];c=__1__["c"]}()');
+    });
+    it('object in object 2', function() {
+      var s = 'var {a,b:{c:{d}}} = o';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var d;var a;!function(){var __0__= o;a=__0__["a"];var __1__=__0__["b"];var __2__=__1__["c"];d=__2__["d"]}()');
+    });
+    it('object in object 3', function() {
+      var s = 'var {a,b:{c:d}} = o';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a;!function(){var __0__= o;a=__0__["a"];var __1__=__0__["b"];d=__1__["c"]}()');
     });
     it('assingexpr single in array', function() {
       var s = '[a] = o';

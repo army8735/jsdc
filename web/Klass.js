@@ -68,9 +68,6 @@ define(function(require, exports, module) {
           else {
             o.name = this.jsdc.uid();
             this.jsdc.ignore(node.leaf(1));
-            if(node.leaf(2).name() == JsNode.HERITAGE) {
-              o.extend = this.join(node.leaf(2).last());
-            }
           }
           this.jsdc.ignore(node.last());
           var classbody = node.last().prev();

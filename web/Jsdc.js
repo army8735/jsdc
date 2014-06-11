@@ -335,20 +335,6 @@ define(function(require, exports, module) {
         });
       }
     },
-    unIgnore: function(node) {
-      var self = this;
-      if(node instanceof Token) {
-        node.ignore && (node.ignore = false);
-      }
-      else if(node.name() == JsNode.TOKEN) {
-        node.token().ignore && (node.token().ignore = false);
-      }
-      else {
-        node.leaves().forEach(function(leaf) {
-          self.unIgnore(leaf);
-        });
-      }
-    },
     uid: function() {
       var temp;
       while(temp = '__' + uid++ + '__') {
