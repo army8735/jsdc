@@ -305,12 +305,12 @@ function A(){}
 `static`静态属性会附加在`function`本身：
 ```js
 class A{
-static a(){}
+static F(){}
 }
 ```
 ```js
 function A(){}
-A.a=function(){}
+A.F=function(){}
 
 ```
 
@@ -349,6 +349,15 @@ constructor(){super.a()}
 ```js
 function A(){}!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();
 function A(){B.a()}
+Object.keys(B).forEach(function(k){A[k]=B[k]});
+```
+默认构造器函数则会自动调用`super()`：
+```js
+class A extends B{
+}
+```
+```js
+function A(){B.call(this)}!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_}();
 Object.keys(B).forEach(function(k){A[k]=B[k]});
 ```
 

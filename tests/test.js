@@ -348,14 +348,14 @@ describe('es6', function() {
       expect(res).to.eql('!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_}();\nfunction A(){B.call(this)}\nA.prototype.a = function(){}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
     });
     it('getter/setter', function() {
-      var s = 'class A extends B{\na(){}\nget b(){}\nset c(d){}\n}';
+      var s = 'class A{get b(){}set c(d){}}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function A(){}!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_}();\nA.prototype.a = function(){}\nA.prototype.b={get b(){}}["b"];\nA.prototype.c={set c(d){}}["c"];\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
+      expect(res).to.eql('function A(){}A.prototype.b={get b(){}}["b"];A.prototype.c={set c(d){}}["c"];');
     });
     it('static', function() {
-      var s = 'class A extends B{\nstatic a(){super.b}\n}';
+      var s = 'class A extends B{\nstatic F(){super.b}\n}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function A(){}!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_}();\nA.a=function(){B.b}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
+      expect(res).to.eql('function A(){B.call(this)}!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_}();\nA.F=function(){B.b}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
     });
     it(';', function() {
       var s = 'class A{;}';
@@ -384,7 +384,7 @@ describe('es6', function() {
       var s = '!class extends A{}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){function __0__(){}!function(){var _=Object.create(A.prototype);_.constructor=__0__;__0__.prototype=_}();Object.keys(A).forEach(function(k){__0__[k]=A[k]});return __0__}()');
+      expect(res).to.eql('!function(){function __0__(){A.call(this)}!function(){var _=Object.create(A.prototype);_.constructor=__0__;__0__.prototype=_}();Object.keys(A).forEach(function(k){__0__[k]=A[k]});return __0__}()');
     });
     it('classexpr constructor', function() {
       var s = '!class {constructor(){}}';
