@@ -853,11 +853,17 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('(!function(){var __0__= o;x=__0__["x"];var __1__=__0__["y"];z=__1__["z"];if(z===void 0)z=1}())');
     });
-    it('varstmt destruct first start with id', function() {
-      var s = 'var a = [b] = {c} = e = o';
+    it('varstmt arr destruct first start with id', function() {
+      var s = 'var a = [b] = [c] = e = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a = function(){var __0__= e = o;c=__0__["c"];b=__0__[0];return __0__}()');
+      expect(res).to.eql('var a = function(){var __0__= e = o;c=__0__[0];b=__0__[0];return __0__}()');
+    });
+    it('varstmt obj destruct first start with id', function() {
+      var s = 'var a = {b} = {c} = e = o';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a = function(){var __0__= e = o;c=__0__["c"];b=__0__["b"];return __0__}()');
     });
   });
   describe('Unicode string', function() {
