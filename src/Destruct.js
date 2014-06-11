@@ -85,15 +85,16 @@ var Destruct = Class(function(jsdc) {
           var temp = self.hash[first.nid()];
           var target = self.getArray(first.leaves());
           target.forEach(function(leaf, i) {
+            var end = i == target.length - 1;
             switch(leaf.name()) {
               case JsNode.SINGLENAME:
                 var id = leaf.first().first().token().content();
-                self.jsdc.appendBefore(id + '=' + temp + '[' + i + '];');
+                self.jsdc.appendBefore(id + '=' + temp + '[' + i + ']' + (end ? '' : ';'));
                 //初始化赋值
                 if(leaf.size() == 2) {
                   var init = leaf.last();
-                  self.jsdc.appendBefore('if(' + id + '===void 0)')
-                  self.jsdc.appendBefore(id + self.join(init) + ';');
+                  self.jsdc.appendBefore((end ? ';' : '') + 'if(' + id + '===void 0)')
+                  self.jsdc.appendBefore(id + self.join(init) + (end ? '' : ';'));
                 }
                 break;
               case JsNode.BINDELEM:
@@ -118,17 +119,18 @@ var Destruct = Class(function(jsdc) {
           self.jsdc.appendBefore(';');
           var temp = self.hash[first.nid()];
           var target = self.getName(first.leaves());
-          target.forEach(function(leaf) {
+          target.forEach(function(leaf, i) {
+            var end = i == target.length - 1;
             leaf = leaf.first();
             switch(leaf.name()) {
               case JsNode.SINGLENAME:
                 var id = leaf.first().first().token().content();
-                self.jsdc.appendBefore(id + '=' + temp + '["' + id + '"];');
+                self.jsdc.appendBefore(id + '=' + temp + '["' + id + '"]' + (end ? '' : ';'));
                 //初始化赋值
                 if(leaf.size() == 2) {
                   var init = leaf.last();
-                  self.jsdc.appendBefore('if(' + id + '===void 0)')
-                  self.jsdc.appendBefore(id + self.join(init) + ';');
+                  self.jsdc.appendBefore((end ? ';' : '') + 'if(' + id + '===void 0)')
+                  self.jsdc.appendBefore(id + self.join(init) + (end ? '' : ';'));
                 }
                 break;
               case JsNode.PROPTNAME:
@@ -137,7 +139,7 @@ var Destruct = Class(function(jsdc) {
                 switch(last.name()) {
                   case JsNode.SINGLENAME:
                     var id = last.first().first().token().content();
-                    self.jsdc.appendBefore(id + '=' + temp + '["' + name + '"];');
+                    self.jsdc.appendBefore(id + '=' + temp + '["' + name + '"]' + (end ? '' : ';'));
                     break;
                   case JsNode.BINDELEM:
                     self.destruct(last.first(), {
@@ -169,15 +171,16 @@ var Destruct = Class(function(jsdc) {
         }
         var target = self.getArray(node.leaves());
         target.forEach(function(leaf, i) {
+          var end = i == target.length - 1;
           switch(leaf.name()) {
             case JsNode.SINGLENAME:
               var id = leaf.first().first().token().content();
-              self.jsdc.appendBefore(id + '=' + temp + '[' + i + '];');
+              self.jsdc.appendBefore(id + '=' + temp + '[' + i + ']' + (end ? '' : ';'));
               //初始化赋值
               if(leaf.size() == 2) {
                 var init = leaf.last();
-                self.jsdc.appendBefore('if(' + id + '===void 0)')
-                self.jsdc.appendBefore(id + self.join(init) + ';');
+                self.jsdc.appendBefore((end ? ';' : '') + 'if(' + id + '===void 0)')
+                self.jsdc.appendBefore(id + self.join(init) + (end ? '' : ';'));
               }
               break;
             case JsNode.BINDELEM:
@@ -199,17 +202,18 @@ var Destruct = Class(function(jsdc) {
           self.jsdc.appendBefore(temp + '=' + data.temp + '[' + data.index + '];');
         }
         var target = self.getArray(node.leaves());
-        target.forEach(function(leaf) {
+        target.forEach(function(leaf, i) {
+          var end = i == target.length - 1;
           leaf = leaf.first();
           switch(leaf.name()) {
             case JsNode.SINGLENAME:
               var id = leaf.first().first().token().content();
-              self.jsdc.appendBefore(id + '=' + temp + '["' + id + '"];');
+              self.jsdc.appendBefore(id + '=' + temp + '["' + id + '"]' + (end ? '' : ';'));
               //初始化赋值
               if(leaf.size() == 2) {
                 var init = leaf.last();
-                self.jsdc.appendBefore('if(' + id + '===void 0)')
-                self.jsdc.appendBefore(id + self.join(init) + ';');
+                self.jsdc.appendBefore((end ? ';' : '') + 'if(' + id + '===void 0)')
+                self.jsdc.appendBefore(id + self.join(init) + (end ? '' : ';'));
               }
               break;
             case JsNode.PROPTNAME:
@@ -218,7 +222,7 @@ var Destruct = Class(function(jsdc) {
               switch(last.name()) {
                 case JsNode.SINGLENAME:
                   var id = last.first().first().token().content();
-                  self.jsdc.appendBefore(id + '=' + temp + '["' + name + '"];');
+                  self.jsdc.appendBefore(id + '=' + temp + '["' + name + '"]' + (end ? '' : ';'));
                   break;
                 case JsNode.BINDELEM:
                   self.destruct(last.first(), {
@@ -242,9 +246,19 @@ var Destruct = Class(function(jsdc) {
       case JsNode.ARRLTR:
         if(start) {
           this.jsdc.ignore(first);
-          self.jsdc.append('!function(){var ');
+          if(assignexpr.parent().name() == JsNode.ASSIGNEXPR) {
+            self.hash[first.nid()] = self.hash[assignexpr.parent().first().first().nid()];
+            this.jsdc.ignore(assignexpr.leaf(1));
+            return;
+          }
+          else if(assignexpr.parent().name() == JsNode.INITLZ) {
+            self.hash[first.nid()] = self.hash[assignexpr.parent().prev().nid()];
+            this.jsdc.ignore(assignexpr.leaf(1));
+            return;
+          }
           var temp = self.jsdc.uid();
           self.hash[first.nid()] = temp;
+          self.jsdc.append('!function(){var ');
           self.jsdc.append(temp);
         }
         else {
@@ -255,17 +269,18 @@ var Destruct = Class(function(jsdc) {
             if(leaf.name() == JsNode.TOKEN) {
               return;
             }
+            var end = i == target.length - 1;
             leaf = leaf.first();
             switch(leaf.name()) {
               case JsNode.TOKEN:
                 var id = leaf.token().content();
-                self.jsdc.appendBefore(id + '=' + temp + '[' + i + '];');
+                self.jsdc.appendBefore(id + '=' + temp + '[' + i + ']' + (end ? '' : ';'));
                 break;
               case JsNode.PRMREXPR:
                 var id = leaf.first().token().content();
                 self.jsdc.appendBefore(id + '=' + temp + '[' + i + '];');
                 self.jsdc.appendBefore('if(' + id + '===void 0)')
-                self.jsdc.appendBefore(id + '=' + self.join(leaf.next().next()) + ';');
+                self.jsdc.appendBefore(id + '=' + self.join(leaf.next().next()) + (end ? '' : ';'));
                 break;
               case JsNode.ARRLTR:
               case JsNode.OBJLTR:
@@ -275,12 +290,26 @@ var Destruct = Class(function(jsdc) {
                 });
             }
           });
+          if(assignexpr.parent().name() == JsNode.ASSIGNEXPR
+            || assignexpr.parent().name() == JsNode.INITLZ) {
+            return;
+          }
           self.jsdc.appendBefore('}()');
         }
         break;
       case JsNode.OBJLTR:
         if(start) {
           self.jsdc.ignore(first);
+          if(assignexpr.parent().name() == JsNode.ASSIGNEXPR) {
+            self.hash[first.nid()] = self.hash[assignexpr.parent().first().first().nid()];
+            this.jsdc.ignore(assignexpr.leaf(1));
+            return;
+          }
+          else if(assignexpr.parent().name() == JsNode.INITLZ) {
+            self.hash[first.nid()] = self.hash[assignexpr.parent().prev().nid()];
+            this.jsdc.ignore(assignexpr.leaf(1));
+            return;
+          }
           self.jsdc.append('!function(){var ');
           var temp = self.jsdc.uid();
           self.hash[first.nid()] = temp;
@@ -290,16 +319,17 @@ var Destruct = Class(function(jsdc) {
           self.jsdc.appendBefore(';');
           var temp = self.hash[first.nid()];
           var target = self.getName(first.leaves());
-          target.forEach(function(leaf) {
+          target.forEach(function(leaf, i) {
+            var end = i == target.length - 1;
             leaf = leaf.first();
             switch(leaf.name()) {
               case JsNode.TOKEN:
                 var id = leaf.token().content();
-                self.jsdc.appendBefore(id + '=' + temp + '["' + id + '"];');
+                self.jsdc.appendBefore(id + '=' + temp + '["' + id + '"]' + (end ? '' : ';'));
                 if(leaf.next()) {
                   var init = leaf.next();
-                  self.jsdc.appendBefore('if(' + id + '===void 0)')
-                  self.jsdc.appendBefore(id + self.join(init) + ';');
+                  self.jsdc.appendBefore((end ? ';' : '') + 'if(' + id + '===void 0)')
+                  self.jsdc.appendBefore(id + self.join(init) + (end ? '' : ';'));
                 }
                 break;
               case JsNode.PROPTNAME:
@@ -308,7 +338,7 @@ var Destruct = Class(function(jsdc) {
                 switch(last.name()) {
                   case JsNode.TOKEN:
                     var id = last.token().content();
-                    self.jsdc.appendBefore(id + '=' + temp + '["' + name + '"];');
+                    self.jsdc.appendBefore(id + '=' + temp + '["' + name + '"]' + (end ? '' : ';'));
                     break;
                   case JsNode.ARRLTR:
                   case JsNode.OBJLTR:
@@ -322,6 +352,10 @@ var Destruct = Class(function(jsdc) {
                 break;
             }
           });
+          if(assignexpr.parent().name() == JsNode.ASSIGNEXPR
+            || assignexpr.parent().name() == JsNode.INITLZ) {
+            return;
+          }
           self.jsdc.appendBefore('}()');
         }
         break;
@@ -344,17 +378,18 @@ var Destruct = Class(function(jsdc) {
           if(leaf.name() == JsNode.TOKEN) {
             return;
           }
+          var end = i == target.length - 1;
           leaf = leaf.first();
           switch(leaf.name()) {
             case JsNode.TOKEN:
               var id = leaf.token().content();
-              self.jsdc.appendBefore(id + '=' + temp + '[' + i + '];');
+              self.jsdc.appendBefore(id + '=' + temp + '[' + i + ']' + (end ? '' : ';'));
               break;
             case JsNode.PRMREXPR:
               var id = leaf.first().token().content();
               self.jsdc.appendBefore(id + '=' + temp + '[' + i + '];');
               self.jsdc.appendBefore('if(' + id + '===void 0)')
-              self.jsdc.appendBefore(id + '=' + self.join(leaf.next().next()) + ';');
+              self.jsdc.appendBefore(id + '=' + self.join(leaf.next().next()) + (end ? '' : ';'));
               break;
             case JsNode.ARRLTR:
             case JsNode.OBJLTR:
@@ -375,16 +410,17 @@ var Destruct = Class(function(jsdc) {
           self.jsdc.appendBefore(temp + '=' + data.temp + '[' + data.index + '];');
         }
         var target = self.getArray(node.leaves());
-        target.forEach(function(leaf) {
+        target.forEach(function(leaf, i) {
+          var end = i == target.length - 1;
           leaf = leaf.first();
           switch(leaf.name()) {
             case JsNode.TOKEN:
               var id = leaf.token().content();
-              self.jsdc.appendBefore(id + '=' + temp + '["' + id + '"];');
+              self.jsdc.appendBefore(id + '=' + temp + '["' + id + '"]' + (end ? '' : ';'));
               if(leaf.next()) {
                 var init = leaf.next();
-                self.jsdc.appendBefore('if(' + id + '===void 0)')
-                self.jsdc.appendBefore(id + self.join(init) + ';');
+                self.jsdc.appendBefore((end ? ';' : '') + 'if(' + id + '===void 0)')
+                self.jsdc.appendBefore(id + self.join(init) + (end ? '' : ';'));
               }
               break;
             case JsNode.PROPTNAME:
@@ -393,7 +429,7 @@ var Destruct = Class(function(jsdc) {
               switch(last.name()) {
                 case JsNode.TOKEN:
                   var id = last.token().content();
-                  self.jsdc.appendBefore(id + '=' + temp + '["' + name + '"];');
+                  self.jsdc.appendBefore(id + '=' + temp + '["' + name + '"]' + (end ? '' : ';'));
                   break;
                 case JsNode.ARRLTR:
                 case JsNode.OBJLTR:

@@ -629,193 +629,229 @@ describe('es6', function() {
       var s = 'var [a] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;!function(){var __0__= o;a=__0__[0];}()');
+      expect(res).to.eql('var a;!function(){var __0__= o;a=__0__[0]}()');
     });
     it('multi in array', function() {
       var s = 'var [a,b] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var __0__= o;a=__0__[0];b=__0__[1];}()');
+      expect(res).to.eql('var b;var a;!function(){var __0__= o;a=__0__[0];b=__0__[1]}()');
     });
     it('comma placeholder in array', function() {
       var s = 'var [a,,b] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var __0__= o;a=__0__[0];b=__0__[2];}()');
+      expect(res).to.eql('var b;var a;!function(){var __0__= o;a=__0__[0];b=__0__[2]}()');
+    });
+    it('multi var in array', function() {
+      var s = 'var [a] = [b] = o';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a;!function(){var __0__= o;b=__0__[0];a=__0__[0]}()');
     });
     it('single in object', function() {
       var s = 'var {a} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;!function(){var __0__= o;a=__0__["a"];}()');
+      expect(res).to.eql('var a;!function(){var __0__= o;a=__0__["a"]}()');
     });
     it('multi in object', function() {
       var s = 'var {a,b} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var __0__= o;a=__0__["a"];b=__0__["b"];}()');
+      expect(res).to.eql('var b;var a;!function(){var __0__= o;a=__0__["a"];b=__0__["b"]}()');
     });
     it('alias in object', function() {
       var s = 'var {a,b:c} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;!function(){var __0__= o;a=__0__["a"];c=__0__["b"];}()');
+      expect(res).to.eql('var a;!function(){var __0__= o;a=__0__["a"];c=__0__["b"]}()');
+    });
+    it('multi var in object', function() {
+      var s = 'var {a} = {b} = o';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a;!function(){var __0__= o;b=__0__["b"];a=__0__["a"]}()');
     });
     it('array in array', function() {
       var s = 'var [a,[b]] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__[0];}()');
+      expect(res).to.eql('var b;var a;!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__[0]}()');
     });
     it('object in array', function() {
       var s = 'var [a,{b}] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__["b"];}()');
+      expect(res).to.eql('var b;var a;!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__["b"]}()');
     });
     it('array in object', function() {
       var s = 'var {a,b:[c]} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var c;var a;!function(){var __0__= o;a=__0__["a"];var __1__=__0__["b"];c=__1__[0];}()');
+      expect(res).to.eql('var c;var a;!function(){var __0__= o;a=__0__["a"];var __1__=__0__["b"];c=__1__[0]}()');
     });
     it('object in object', function() {
       var s = 'var {a,b:{c}} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var c;var a;!function(){var __0__= o;a=__0__["a"];var __1__=__0__["b"];c=__1__["c"];}()');
+      expect(res).to.eql('var c;var a;!function(){var __0__= o;a=__0__["a"];var __1__=__0__["b"];c=__1__["c"]}()');
     });
     it('assingexpr single in array', function() {
       var s = '[a] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){var __0__= o;a=__0__[0];}()');
+      expect(res).to.eql('!function(){var __0__= o;a=__0__[0]}()');
     });
     it('assingexpr multi in array', function() {
       var s = '[a,b] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){var __0__= o;a=__0__[0];b=__0__[1];}()');
+      expect(res).to.eql('!function(){var __0__= o;a=__0__[0];b=__0__[1]}()');
+    });
+    it('multi assingexpr in array', function() {
+      var s = '[a] = [b] = o';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){var __0__= o;b=__0__[0];a=__0__[0]}()');
+    });
+    it('multi assingexpr multi in array', function() {
+      var s = '[a,b] = [c,d] = o';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){var __0__= o;c=__0__[0];d=__0__[1];a=__0__[0];b=__0__[1]}()');
     });
     it('assingexpr comma placeholder in array', function() {
       var s = '[a,,b] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){var __0__= o;a=__0__[0];b=__0__[2];}()');
+      expect(res).to.eql('!function(){var __0__= o;a=__0__[0];b=__0__[2]}()');
     });
     it('assingexpr single in object', function() {
       var s = '({a} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(!function(){var __0__= o;a=__0__["a"];}())');
+      expect(res).to.eql('(!function(){var __0__= o;a=__0__["a"]}())');
     });
     it('assingexpr multi in object', function() {
       var s = '({a,b} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(!function(){var __0__= o;a=__0__["a"];b=__0__["b"];}())');
+      expect(res).to.eql('(!function(){var __0__= o;a=__0__["a"];b=__0__["b"]}())');
+    });
+    it('multi assingexpr in object', function() {
+      var s = '({a} = {b} = o)';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('(!function(){var __0__= o;b=__0__["b"];a=__0__["a"]}())');
+    });
+    it('multi assingexpr multi in object', function() {
+      var s = '({a,b} = {c,d} = o)';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('(!function(){var __0__= o;c=__0__["c"];d=__0__["d"];a=__0__["a"];b=__0__["b"]}())');
     });
     it('assingexpr alias in object', function() {
       var s = '({a,b:c} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(!function(){var __0__= o;a=__0__["a"];c=__0__["b"];}())');
+      expect(res).to.eql('(!function(){var __0__= o;a=__0__["a"];c=__0__["b"]}())');
     });
     it('assingexpr array in array', function() {
       var s = '([a,[b]] = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__[0];}())');
+      expect(res).to.eql('(!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__[0]}())');
     });
     it('assingexpr object in array', function() {
       var s = '([a,{b}] = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__["b"];}())');
+      expect(res).to.eql('(!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__["b"]}())');
     });
     it('assingexpr array in object', function() {
       var s = '({a,b:[c]} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(!function(){var __0__= o;a=__0__["a"];var __1__=__0__["b"];c=__1__[0];}())');
+      expect(res).to.eql('(!function(){var __0__= o;a=__0__["a"];var __1__=__0__["b"];c=__1__[0]}())');
     });
     it('assingexpr object in object', function() {
       var s = '({a,b:{c}} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(!function(){var __0__= o;a=__0__["a"];var __1__=__0__["b"];c=__1__["c"];}())');
+      expect(res).to.eql('(!function(){var __0__= o;a=__0__["a"];var __1__=__0__["b"];c=__1__["c"]}())');
     });
     it('init array', function() {
       var s = 'var [a=1] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;!function(){var __0__= o;a=__0__[0];if(a===void 0)a=1;}()');
+      expect(res).to.eql('var a;!function(){var __0__= o;a=__0__[0];if(a===void 0)a=1}()');
     });
     it('init object', function() {
       var s = 'var {x=1} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var x;!function(){var __0__= o;x=__0__["x"];if(x===void 0)x=1;}()');
+      expect(res).to.eql('var x;!function(){var __0__= o;x=__0__["x"];if(x===void 0)x=1}()');
     });
     it('init array in array', function() {
       var s = 'var [a,[b=1]] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__[0];if(b===void 0)b=1;}()');
+      expect(res).to.eql('var b;var a;!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__[0];if(b===void 0)b=1}()');
     });
     it('init object in array', function() {
       var s = 'var [a,{b=1}] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__["b"];if(b===void 0)b=1;}()');
+      expect(res).to.eql('var b;var a;!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__["b"];if(b===void 0)b=1}()');
     });
     it('init array in object', function() {
       var s = 'var {x,y:[z=1]} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var z;var x;!function(){var __0__= o;x=__0__["x"];var __1__=__0__["y"];z=__1__[0];if(z===void 0)z=1;}()');
+      expect(res).to.eql('var z;var x;!function(){var __0__= o;x=__0__["x"];var __1__=__0__["y"];z=__1__[0];if(z===void 0)z=1}()');
     });
     it('init object in object', function() {
       var s = 'var {x,y:{z=1}} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var z;var x;!function(){var __0__= o;x=__0__["x"];var __1__=__0__["y"];z=__1__["z"];if(z===void 0)z=1;}()');
+      expect(res).to.eql('var z;var x;!function(){var __0__= o;x=__0__["x"];var __1__=__0__["y"];z=__1__["z"];if(z===void 0)z=1}()');
     });
     it('assingexpr init array', function() {
       var s = '[a=1] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){var __0__= o;a=__0__[0];if(a===void 0)a=1;}()');
+      expect(res).to.eql('!function(){var __0__= o;a=__0__[0];if(a===void 0)a=1}()');
     });
     it('assingexpr init object', function() {
       var s = '({x=1} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(!function(){var __0__= o;x=__0__["x"];if(x===void 0)x=1;}())');
+      expect(res).to.eql('(!function(){var __0__= o;x=__0__["x"];if(x===void 0)x=1}())');
     });
     it('assingexpr init array in array', function() {
       var s = '[a,[b=1]] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__[0];if(b===void 0)b=1;}()');
+      expect(res).to.eql('!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__[0];if(b===void 0)b=1}()');
     });
     it('assingexpr init object in array', function() {
       var s = '[a,{b=1}] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__["b"];if(b===void 0)b=1;}()');
+      expect(res).to.eql('!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__["b"];if(b===void 0)b=1}()');
     });
     it('assingexpr init array in object', function() {
       var s = '({x,y:[z=1]} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(!function(){var __0__= o;x=__0__["x"];var __1__=__0__["y"];z=__1__[0];if(z===void 0)z=1;}())');
+      expect(res).to.eql('(!function(){var __0__= o;x=__0__["x"];var __1__=__0__["y"];z=__1__[0];if(z===void 0)z=1}())');
     });
     it('assingexpr init object in object', function() {
       var s = '({x,y:{z=1}} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(!function(){var __0__= o;x=__0__["x"];var __1__=__0__["y"];z=__1__["z"];if(z===void 0)z=1;}())');
+      expect(res).to.eql('(!function(){var __0__= o;x=__0__["x"];var __1__=__0__["y"];z=__1__["z"];if(z===void 0)z=1}())');
     });
   });
 });
