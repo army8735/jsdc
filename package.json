@@ -43,6 +43,9 @@
   ],
   "author": "army8735",
   "license": "MIT",
+  "spm": {
+    "main": "./index.js"
+  },
   "dependencies": {
     "homunculus": "^0.2.6-5"
   },
