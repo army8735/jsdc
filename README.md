@@ -22,6 +22,7 @@ npm install jsdc
 ### 已实现的部分
 * 二进制和八进制的Number扩展
 * Unicode的字符串增强
+* Object属性增强
 * block局部作用域
 * let/const关键字
 * 默认参数赋值
