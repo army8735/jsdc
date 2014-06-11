@@ -272,6 +272,9 @@ var Jsdc = Class(function(code) {
       case JsNode.PROPTDEF:
         this.obj.propt(node, true);
         break;
+      case JsNode.OBJLTR:
+        this.obj.parse(node, true);
+        break;
     }
   },
   after: function(node) {
@@ -328,6 +331,9 @@ var Jsdc = Class(function(code) {
         break;
       case JsNode.PROPTNAME:
         this.obj.name(node);
+        break;
+      case JsNode.OBJLTR:
+        this.obj.parse(node);
         break;
     }
   },

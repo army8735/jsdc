@@ -960,5 +960,11 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('var a = {o:function(){}}');
     });
+    it('cal', function() {
+      var s = 'var o = {[a]:1}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var o = function(){var __0__={__1__:1};__0__[a]=__1__;delete __1__;return __0__}()');
+    });
   });
 });
