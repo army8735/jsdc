@@ -307,6 +307,9 @@ var Destruct = Class(function(jsdc) {
               || assignexpr.parent().name() == JsNode.INITLZ)) {
             return;
           }
+          if(self.inAssign[first.nid()]) {
+            self.jsdc.appendBefore(';return ' + temp);
+          }
           self.jsdc.appendBefore('}()');
         }
         break;
@@ -381,6 +384,9 @@ var Destruct = Class(function(jsdc) {
             && (assignexpr.parent().name() == JsNode.ASSIGNEXPR
               || assignexpr.parent().name() == JsNode.INITLZ)) {
             return;
+          }
+          if(self.inAssign[first.nid()]) {
+            self.jsdc.appendBefore(';return ' + temp);
           }
           self.jsdc.appendBefore('}()');
         }

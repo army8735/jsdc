@@ -857,7 +857,7 @@ describe('es6', function() {
       var s = 'var a = [b] = {c} = e = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a = function(){var __0__= e = o;c=__0__["c"];b=__0__[0]}()');
+      expect(res).to.eql('var a = function(){var __0__= e = o;c=__0__["c"];b=__0__[0];return __0__}()');
     });
   });
   describe('Unicode string', function() {

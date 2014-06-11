@@ -73,6 +73,9 @@ function drawNode(layer, node, x, index, parent, sibling) {
 	if(index > 0) {
 		h += 24;
 	}
+  if(!node.name) {
+    return;
+  }
 	var isToken = node.name() == 'token',
 		isVirtual = isToken && node.leaves().type() == -1,
 		text = new Kinetic.Text({
@@ -130,19 +133,12 @@ seajs.use(['../index', './jssc'], function(jsdc, jssc) {
 	function init() {
 		var nodes = Array.prototype.slice.call(document.getElementsByTagName('code'), 0);
 		nodes.forEach(function(node, i) {
-      try {
-        var res = jsdc.parse(node.textContent || node.innerText || node.firstChild && node.firstChild.nodeValue);
-        var ast = jsdc.ast();
-        var tokens = jsdc.tokens();
-      } catch(e) {
-        res = e;
-        console.error(e.message);
-        ast = null;
-        tokens = null;
-      }
-      var pre = node.parentNode,
-        ncode = document.createElement('code'),
-        npre = document.createElement('pre');
+      var res = jsdc.parse(node.textContent || node.innerText || node.firstChild && node.firstChild.nodeValue);
+      var ast = jsdc.ast();
+      var tokens = jsdc.tokens();
+      var pre = node.parentNode;
+      var ncode = document.createElement('code');
+      var npre = document.createElement('pre');
 			ncode.innerHTML = res;
 			ncode.className = node.className;
 			npre.appendChild(ncode);

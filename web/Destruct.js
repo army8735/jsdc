@@ -308,6 +308,9 @@ define(function(require, exports, module) {
                 || assignexpr.parent().name() == JsNode.INITLZ)) {
               return;
             }
+            if(self.inAssign[first.nid()]) {
+              self.jsdc.appendBefore(';return ' + temp);
+            }
             self.jsdc.appendBefore('}()');
           }
           break;
@@ -382,6 +385,9 @@ define(function(require, exports, module) {
               && (assignexpr.parent().name() == JsNode.ASSIGNEXPR
                 || assignexpr.parent().name() == JsNode.INITLZ)) {
               return;
+            }
+            if(self.inAssign[first.nid()]) {
+              self.jsdc.appendBefore(';return ' + temp);
             }
             self.jsdc.appendBefore('}()');
           }
