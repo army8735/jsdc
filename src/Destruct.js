@@ -7,6 +7,7 @@ var Class = require('./util/Class');
 var Destruct = Class(function(jsdc) {
   this.jsdc = jsdc;
   this.hash = {};
+  this.inAssign = {};
   this.idCache = {};
 }).methods({
   getIds: function(node) {
@@ -249,17 +250,28 @@ var Destruct = Class(function(jsdc) {
           if(assignexpr.parent().name() == JsNode.ASSIGNEXPR) {
             self.hash[first.nid()] = self.hash[assignexpr.parent().first().first().nid()];
             this.jsdc.ignore(assignexpr.leaf(1));
-            return;
           }
           else if(assignexpr.parent().name() == JsNode.INITLZ) {
-            self.hash[first.nid()] = self.hash[assignexpr.parent().prev().nid()];
-            this.jsdc.ignore(assignexpr.leaf(1));
-            return;
+            var bindpat = assignexpr.parent().prev();
+            if(bindpat.name() == JsNode.ARRBINDPAT
+              || bindpat.name() == JsNode.OBJBINDPAT) {
+              self.hash[first.nid()] = self.hash[assignexpr.parent().prev().nid()];
+              this.jsdc.ignore(assignexpr.leaf(1));
+            }
+            else {
+              self.jsdc.append('function(){var ');
+              var temp = self.jsdc.uid();
+              self.hash[first.nid()] = temp;
+              self.inAssign[first.nid()] = true;
+              self.jsdc.append(temp);
+            }
           }
-          var temp = self.jsdc.uid();
-          self.hash[first.nid()] = temp;
-          self.jsdc.append('!function(){var ');
-          self.jsdc.append(temp);
+          else {
+            var temp = self.jsdc.uid();
+            self.hash[first.nid()] = temp;
+            self.jsdc.append('!function(){var ');
+            self.jsdc.append(temp);
+          }
         }
         else {
           self.jsdc.appendBefore(';');
@@ -290,8 +302,9 @@ var Destruct = Class(function(jsdc) {
                 });
             }
           });
-          if(assignexpr.parent().name() == JsNode.ASSIGNEXPR
-            || assignexpr.parent().name() == JsNode.INITLZ) {
+          if(!self.inAssign[first.nid()]
+            && (assignexpr.parent().name() == JsNode.ASSIGNEXPR
+              || assignexpr.parent().name() == JsNode.INITLZ)) {
             return;
           }
           self.jsdc.appendBefore('}()');
@@ -306,14 +319,26 @@ var Destruct = Class(function(jsdc) {
             return;
           }
           else if(assignexpr.parent().name() == JsNode.INITLZ) {
-            self.hash[first.nid()] = self.hash[assignexpr.parent().prev().nid()];
-            this.jsdc.ignore(assignexpr.leaf(1));
-            return;
+            var bindpat = assignexpr.parent().prev();
+            if(bindpat.name() == JsNode.ARRBINDPAT
+              || bindpat.name() == JsNode.OBJBINDPAT) {
+              self.hash[first.nid()] = self.hash[assignexpr.parent().prev().nid()];
+              this.jsdc.ignore(assignexpr.leaf(1));
+            }
+            else {
+              self.jsdc.append('function(){var ');
+              var temp = self.jsdc.uid();
+              self.hash[first.nid()] = temp;
+              self.inAssign[first.nid()] = true;
+              self.jsdc.append(temp);
+            }
           }
-          self.jsdc.append('!function(){var ');
-          var temp = self.jsdc.uid();
-          self.hash[first.nid()] = temp;
-          self.jsdc.append(temp);
+          else {
+            self.jsdc.append('!function(){var ');
+            var temp = self.jsdc.uid();
+            self.hash[first.nid()] = temp;
+            self.jsdc.append(temp);
+          }
         }
         else {
           self.jsdc.appendBefore(';');
@@ -352,8 +377,9 @@ var Destruct = Class(function(jsdc) {
                 break;
             }
           });
-          if(assignexpr.parent().name() == JsNode.ASSIGNEXPR
-            || assignexpr.parent().name() == JsNode.INITLZ) {
+          if(!self.inAssign[first.nid()]
+            && (assignexpr.parent().name() == JsNode.ASSIGNEXPR
+              || assignexpr.parent().name() == JsNode.INITLZ)) {
             return;
           }
           self.jsdc.appendBefore('}()');
@@ -465,7 +491,7 @@ var Destruct = Class(function(jsdc) {
   },
   getName: function(leaves) {
     return leaves.filter(function(leaf, i) {
-      return i % 2 == 1;
+      return i % 2 == 1 && i != leaves.length - 1;
     });
   },
   join: function(node, res) {
