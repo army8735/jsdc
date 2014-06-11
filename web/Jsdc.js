@@ -18,6 +18,7 @@ define(function(require, exports, module) {
   var ArrowFn = require('./ArrowFn');
   var Generator = require('./Generator');
   var Destruct = require('./Destruct');
+  var Str = require('./Str');
   
   var Jsdc = Class(function(code) {
     this.code = (code + '') || '';
@@ -39,6 +40,7 @@ define(function(require, exports, module) {
     this.arrowFn = new ArrowFn(this);
     this.gen = new Generator(this);
     this.destruct = new Destruct(this);
+    this.str = new Str(this);
   
     this.i = 0;
     this.ids = {};
@@ -141,6 +143,9 @@ define(function(require, exports, module) {
         }
         else if(token.type() == Token.TEMPLATE) {
           this.template.parse(token);
+        }
+        else if(token.type() == Token.STRING) {
+          this.str.parse(token);
         }
         else if(!token.ignore && token.type() == Token.NUMBER) {
           this.num.parse(token);

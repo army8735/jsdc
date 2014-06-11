@@ -854,4 +854,26 @@ describe('es6', function() {
       expect(res).to.eql('(!function(){var __0__= o;x=__0__["x"];var __1__=__0__["y"];z=__1__["z"];if(z===void 0)z=1}())');
     });
   });
+  describe('Unicode string', function() {
+    it('normal', function() {
+      var s = '"\\u{10000}"';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('"\\uFFFF\\u0001"');
+    });
+    it('multi', function() {
+      var s = '"\\u{10000}\\u{10000}"';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('"\\uFFFF\\u0001\\uFFFF\\u0001"');
+    });
+    it('ignore', function() {
+      var s = '"\\\\u{10000}"';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('"\\\\u{10000}"');
+    });
+    it('not ignore', function() {
+      var s = '"\\\\\\u{10000}"';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('"\\\\\\uFFFF\\u0001"');
+    });
+  });
 });

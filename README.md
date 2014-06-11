@@ -21,6 +21,7 @@ npm install jsdc
 
 ### 已实现的部分
 * 二进制和八进制的Number扩展
+* Unicode的字符串增强
 * block局部作用域
 * let/const关键字
 * 默认参数赋值
@@ -34,6 +35,7 @@ npm install jsdc
 * ArrowFunction箭头函数
 * yield语句
 * Generator生成器函数
+* 解构
 
 ## API
 
