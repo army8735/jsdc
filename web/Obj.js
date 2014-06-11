@@ -82,7 +82,7 @@ define(function(require, exports, module) {
           h.temp.forEach(function(t) {
             self.jsdc.appendBefore(';' + id);
             self.jsdc.appendBefore(t.id + '=' + t.temp);
-            self.jsdc.appendBefore(';delete ' + t.temp);
+            self.jsdc.appendBefore(';delete ' + id + '.' + t.temp);
           });
           self.jsdc.appendBefore(';return ' + id + '}()');
         }
