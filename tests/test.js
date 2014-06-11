@@ -362,9 +362,9 @@ describe('es6', function() {
       expect(res).to.eql('function A(){}A.prototype.b={get b(){}}["b"];A.prototype.c={set c(d){}}["c"];');
     });
     it('static', function() {
-      var s = 'class A extends B{\nstatic F(){super.b}\n}';
+      var s = 'class A extends B{\nstatic F(){super.b()}\n}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function A(){B.call(this)}!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_}();\nA.F=function(){B.b}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
+      expect(res).to.eql('function A(){B.call(this)}!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_}();\nA.F=function(){B.prototype.b.call(this)}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
     });
     it(';', function() {
       var s = 'class A{;}';

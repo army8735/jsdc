@@ -387,15 +387,15 @@ function A(){}!function(){var _=Object.create(B.prototype);_.constructor=A;A.pro
 function A(){B.call(this)}
 Object.keys(B).forEach(function(k){A[k]=B[k]});
 ```
-如果不是调用父类构造函数而是方法，则不会添加`call`：
+如果不是调用父类构造函数而是方法，则会这样：
 ```js
 class A extends B{
 constructor(){super.a()}
 }
 ```
 ```js
-function A(){}!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();
-function A(){B.a()}
+!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();
+function A(){B.a.call(this)}
 Object.keys(B).forEach(function(k){A[k]=B[k]});
 ```
 默认构造器函数则会自动调用`super()`：

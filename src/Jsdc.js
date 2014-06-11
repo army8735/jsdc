@@ -224,6 +224,7 @@ var Jsdc = Class(function(code) {
         this.rest.args(node);
         break;
       case JsNode.ARGLIST:
+        this.klass.arglist(node);
         this.rest.arglist(node);
         break;
       case JsNode.ITERSTMT:

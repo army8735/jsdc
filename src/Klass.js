@@ -7,6 +7,7 @@ var Class = require('./util/Class');
 var Klass = Class(function(jsdc) {
   this.jsdc = jsdc;
   this.hash = {};
+  this.sup = {};
 }).methods({
   parse: function(node, start) {
     if(node.name() == JsNode.CLASSDECL) {
@@ -153,9 +154,33 @@ var Klass = Class(function(jsdc) {
     var top = this.closest(node);
     if(this.hash.hasOwnProperty(top.nid())) {
       this.jsdc.append(this.hash[top.nid()].extend);
-      if(node.next()
-        && node.next().name() == JsNode.ARGS) {
-        this.jsdc.append('.call');
+      if(node.next()) {
+        if(node.next().name() == JsNode.ARGS) {
+          this.jsdc.append('.call');
+        }
+        else {
+          this.jsdc.append('.prototype');
+          var parent = node.parent();
+          while(parent = parent.parent()) {
+            if(parent.name() == JsNode.CALLEXPR) {
+              this.sup[parent.leaf(1).leaf(1).nid()] = this.hash[top.nid()].extend;
+              break;
+            }
+          }
+        }
+      }
+    }
+  },
+  arglist: function(node) {
+    if(this.sup.hasOwnProperty(node.nid())) {
+      var ex = this.sup[node.nid()];
+      var i = this.jsdc.res.lastIndexOf('(');
+      this.jsdc.insert('.call', i);
+      if(node.size()) {
+        this.jsdc.append('this,');
+      }
+      else {
+        this.jsdc.append('this');
       }
     }
   },
