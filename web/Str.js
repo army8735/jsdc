@@ -20,7 +20,7 @@ define(function(require, exports, module) {
           }
         }
         if(count % 2 == 1) {
-          return;
+          return m;
         }
         var arr = [];
         n = parseInt(n, 16);
@@ -31,7 +31,7 @@ define(function(require, exports, module) {
         arr.push(fix(n.toString(16)));
         return '\\u' + arr.join('\\u');
       });
-      if(res.length != s.length && res != s) {
+      if(res != s) {
         this.jsdc.ignore(t);
         this.jsdc.append(res);
       }
