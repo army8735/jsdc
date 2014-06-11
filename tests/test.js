@@ -246,17 +246,17 @@ describe('es6', function() {
     it('only one id', function() {
       var s = 'function a(b = 1){}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function a(b ){if(typeof b=="undefined")b = 1;}')
+      expect(res).to.eql('function a(b ){if(b===void 0)b = 1;}')
     });
     it('after an id', function() {
       var s = 'function a(b, c = fn()){}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function a(b, c ){if(typeof c=="undefined")c = fn ( );}')
+      expect(res).to.eql('function a(b, c ){if(c===void 0)c = fn ( );}')
     });
     it('multi', function() {
       var s = 'function a(b = 1, c = []){}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function a(b , c ){if(typeof b=="undefined")b = 1;if(typeof c=="undefined")c = [ ];}')
+      expect(res).to.eql('function a(b , c ){if(b===void 0)b = 1;if(c===void 0)c = [ ];}')
     });
   });
   describe('rest params', function() {

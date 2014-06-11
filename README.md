@@ -222,7 +222,7 @@ function method(a, b = 1) {
 }
 ```
 ```js
-function method(a, b ) {if(typeof b == "undefined") b = 1;
+function method(a, b ) {if(b ===void 0) b = 1;
 }
 ```
 

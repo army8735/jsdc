@@ -29,7 +29,7 @@ var DefaultValue = Class(function(jsdc) {
       var sgnames = self.hash[fnbody.nid()];
       sgnames.forEach(function(sgname) {
         var id = sgname.first().first().token().content();
-        self.jsdc.append('if(typeof ' + id + '=="undefined")' + id);
+        self.jsdc.append('if(' + id + '===void 0)' + id);
         self.recursion(sgname.last());
         self.jsdc.append(';');
       });
