@@ -933,5 +933,32 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('"\\\\\\uFFFF\\u0001"');
     });
+    it('prefix 2', function() {
+      var s = '"\\u{10010}"';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('"\\uFFFF\\u0011"');
+    });
+    it('prefix 1', function() {
+      var s = '"\\u{10110}"';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('"\\uFFFF\\u0111"');
+    });
+    it('prefix 0', function() {
+      var s = '"\\u{11110}"';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('"\\uFFFF\\u1111"');
+    });
+  });
+  describe('object property', function() {
+    it('id', function() {
+      var s = 'var a = {o}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a = {o:o}');
+    });
+    it('method', function() {
+      var s = 'var a = {o(){}}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a = {o:function(){}}');
+    });
   });
 });

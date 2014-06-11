@@ -19,6 +19,7 @@ define(function(require, exports, module) {
   var Generator = require('./Generator');
   var Destruct = require('./Destruct');
   var Str = require('./Str');
+  var Obj = require('./Obj');
   
   var Jsdc = Class(function(code) {
     this.code = (code + '') || '';
@@ -41,6 +42,7 @@ define(function(require, exports, module) {
     this.gen = new Generator(this);
     this.destruct = new Destruct(this);
     this.str = new Str(this);
+    this.obj = new Obj(this);
   
     this.i = 0;
     this.ids = {};
@@ -268,6 +270,9 @@ define(function(require, exports, module) {
         case JsNode.YIELDEXPR:
           this.gen.yield(node, true);
           break;
+        case JsNode.PROPTDEF:
+          this.obj.propt(node, true);
+          break;
       }
     },
     after: function(node) {
@@ -318,6 +323,12 @@ define(function(require, exports, module) {
           break;
         case JsNode.YIELDEXPR:
           this.gen.yield(node);
+          break;
+        case JsNode.PROPTDEF:
+          this.obj.propt(node);
+          break;
+        case JsNode.PROPTNAME:
+          this.obj.name(node);
           break;
       }
     },

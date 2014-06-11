@@ -97,6 +97,22 @@ var i = parseInt("0o456", 8), j = parseInt("0O777", 8)
 '\\u{10000}'
 ```
 
+### Object增强
+赋值对象时`Object`的同名属性可以简写：
+```js
+var a = {o}
+```
+```js
+var a = {o:o}
+```
+方法也是：
+```js
+var a = {o(){}}
+```
+```js
+var a = {o:function(){}}
+```
+
 ### var和函数迁移
 将`var`申明迁移至最近的作用域起始处：
 ```js

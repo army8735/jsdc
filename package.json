@@ -26,7 +26,9 @@
         "jsdc/src/Num.js",
         "jsdc/src/Rest.js",
         "jsdc/src/Scope.js",
-        "jsdc/src/Template.js"
+        "jsdc/src/Template.js",
+        "jsdc/src/Str.js",
+        "jsdc/src/Obj.js"
       ]
     }
   },

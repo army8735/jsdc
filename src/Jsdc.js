@@ -18,6 +18,7 @@ var ArrowFn = require('./ArrowFn');
 var Generator = require('./Generator');
 var Destruct = require('./Destruct');
 var Str = require('./Str');
+var Obj = require('./Obj');
 
 var Jsdc = Class(function(code) {
   this.code = (code + '') || '';
@@ -40,6 +41,7 @@ var Jsdc = Class(function(code) {
   this.gen = new Generator(this);
   this.destruct = new Destruct(this);
   this.str = new Str(this);
+  this.obj = new Obj(this);
 
   this.i = 0;
   this.ids = {};
@@ -267,6 +269,9 @@ var Jsdc = Class(function(code) {
       case JsNode.YIELDEXPR:
         this.gen.yield(node, true);
         break;
+      case JsNode.PROPTDEF:
+        this.obj.propt(node, true);
+        break;
     }
   },
   after: function(node) {
@@ -317,6 +322,12 @@ var Jsdc = Class(function(code) {
         break;
       case JsNode.YIELDEXPR:
         this.gen.yield(node);
+        break;
+      case JsNode.PROPTDEF:
+        this.obj.propt(node);
+        break;
+      case JsNode.PROPTNAME:
+        this.obj.name(node);
         break;
     }
   },
