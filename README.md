@@ -171,9 +171,9 @@ var a;{a=function (){}}
 }
 ```
 ```js
-var b;!function() {
+!function() {
   let a = 1;
-  b=function (){}
+  function b(){}
 }();
 ```
 `if`语句，`iterator`语句和`try`/`catch`/`finally`等也是，注意和纯`{}`语句插入匿名函数位置的异同：
