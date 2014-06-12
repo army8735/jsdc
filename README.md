@@ -214,6 +214,7 @@ var a;!function() {
   var c = 1;
 }();
 ```
+> 函数和`Generator`函数均默认块级作用域。
 
 ### 默认参数值
 根据是否`undefined`赋值，它可以有多个：

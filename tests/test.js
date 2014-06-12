@@ -665,7 +665,7 @@ describe('es6', function() {
       var s = '{function *a(){}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;!function(){a=function(){var __0__=0;return function(){return{next:__1__}};function __1__(){switch(__0__++){case 0:;return{done:true}}}}();}();');
+      expect(res).to.eql('!function(){var a=function(){var __0__=0;return function(){return{next:__1__}};function __1__(){switch(__0__++){case 0:;return{done:true}}}}();}();');
     });
     it('yield a generator', function() {
       var s = 'function *a(){yield * b}';

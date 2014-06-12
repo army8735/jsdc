@@ -70,23 +70,6 @@ define(function(require, exports, module) {
         }
       });
     },
-    pregen: function(gendecl) {
-      var parent = this.closest(gendecl);
-      if(parent
-        && this.hash[parent.nid()]) {
-        //插入声明的变量到作用域开始，并改写为var形式
-        var i = this.index[this.index.length - 1];
-        this.history[i] = this.history[i] || {};
-        var his = this.history[i];
-        var id = gendecl.leaf(2).first().token().content();
-        if(!his.hasOwnProperty(id)) {
-          his[id] = true;
-          this.jsdc.insert('var ' + id + ';', i);
-        }
-        this.jsdc.ignore(gendecl.leaf(2));
-        this.jsdc.append(id + '=');
-      }
-    },
     join: function(node) {
       var first = node.first();
       var res = [];

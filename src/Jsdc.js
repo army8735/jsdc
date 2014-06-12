@@ -205,7 +205,6 @@ var Jsdc = Class(function(code) {
         this.destruct.expr(node, true);
         break;
       case JsNode.GENDECL:
-        this.scope.pregen(node);
         this.gen.parse(node, true);
         break;
       case JsNode.GENEXPR:

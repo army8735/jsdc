@@ -206,7 +206,6 @@ define(function(require, exports, module) {
           this.destruct.expr(node, true);
           break;
         case JsNode.GENDECL:
-          this.scope.pregen(node);
           this.gen.parse(node, true);
           break;
         case JsNode.GENEXPR:
