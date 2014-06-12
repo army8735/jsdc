@@ -164,7 +164,13 @@ seajs.use(['../index', './jssc'], function(jsdc, jssc) {
 		document.getElementsByTagName('code')[0].innerHTML = s;
 		pre[0].style.display = 'block';
 		init();
+    location.hash = encodeURIComponent(s);
 	}
+  var s = location.hash.replace(/^#/, '');
+  if(s) {
+    ta.value = decodeURIComponent(s);
+    input.onclick();
+  }
 });
 </script>
 </body>
