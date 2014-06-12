@@ -389,6 +389,7 @@ function A(){}
 Object.keys(B).forEach(function(k){A[k]=B[k]});
 ```
 > 开头会附加上一段`prototype`原型和`constructor`构造器，标准的寄生组合式继承方法。
+
 > 结尾会继承父类的静态属性。
 
 `super`关键字直接改写为父类引用：
@@ -435,9 +436,11 @@ var o = function(){function __0__(){}
   __0__.prototype.method = function(){}
 return __0__}()
 ```
-> 由于表达式没有名字（也可以有），所以需要封装成立即执行的匿名函数并返回一个`class`声明
-> 有名字的话就用原有名字，否则依然临时唯一id
-> 注意匿名函数的结尾没有分号，因为本身是个`assignmentexpr`
+> 由于表达式没有名字（也可以有），所以需要封装成立即执行的匿名函数并返回一个`class`声明。
+
+> 有名字的话就用原有名字，否则依然临时唯一id。
+
+> 注意匿名函数的结尾没有分号，因为本身是个`assignmentexpr`。
 
 ### module
 只要出现了module/import/export语句，就认为文件是个模块，用`define`封装成AMD/CMD模块：
@@ -447,7 +450,7 @@ module circle from "a"
 ```js
 define(function(requrie,exports,module){module circle from "a"});
 ```
-> 注意语句本身尚未做处理，下面会说明。为阅读方便，下面所有都省略了`define`封装
+> 注意语句本身尚未做处理，下面会说明。为阅读方便，下面所有都省略了`define`封装。
 
 也可以通过API设置来控制：
 ```js
@@ -635,7 +638,7 @@ function *a(){
 }
 ```
 ```js
-var a=function(){return function (){return {next:a}};function a(){
+var a=function(){return function(){return {next:a}};function a(){
   arguments[0];return {value:1,done:false}
   arguments[0];return {value:2,done:false}
 }}();
@@ -650,7 +653,7 @@ function *a(){
 }
 ```
 ```js
-var a=function(){return function (){return {next:__0__}};function __0__(){
+var a=function(){return function(){return {next:__0__}};function __0__(){
   arguments[0];return {value:1,done:false}
   arguments[0];return {value:2,done:false}
 }}();
@@ -663,7 +666,7 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var __1__=0;return function (){return {next:__0__}};function __0__(){
+var a=function(){var __1__=0;return function(){return {next:__0__}};function __0__(){
   arguments[0];return {value:1,done:false}
   arguments[0];return {value:2,done:false}
 }}();
@@ -676,7 +679,7 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var __1__=0;return function (){return {next:__0__}};function __0__(){
+var a=function(){var __1__=0;return function(){return {next:__0__}};function __0__(){
   switch(__1__++){case 0:arguments[0];return {value:1,done:false}
   case 1:arguments[0];return {value:1,done:false}}
 }}();
@@ -690,13 +693,14 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var __1__=0;return function (){return {next:__0__}};var a;function __0__(){
+var a=function(){var __1__=0;return function(){return {next:__0__}};var a;function __0__(){
   switch(__1__++){case 0:a = 1;
   arguments[0];return {value:a++,done:false};
   case 1:arguments[0];return {value:a++,done:false;}
 }}();
 ```
 > 函数则不需要前置。
+
 > 注意函数内有个同名变量`a`，这就是前面为什么要改函数名的原因。
 
 添加`default`语句，更改最后一个`yield`的`done`为`true`：
@@ -708,7 +712,7 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var __6__=0;return function (){return {next:__7__}};var a;function __7__(){
+var a=function(){var __6__=0;return function(){return {next:__7__}};var a;function __7__(){
  switch(__6__++){case 0:a = 1;
   arguments[0];return {value:a++,done:false};
   case 1:arguments[0];return {value:a++,done:true};default:;;return{done:true}}
@@ -721,9 +725,18 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var __0__=0;return function (){return{next:__1__}};function __1__(){
+var a=function(){var __0__=0;return function(){return{next:__1__}};function __1__(){
   switch(__0__++){case 0:arguments[0];var __2__=b();if(!__2__.done)__0__--;return __2__;default:;return{done:true}}
 }}();
+```
+表达式也一样：
+```js
+~function *(){
+}
+```
+```js
+~function(){var __0__=0;return function (){return{next:__1__}};function __1__(){
+}}()
 ```
 
 ### destructure解构
@@ -734,7 +747,7 @@ var [a] = [1]
 ```js
 var a;!function(){var __0__= [1];a=__0__[0];}()
 ```
-> 变量名会被前置，同时包裹执行一个匿名函数，将变量名赋值对应到正确的索引
+> 变量名会被前置，同时包裹执行一个匿名函数，将变量名赋值对应到正确的索引。
 
 多个变量一样，注意逗号占位符：
 ```js
@@ -750,7 +763,7 @@ var {a} = {"a":1}
 ```js
 var a;!function(){var __0__= {"a":1};a=__0__["a"]}()
 ```
-> 注意变量名和键名要一致
+> 注意变量名和键名要一致。
 
 对象可以用`:`号更改引用：
 ```js

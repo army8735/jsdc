@@ -33,12 +33,38 @@ var Generator = Class(function(jsdc) {
       this.jsdc.append('function(){');
       this.jsdc.append('var ' + state + '=0;');
       this.jsdc.append('return ');
-      this.jsdc.append('function (){return{next:' + temp + '}};');
+      this.jsdc.append('function(){return{next:' + temp + '}};');
       o.pos = this.jsdc.res.length;
       this.jsdc.append('function ' + temp);
     }
     else {
       this.jsdc.appendBefore('}();');
+    }
+  },
+  expr: function(node, start) {
+    if(start) {
+      this.jsdc.ignore(node.first());
+      this.jsdc.ignore(node.leaf(1));
+      if(node.leaf(2).name() == JsNode.BINDID) {
+        this.jsdc.ignore(node.leaf(2));
+      }
+      var state = this.jsdc.uid();
+      var temp = this.jsdc.uid();
+      var o = this.hash[node.nid()] = {
+        state: state,
+        index: 0,
+        temp: temp,
+        yield: []
+      };
+      this.jsdc.append('function(){');
+      this.jsdc.append('var ' + state + '=0;');
+      this.jsdc.append('return ');
+      this.jsdc.append('function(){return{next:' + temp + '}};');
+      o.pos = this.jsdc.res.length;
+      this.jsdc.append('function ' + temp);
+    }
+    else {
+      this.jsdc.appendBefore('}()');
     }
   },
   yield: function(node, start) {
@@ -106,7 +132,8 @@ var Generator = Class(function(jsdc) {
   closest: function(node) {
     var parent = node;
     while(parent = parent.parent()) {
-      if(parent.name() == JsNode.GENDECL) {
+      if(parent.name() == JsNode.GENDECL
+        || parent.name() == JsNode.GENEXPR) {
         return parent;
       }
     }

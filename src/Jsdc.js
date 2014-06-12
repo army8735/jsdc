@@ -55,6 +55,9 @@ var Jsdc = Class(function(code) {
     var parser = homunculus.getParser('es6');
     try {
       self.node = parser.parse(code);
+    } catch(e) {
+      return e.toString();
+    }
       self.ignores = parser.ignore();
       //记录所有id
       var lexer = parser.lexer;
@@ -72,9 +75,6 @@ var Jsdc = Class(function(code) {
       self.scope.parse(self.node);
       //递归处理
       self.recursion(self.node);
-    } catch(e) {
-      return e.toString();
-    }
     return self.res;
   },
   ast: function() {
@@ -211,6 +211,9 @@ var Jsdc = Class(function(code) {
         this.scope.pregen(node);
         this.gen.parse(node, true);
         break;
+      case JsNode.GENEXPR:
+        this.gen.expr(node, true);
+        break;
       case JsNode.FNBODY:
         this.scope.enter(node);
         this.defaultValue.enter(node);
@@ -330,6 +333,9 @@ var Jsdc = Class(function(code) {
         break;
       case JsNode.GENDECL:
         this.gen.parse(node);
+        break;
+      case JsNode.GENEXPR:
+        this.gen.expr(node);
         break;
       case JsNode.YIELDEXPR:
         this.gen.yield(node);
