@@ -99,6 +99,10 @@ var Jsdc = Class(function(code) {
   insert: function(s, i) {
     this.res = this.res.slice(0, i) + s + this.res.slice(i);
   },
+  replace: function(s, i, len) {
+    this.res = this.res.slice(0, i) + s + this.res.slice(i + len);
+    this.i += s.length - len;
+  },
   next: function() {
     var i = ++this.index;
     return this.ignores.hasOwnProperty(i) ? this.ignores[i] : null;

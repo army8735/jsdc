@@ -607,49 +607,49 @@ describe('es6', function() {
       var s = 'function *a(){}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:}}}();');
+      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:;return{done:true}}}}();');
     });
     it('normal', function() {
-      var s = 'function *a(){yield 1;}';
+      var s = 'function *a(){yield 1}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:return 1;}}}();');
+      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:arguments[0];return {value:1,done:true};default:;return{done:true}}}}();');
     });
     it('multi yield', function() {
       var s = 'function *a(){yield 1;yield 2}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:return 1;case 1:return 2}}}();');
+      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:arguments[0];return {value:1,done:false};case 1:arguments[0];return {value:2,done:true};default:;return{done:true}}}}();');
     });
     it('with var state', function() {
       var s = 'function *a(){var a = 1;yield a++;yield a++}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};var a;function __1__(){switch(__0__++){case 0:a = 1;return a++;case 1:return a++}}}();');
+      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};var a;function __1__(){switch(__0__++){case 0:a = 1;arguments[0];return {value:a++,done:false};case 1:arguments[0];return {value:a++,done:true};default:;return{done:true}}}}();');
     });
     it('scope in genaretor', function() {
       var s = 'function *a(){{var a}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};var a;function __1__(){switch(__0__++){case 0:!function(){a}();}}}();');
+      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};var a;function __1__(){switch(__0__++){case 0:!function(){a}();;return{done:true}}}}();');
     });
     it('let scope', function() {
       var s = 'function *a(){{let a}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:!function(){var a}();}}}();');
+      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:!function(){var a}();;return{done:true}}}}();');
     });
     it('ignore fndecl', function() {
       var s = 'function *a(){function a(){}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:function a(){}}}}();');
+      expect(res).to.eql('var a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:function a(){};return{done:true}}}}();');
     });
     it('in block', function() {
       var s = '{function *a(){}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;!function(){a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:}}}();}();');
+      expect(res).to.eql('var a;!function(){a=function(){var __0__=0;return function (){return {next:__1__}};function __1__(){switch(__0__++){case 0:;return{done:true}}}}();}();');
     });
   });
   describe('destructor', function() {

@@ -12,7 +12,6 @@ var Generator = Class(function(jsdc) {
     if(start) {
       this.jsdc.ignore(node.leaf(1));
       var token = node.leaf(2).first().token();
-      var id = token.content();
       //有可能被scope前置过
       var hasPre = token.ignore;
       //忽略本身
@@ -28,7 +27,8 @@ var Generator = Class(function(jsdc) {
       var o = this.hash[node.nid()] = {
         state: state,
         index: 0,
-        temp: temp
+        temp: temp,
+        yield: []
       };
       this.jsdc.append('function(){');
       this.jsdc.append('var ' + state + '=0;');
@@ -49,7 +49,7 @@ var Generator = Class(function(jsdc) {
         this.jsdc.append('case ' + (o.index - 1) + ':');
       }
       this.jsdc.ignore(node.first());
-      this.jsdc.append('return ');
+      this.jsdc.append('arguments[0];return ');
       //yield *
       if(node.size() > 2
         && node.leaf(1).name() == JsNode.TOKEN
@@ -57,20 +57,34 @@ var Generator = Class(function(jsdc) {
         this.jsdc.ignore(node.leaf(1));
         this.yie[node.nid()] = true;
       }
+      else {
+        this.jsdc.append('{value:');
+      }
     }
-    else if(this.yie.hasOwnProperty(node.nid())) {
-      this.jsdc.appendBefore('()');
+    else {
+      if(this.yie.hasOwnProperty(node.nid())) {
+        this.jsdc.appendBefore('()');
+      }
+      else {
+        this.jsdc.appendBefore(',done:false}');
+        o.yield.push(this.jsdc.i);
+      }
     }
   },
   body: function(node, start) {
     var top = node.parent();
     if(top.name() == JsNode.GENDECL) {
+      var o = this.hash[top.nid()];
       if(start) {
-        var o = this.hash[top.nid()];
         this.jsdc.append('switch(' + o.state + '++){case 0:');
       }
       else {
-        this.jsdc.appendBefore('}');
+        if(o.index) {
+          var i = o.yield[o.yield.length - 1];
+          i = this.jsdc.res.lastIndexOf(',done:false}', i);
+          this.jsdc.replace('true};default:', i + 6, 6);
+        }
+        this.jsdc.appendBefore(';return{done:true}}');
       }
     }
   },

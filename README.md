@@ -592,6 +592,29 @@ function *a() {
 ```
 > `Generator`语句本身尚未做处理，后面会提到。
 
+语句前会加上`arguments[0]`，模拟`next()`带上的一个参数：
+```js
+function *a() {
+  var a = yield
+}
+```
+```js
+function *a() {
+  var a = arguments[0];return
+}
+```
+`yield`的返回值将变成一个对象的value：
+```js
+function *a() {
+  var a = yield 1
+}
+```
+```js
+function *a() {
+  var a = arguments[0];return {value:1}
+}
+```
+
 ### Generator生成器函数
 它的实现比较复杂，首先是改写为普通函数：
 ```js
@@ -602,8 +625,8 @@ function *a(){
 ```
 ```js
 function a(){
-  return 1
-  return 2
+  arguments[0];return {value:1,done:false}
+  arguments[0];return {value:2,done:false}
 }
 ```
 然后包裹：
@@ -615,8 +638,8 @@ function *a(){
 ```
 ```js
 var a=function(){return function (){return {next:a}};function a(){
-  return 1
-  return 2
+  arguments[0];return {value:1,done:false}
+  arguments[0];return {value:2,done:false}
 }}();
 ```
 > 这样每次调用它便能得到像es6中一样的一个具有`next()`方法的对象。
@@ -630,8 +653,8 @@ function *a(){
 ```
 ```js
 var a=function(){return function (){return {next:__0__}};function __0__(){
-  return 1
-  return 2
+  arguments[0];return {value:1,done:false}
+  arguments[0];return {value:2,done:false}
 }}();
 ```
 再次添加一个唯一临时id作为state标识，来为实现`yield`功能做准备：
@@ -643,8 +666,8 @@ function *a(){
 ```
 ```js
 var a=function(){var __1__=0;return function (){return {next:__0__}};function __0__(){
-  return 1
-  return 2
+  arguments[0];return {value:1,done:false}
+  arguments[0];return {value:2,done:false}
 }}();
 ```
 当出现`yield`语句时，添加`switch`语句来模拟顺序执行：
@@ -656,8 +679,8 @@ function *a(){
 ```
 ```js
 var a=function(){var __1__=0;return function (){return {next:__0__}};function __0__(){
-  switch(__1__++){case 0:return 1
-  case 1:return 2}
+  switch(__1__++){case 0:arguments[0];return {value:1,done:false}
+  case 1:arguments[0];return {value:1,done:false}}
 }}();
 ```
 同时函数里面的`var`声明需要前置，以免每次调用`next()`方法时又重新声明一遍失去了状态：
@@ -671,12 +694,28 @@ function *a(){
 ```js
 var a=function(){var __1__=0;return function (){return {next:__0__}};var a;function __0__(){
   switch(__1__++){case 0:a = 1;
-  return a++;
-  case 1:return a++;}
+  arguments[0];return {value:a++,done:false};
+  case 1:arguments[0];return {value:a++,done:false;}
 }}();
 ```
 > 函数则不需要前置。
 > 注意函数内有个同名变量`a`，这就是前面为什么要改函数名的原因。
+
+添加`default`语句，更改最后一个`yield`的`done`为`true`：
+```js
+function *a(){
+  var a = 1;
+  yield a++;
+  yield a++;
+}
+```
+```js
+var a=function(){var __6__=0;return function (){return {next:__7__}};var a;function __7__(){
+ switch(__6__++){case 0:a = 1;
+  arguments[0];return {value:a++,done:false};
+  case 1:arguments[0];return {value:a++,done:true};default:;;return{done:true}}
+}}();
+```
 
 ### destructure解构
 `var`声明变量时可以用数组：
