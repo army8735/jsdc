@@ -310,34 +310,34 @@ describe('es6', function() {
   });
   describe('for of', function() {
     it('normal', function() {
-      var s = 'for(a of {}){}';
+      var s = 'for(a of o){}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(a in {}){a={}[a];}');
+      expect(res).to.eql('for(a =o.next();!a.done;){a=a.value;}');
     });
     it('without blockstmt', function() {
       var s = 'for(a of b);';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(a in b){a=b[a];;}');
+      expect(res).to.eql('for(a =b.next();!a.done;){a=a.value;;}');
     });
     it('without blockstmt and append comment', function() {
       var s = 'for(a of b);//';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(a in b){a=b[a];;}//');
+      expect(res).to.eql('for(a =b.next();!a.done;){a=a.value;;}//');
     });
     it('without blockstmt and append mulit comment', function() {
       var s = 'for(a of b);/**/\n//\n';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(a in b){a=b[a];;}/**/\n//\n');
+      expect(res).to.eql('for(a =b.next();!a.done;){a=a.value;;}/**/\n//\n');
     });
     it('varstmt', function() {
       var s = 'for(var a of {}){a}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(var a in {}){a={}[a];a}');
+      expect(res).to.eql('for(var a ={}.next();!a.done;){a=a.value;a}');
     });
     it('varstmt without blockstmt', function() {
       var s = 'for(var a of {})a';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(var a in {}){a={}[a];a}');
+      expect(res).to.eql('for(var a ={}.next();!a.done;){a=a.value;a}');
     });
   });
   describe('class', function() {

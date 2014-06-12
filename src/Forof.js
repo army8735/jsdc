@@ -29,17 +29,32 @@ var Forof = Class(function(jsdc) {
     var parent = node.parent();
     if(parent.name() == JsNode.ITERSTMT
       && this.hash.hasOwnProperty(parent.nid())) {
-      this.jsdc.append('in ');
+      this.jsdc.append('=');
     }
   },
-  prts: function(node) {
+  prts: function(node, start) {
+    //for of的语句如果省略{}则加上
     var parent = node.parent();
     if(parent.name() == JsNode.ITERSTMT
       && this.hash.hasOwnProperty(parent.nid())) {
-      var last = parent.last();
-      if(last.name() != JsNode.BLOCKSTMT) {
-        this.jsdc.append('{');
-        this.assign(parent);
+      if(start) {
+        this.jsdc.append('.next();!');
+        var k = parent.leaf(2);
+        //forof的varstmt只能有一个id，其它为mmbexpr
+        if(k.name() == JsNode.VARSTMT) {
+          k = k.last().first().first().token().content();
+        }
+        else {
+          k = this.join(k);
+        }
+        this.jsdc.append(k + '.done;')
+      }
+      else {
+        var last = parent.last();
+        if(last.name() != JsNode.BLOCKSTMT) {
+          this.jsdc.append('{');
+          this.assign(parent);
+        }
       }
     }
   },
@@ -65,8 +80,7 @@ var Forof = Class(function(jsdc) {
     else {
       k = this.join(k);
     }
-    var v = this.join(node.leaf(4));
-    this.jsdc.append(k + '=' + v + '[' + k + '];');
+    this.jsdc.append(k + '=' + k + '.value;');
   },
   join: function(node) {
     var res = { s: '' };

@@ -282,26 +282,41 @@ Math.max.apply(Math, [].concat(a))
 ```
 
 ### for of循环
-将`of`改为`in`：
+将`of`改为`=`并添加`;`补完循环：
 ```js
-for(a of b){}
+for(a of b){
+}
 ```
 ```js
-for(a in b){}
+for(a =b;;){
+}
 ```
-循环体内复制将键改为值：
+将赋值添加`.next()`并添加`.done`结束判断：
 ```js
-for(a of b){}
+for(a of b){
+}
 ```
 ```js
-for(a in b){a = b[a];}
+for(a =b.next();!a.done;){
+}
+```
+循环体内先赋值`.value`：
+```js
+for(a of b){
+}
+```
+```js
+for(a =b.next();!a.done;){a=a.value;
+}
 ```
 `var`语句同样处理：
 ```js
-for(var a of b){}
+for(var a of b){
+}
 ```
 ```js
-for(var a in b){a = b[a];}
+for(var a =b.next();!a.done;){a=a.value;
+}
 ```
 
 ### class类声明

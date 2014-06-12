@@ -167,6 +167,9 @@ define(function(require, exports, module) {
                 this.sup[parent.leaf(1).leaf(1).nid()] = this.hash[top.nid()].extend;
                 break;
               }
+              else if(parent.name() == JsNode.FNBODY) {
+                break;
+              }
             }
           }
         }

@@ -6,6 +6,7 @@ var Class = require('./util/Class');
 var Generator = Class(function(jsdc) {
   this.jsdc = jsdc;
   this.hash = {};
+  this.yie = {};
 }).methods({
   parse: function(node, start) {
     if(start) {
@@ -49,8 +50,16 @@ var Generator = Class(function(jsdc) {
       }
       this.jsdc.ignore(node.first());
       this.jsdc.append('return ');
+      //yield *
+      if(node.size() > 2
+        && node.leaf(1).name() == JsNode.TOKEN
+        && node.leaf(1).token().content() == '*') {
+        this.jsdc.ignore(node.leaf(1));
+        this.yie[node.nid()] = true;
+      }
     }
-    else {
+    else if(this.yie.hasOwnProperty(node.nid())) {
+      this.jsdc.appendBefore('()');
     }
   },
   body: function(node, start) {
