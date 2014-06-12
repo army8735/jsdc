@@ -6,7 +6,7 @@ var Class = require('./util/Class');
 var Generator = Class(function(jsdc) {
   this.jsdc = jsdc;
   this.hash = {};
-  this.yie = {};
+  this.star = {};
 }).methods({
   parse: function(node, start) {
     if(start) {
@@ -33,7 +33,7 @@ var Generator = Class(function(jsdc) {
       this.jsdc.append('function(){');
       this.jsdc.append('var ' + state + '=0;');
       this.jsdc.append('return ');
-      this.jsdc.append('function (){return {next:' + temp + '}};');
+      this.jsdc.append('function (){return{next:' + temp + '}};');
       o.pos = this.jsdc.res.length;
       this.jsdc.append('function ' + temp);
     }
@@ -49,25 +49,33 @@ var Generator = Class(function(jsdc) {
         this.jsdc.append('case ' + (o.index - 1) + ':');
       }
       this.jsdc.ignore(node.first());
-      this.jsdc.append('arguments[0];return ');
+      this.jsdc.append('arguments[0];');
       //yield *
       if(node.size() > 2
         && node.leaf(1).name() == JsNode.TOKEN
         && node.leaf(1).token().content() == '*') {
         this.jsdc.ignore(node.leaf(1));
-        this.yie[node.nid()] = true;
+        var temp = this.star[node.nid()] = this.jsdc.uid();
+        this.jsdc.append('var ' + temp + '=');
       }
       else {
-        this.jsdc.append('{value:');
+        this.jsdc.append('return{value:');
       }
     }
     else {
-      if(this.yie.hasOwnProperty(node.nid())) {
-        this.jsdc.appendBefore('()');
+      if(this.star.hasOwnProperty(node.nid())) {
+        var temp = this.star[node.nid()];
+        this.jsdc.appendBefore('();if(!' + temp + '.done)' + o.state + '--;return ' + temp);
+        o.yield.push({
+          i: this.jsdc.i,
+          star: temp
+        });
       }
       else {
         this.jsdc.appendBefore(',done:false}');
-        o.yield.push(this.jsdc.i);
+        o.yield.push({
+          i: this.jsdc.i
+        });
       }
     }
   },
@@ -80,9 +88,16 @@ var Generator = Class(function(jsdc) {
       }
       else {
         if(o.index) {
-          var i = o.yield[o.yield.length - 1];
-          i = this.jsdc.res.lastIndexOf(',done:false}', i);
-          this.jsdc.replace('true};default:', i + 6, 6);
+          var yie = o.yield[o.yield.length - 1];
+          var i;
+          if(yie.star) {
+            i = this.jsdc.res.lastIndexOf(yie.star, i);
+            this.jsdc.replace(';default:', i + yie.star.length, 0);
+          }
+          else {
+            i = this.jsdc.res.lastIndexOf(',done:false}', i);
+            this.jsdc.replace('true};default:', i + 6, 6);
+          }
         }
         this.jsdc.appendBefore(';return{done:true}}');
       }

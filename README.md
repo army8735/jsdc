@@ -436,9 +436,7 @@ var o = function(){function __0__(){}
 return __0__}()
 ```
 > 由于表达式没有名字（也可以有），所以需要封装成立即执行的匿名函数并返回一个`class`声明
-
 > 有名字的话就用原有名字，否则依然临时唯一id
-
 > 注意匿名函数的结尾没有分号，因为本身是个`assignmentexpr`
 
 ### module
@@ -714,6 +712,17 @@ var a=function(){var __6__=0;return function (){return {next:__7__}};var a;funct
  switch(__6__++){case 0:a = 1;
   arguments[0];return {value:a++,done:false};
   case 1:arguments[0];return {value:a++,done:true};default:;;return{done:true}}
+}}();
+```
+`yield`还支持返回一个`Generator`，这就是一个递归：
+```js
+function *a(){
+  yield * b
+}
+```
+```js
+var a=function(){var __0__=0;return function (){return{next:__1__}};function __1__(){
+  switch(__0__++){case 0:arguments[0];var __2__=b();if(!__2__.done)__0__--;return __2__;default:;return{done:true}}
 }}();
 ```
 
