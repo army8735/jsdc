@@ -47,8 +47,12 @@ var Destruct = Class(function(jsdc) {
     }
     var res = [];
     node.leaves().forEach(function(leaf) {
-      if(leaf.name() == JsNode.SINGLENAME) {
-        res.push(leaf.first().first().token().content());
+      switch(leaf.name()) {
+        case JsNode.SINGLENAME:
+          res.push(leaf.first().first().token().content());
+          break;
+        case JsNode.BINDREST:
+          res.push(leaf.last().first().token().content());
       }
     });
     this.idCache[node.nid()] = res;
@@ -104,6 +108,9 @@ var Destruct = Class(function(jsdc) {
                   index: i
                 });
                 break;
+              case JsNode.BINDREST:
+                var id = leaf.last().first().token().content();
+                self.jsdc.appendBefore(id + '=' + temp + '.slice(' + i + ')');
             }
           });
           self.jsdc.appendBefore('}()');
@@ -190,6 +197,9 @@ var Destruct = Class(function(jsdc) {
                 index: i
               });
               break;
+            case JsNode.BINDREST:
+              var id = leaf.last().first().token().content();
+              self.jsdc.appendBefore(id + '=' + temp + '.slice(' + i + ')');
           }
         });
         break;
@@ -285,8 +295,14 @@ var Destruct = Class(function(jsdc) {
             leaf = leaf.first();
             switch(leaf.name()) {
               case JsNode.TOKEN:
-                var id = leaf.token().content();
-                self.jsdc.appendBefore(id + '=' + temp + '[' + i + ']' + (end ? '' : ';'));
+                if(leaf.token().content() == '...') {
+                  var id = leaf.next().first().token().content();
+                  self.jsdc.appendBefore(id + '=' + temp + '.slice(' + i + ')');
+                }
+                else {
+                  var id = leaf.token().content();
+                  self.jsdc.appendBefore(id + '=' + temp + '[' + i + ']' + (end ? '' : ';'));
+                }
                 break;
               case JsNode.PRMREXPR:
                 var id = leaf.first().token().content();
@@ -414,8 +430,14 @@ var Destruct = Class(function(jsdc) {
           leaf = leaf.first();
           switch(leaf.name()) {
             case JsNode.TOKEN:
-              var id = leaf.token().content();
-              self.jsdc.appendBefore(id + '=' + temp + '[' + i + ']' + (end ? '' : ';'));
+              if(leaf.token().content() == '...') {
+                var id = leaf.next().first().token().content();
+                self.jsdc.appendBefore(id + '=' + temp + '.slice(' + i + ')');
+              }
+              else {
+                var id = leaf.token().content();
+                self.jsdc.appendBefore(id + '=' + temp + '[' + i + ']' + (end ? '' : ';'));
+              }
               break;
             case JsNode.PRMREXPR:
               var id = leaf.first().token().content();

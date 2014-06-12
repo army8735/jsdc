@@ -356,6 +356,16 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_}();\nfunction A(){B.call(this)}\nA.prototype.a = function(){}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
     });
+    it('super call property', function() {
+      var s = 'class A extends B{constructor(){super.a}}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_}();function A(){B.prototype.a}Object.keys(B).forEach(function(k){A[k]=B[k]});');
+    });
+    it('super call method with argments', function() {
+      var s = 'class A extends B{constructor(){super.a(1)}}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_}();function A(){B.prototype.a.call(this,1)}Object.keys(B).forEach(function(k){A[k]=B[k]});');
+    });
     it('getter/setter', function() {
       var s = 'class A{get b(){}set c(d){}}';
       var res = Jsdc.parse(s);
@@ -406,6 +416,12 @@ describe('es6', function() {
       Jsdc.reset();
       var res = Jsdc.parse(s);
       expect(res).to.eql('!function(){function A(){}return A}()');
+    });
+    it('classexpr super', function() {
+      var s = '!class A extends B{constructor(){super()}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_}();extends Bfunction A(){B.call(this)}Object.keys(B).forEach(function(k){A[k]=B[k]});return A}()');
     });
     it('classexpr super', function() {
       var s = '!class A extends B{constructor(){super()}}';
@@ -663,6 +679,12 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('~function(){var __0__=0;return function(){return{next:__1__}};function __1__(){}}()');
     });
+    it('generator expr with name', function() {
+      var s = '~function * a(){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('~function(){var __0__=0;return function(){return{next:__1__}};function __1__(){}}()');
+    });
   });
   describe('destructor', function() {
     it('single in array', function() {
@@ -911,6 +933,12 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('(!function(){var __0__= o;x=__0__["x"];var __1__=__0__["y"];z=__1__["z"];if(z===void 0)z=1}())');
     });
+    it('assingexpr init object in object in object', function() {
+      var s = '({x,y:{m:{n},o:p}} = o)';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('(!function(){var __0__= o;x=__0__["x"];var __1__=__0__["y"];var __2__=__1__["m"];n=__2__["n"]p=__1__["o"]}())');
+    });
     it('varstmt arr destruct first start with id', function() {
       var s = 'var a = [b] = [c] = e = o';
       Jsdc.reset();
@@ -922,6 +950,36 @@ describe('es6', function() {
       Jsdc.reset();
       var res = Jsdc.parse(s);
       expect(res).to.eql('var a = function(){var __0__= e = o;c=__0__["c"];b=__0__["b"];return __0__}()');
+    });
+    it('array var rest', function() {
+      var s = 'var [a, ...b] = o';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var b;var a;!function(){var __0__= o;a=__0__[0];b=__0__.slice(1)}()');
+    });
+    it('array in array var rest', function() {
+      var s = 'var [a, [b, ...c]] = o';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var c;var b;var a;!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__[0];c=__1__.slice(1)}()');
+    });
+    it('array expr spread', function() {
+      var s = '[a, ...b] = o';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){var __0__= o;a=__0__[0];b=__0__.slice(1)}()');
+    });
+    it('array in array expr spread', function() {
+      var s = '[a, [b, ...c]] = o';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__[0];c=__1__.slice(1)}()');
+    });
+    it('array in array in array expr spread', function() {
+      var s = '[a, [b, [...c]]] = o';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__[0];var __2__=__1__[1];c=__2__.slice(0)}()');
     });
   });
   describe('Unicode string', function() {
