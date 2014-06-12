@@ -1,6 +1,6 @@
 {
   "name": "jsdc",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "transform ecmascript6 to ecmascript5",
   "maintainers": [
     {

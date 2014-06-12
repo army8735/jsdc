@@ -184,7 +184,7 @@ describe('es6', function() {
     it('block with function decl', function() {
       var s = '{function a(){}}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;!function(){a=function (){}}();');
+      expect(res).to.eql('!function(){function a(){}}();');
     });
     it('block with varstmt', function() {
       var s = '{var a}';
@@ -199,7 +199,7 @@ describe('es6', function() {
     it('block with var and fn with same name', function() {
       var s = '{var a;function a(){}}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;!function(){a;a=function (){}}();');
+      expect(res).to.eql('var a;!function(){a;function a(){}}();');
     });
     it('var in method', function() {
       var s = 'class A{m(){var a}}';
