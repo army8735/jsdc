@@ -22,15 +22,18 @@ var Scope = Class(function(jsdc) {
     var self = this;
     var isToken = node.name() == JsNode.TOKEN;
     if(!isToken) {
-      //每个{}作用域记录是否有lexdecl
-      if(node.name() == JsNode.LEXDECL) {
+      var name = node.name();
+      //每个{}作用域记录是否有lexdecl或fn或generator
+      if(name == JsNode.LEXDECL
+        || name == JsNode.FNDECL
+        || name == JsNode.GENDECL) {
         var parent = self.closest(node);
         //全局lexdecl没有作用域无需记录，fnbody的也无需记录
         if(parent && parent.name() != JsNode.FNBODY) {
           self.hash[parent.nid()] = true;
         }
       }
-      else if(node.name() == JsNode.BLOCKSTMT
+      else if(name == JsNode.BLOCKSTMT
         && !NOT_ABS_BLOCK.hasOwnProperty(node.parent().name())) {
         self.hash[node.first().nid()] = true;
       }

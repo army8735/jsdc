@@ -241,6 +241,16 @@ describe('es6', function() {
       var res = new Jsdc().parse(s);
       expect(res).to.eql('!function(){var a}();')
     });
+    it('function in block', function() {
+      var s = '{function a(){}}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){function a(){}}();');
+    });
+    it('function in ifstmt', function() {
+      var s = 'if(true){function a(){}}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('if(true){!function(){function a(){}}();}');
+    });
   });
   describe('init params', function() {
     it('only one id', function() {
