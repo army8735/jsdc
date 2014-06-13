@@ -400,7 +400,7 @@ constructor(){super()}
 }
 ```
 ```js
-function A(){}!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();
+!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();
 function A(){B.call(this)}
 Object.keys(B).forEach(function(k){A[k]=B[k]});
 ```
