@@ -81,6 +81,11 @@ define(function(require, exports, module) {
       switch(first.name()) {
         case JsNode.ARRBINDPAT:
           if(start) {
+            //忽略前面的,改为;
+            var prev = node.prev();
+            if(prev.token().content() == ',') {
+              self.jsdc.append(';');
+            }
             self.jsdc.append('!function(){var ');
             var temp = self.jsdc.uid();
             self.hash[first.nid()] = temp;
@@ -115,6 +120,14 @@ define(function(require, exports, module) {
               }
             });
             self.jsdc.appendBefore('}()');
+            //忽略后面的,改为;
+            var next = node.next();
+            if(next.token().content() == ',') {
+              next = next.next();
+              if(next.first().name() == JsNode.BINDID) {
+                self.jsdc.appendBefore(';var ');
+              }
+            }
           }
           break;
         case JsNode.OBJBINDPAT:

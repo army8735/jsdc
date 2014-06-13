@@ -68,7 +68,17 @@ var Scope = Class(function(jsdc) {
             self.jsdc.insert('var ' + id + ';', i);
           }
         });
-        self.jsdc.ignore(varstmt.first().token());
+        if(vardecl.first().name() == JsNode.BINDID) {
+          self.jsdc.ignore(varstmt.first().token());
+        }
+        else {
+          //destruct需忽略前后可能的,再改为; var也需忽略
+          self.jsdc.ignore(vardecl.prev());
+          var next = vardecl.next();
+          if(next.token().content() == ',') {
+            self.jsdc.ignore(next);
+          }
+        }
       }
     });
   },

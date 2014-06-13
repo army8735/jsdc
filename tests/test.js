@@ -991,6 +991,30 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('!function(){var __0__= o;a=__0__[0];var __1__=__0__[1];b=__1__[0];var __2__=__1__[1];c=__2__.slice(0)}()');
     });
+    it('var id,destruct', function() {
+      var s = 'var a,[b]=1';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var b;var a;!function(){var __0__=1;b=__0__[0]}()');
+    });
+    it('var id,destruct,id', function() {
+      var s = 'var a,[b]=[1],c';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var b;var a;!function(){var __0__=[1];b=__0__[0]}();var c');
+    });
+    it('var id,destruct,destruct', function() {
+      var s = 'var a,[b]=[1],[c]=[2]';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var c;var b;var a;!function(){var __0__=[1];b=__0__[0]}();!function(){var __1__=[2];c=__1__[0]}()');
+    });
+    it('var destruct,destruct,id', function() {
+      var s = 'var [a]=[0],[b]=[1],c';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var b;var a;!function(){var __0__=[0];a=__0__[0]}();!function(){var __1__=[1];b=__1__[0]}();var c');
+    });
   });
   describe('Unicode string', function() {
     it('normal', function() {
