@@ -364,12 +364,11 @@ define(function(require, exports, module) {
     },
     uid: function() {
       var temp;
-      while(temp = '__' + uid++ + '__') {
+      while(temp = '_' + uid++ + '_') {
         if(!this.ids.hasOwnProperty(temp)) {
-          break;
+          return temp;
         }
       }
-      return temp;
     },
     define: function(d) {
       return Jsdc.define(d);

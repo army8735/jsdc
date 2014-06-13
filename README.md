@@ -120,9 +120,9 @@ var a = {
 }
 ```
 ```js
-var a = function(){var __0__={
-__1__: 1
-};__0__['a'+'b']=__0__.__1__;delete __0__.__1__;return __0__}()
+var a = function(){var _0_={
+_1_: 1
+};_0_['a'+'b']=_0_._1_;delete _0_._1_;return _0_}()
 ```
 > 实现方法是先用个临时唯一变量替换掉表达式，最后再将它还原回来。
 
@@ -433,9 +433,9 @@ var o = class{
 }
 ```
 ```js
-var o = function(){function __0__(){}
-  __0__.prototype.method = function(){}
-return __0__}()
+var o = function(){function _0_(){}
+  _0_.prototype.method = function(){}
+return _0_}()
 ```
 > 由于表达式没有名字（也可以有），所以需要封装成立即执行的匿名函数并返回一个`class`声明。
 
@@ -476,37 +476,37 @@ require("a");
 import a from "a"
 ```
 ```js
-var a;!function(){var __0__=require("a");a=__0__.a}();
+var a;!function(){var _0_=require("a");a=_0_.a}();
 ```
-> 类似`__0__`变量是自动生成的，数字会自动累加，且不会和已有变量冲突。
+> 类似`_0_`变量是自动生成的，数字会自动累加，且不会和已有变量冲突。
 
 在冲突时会自动跳过：
 ```js
-import __0__ from "a"
+import _0_ from "a"
 ```
 ```js
-var __0__;!function(){var __1__=require("a");__0__=__1__.a}();
+var _0_;!function(){var _1_=require("a");_0_=_1_.a}();
 ```
 `import`还可以指定多个id：
 ```js
 import a,b from "a"
 ```
 ```js
-var a;var b;!function(){var __0__=require("a");a=__0__.a;b=__0__.b;}();
+var a;var b;!function(){var _0_=require("a");a=_0_.a;b=_0_.b;}();
 ```
 `import`可以用`{}`来赋值，注意里面`as`声明变量名的方法：
 ```js
 import {a,b as c} from "a"
 ```
 ```js
-var a;var c;!function(){var __0__=require("a");a=__0__.a;c=__0__.b;}();
+var a;var c;!function(){var _0_=require("a");a=_0_.a;c=_0_.b;}();
 ```
 `export * from ""`会将模块的导出赋给module.exports：
 ```js
 export * from "a"
 ```
 ```js
-!function(){var __0__=require("a");Object.keys(__0__).forEach(function(k){module.exports[k]=temp[k];});}();
+!function(){var _0_=require("a");Object.keys(_0_).forEach(function(k){module.exports[k]=temp[k];});}();
 ```
 `export`一个`var`语句时会自动赋值同名变量：
 ```js
@@ -538,23 +538,23 @@ module.exports=a
 var a = [for(k of o)k]
 ```
 ```js
-var a = function(){var k;var __0__=[];for(k in o){k=o[k];__0__.push(k)}return __0__}()
+var a = function(){var k;var _0_=[];for(k in o){k=o[k];_0_.push(k)}return _0_}()
 ```
-> 注意再次出现的临时变量`__0__`和上面提到的一致，不会冲突。
+> 注意再次出现的临时变量`_0_`和上面提到的一致，不会冲突。
 
 `if`语句可以替代`Array.filter`方法：
 ```js
 var a = [for(k of o)if(k)k]
 ```
 ```js
-var a = function(){var k;var __0__=[];for(k in o){k=o[k];if(k)__0__.push(k)}return __0__}()
+var a = function(){var k;var _0_=[];for(k in o){k=o[k];if(k)_0_.push(k)}return _0_}()
 ```
 嵌套组合使用也是可以的：
 ```js
 var a = [for(a of b)for(c of a)if(c)c]
 ```
 ```js
-var a = function(){var a;var c;var __0__=[];for(a in b){a=b[a];for(c in a){c=a[c];if(c)__0__.push(c)}}return __0__}()
+var a = function(){var a;var c;var _0_=[];for(a in b){a=b[a];for(c in a){c=a[c];if(c)_0_.push(c)}}return _0_}()
 ```
 
 ### ArrowFunction箭头函数
@@ -654,7 +654,7 @@ function *a(){
 }
 ```
 ```js
-var a=function(){return function(){return {next:__0__}};function __0__(){
+var a=function(){return function(){return {next:_0_}};function _0_(){
   arguments[0];return {value:1,done:false}
   arguments[0];return {value:2,done:false}
 }}();
@@ -667,7 +667,7 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var __1__=0;return function(){return {next:__0__}};function __0__(){
+var a=function(){var _1_=0;return function(){return {next:_0_}};function _0_(){
   arguments[0];return {value:1,done:false}
   arguments[0];return {value:2,done:false}
 }}();
@@ -680,8 +680,8 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var __1__=0;return function(){return {next:__0__}};function __0__(){
-  switch(__1__++){case 0:arguments[0];return {value:1,done:false}
+var a=function(){var _1_=0;return function(){return {next:_0_}};function _0_(){
+  switch(_1_++){case 0:arguments[0];return {value:1,done:false}
   case 1:arguments[0];return {value:1,done:false}}
 }}();
 ```
@@ -694,8 +694,8 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var __1__=0;return function(){return {next:__0__}};var a;function __0__(){
-  switch(__1__++){case 0:a = 1;
+var a=function(){var _1_=0;return function(){return {next:_0_}};var a;function _0_(){
+  switch(_1_++){case 0:a = 1;
   arguments[0];return {value:a++,done:false};
   case 1:arguments[0];return {value:a++,done:false;}
 }}();
@@ -713,8 +713,8 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var __6__=0;return function(){return {next:__7__}};var a;function __7__(){
- switch(__6__++){case 0:a = 1;
+var a=function(){var _6_=0;return function(){return {next:_7_}};var a;function _7_(){
+ switch(_6_++){case 0:a = 1;
   arguments[0];return {value:a++,done:false};
   case 1:arguments[0];return {value:a++,done:true};default:;;return{done:true}}
 }}();
@@ -726,8 +726,8 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var __0__=0;return function(){return{next:__1__}};function __1__(){
-  switch(__0__++){case 0:arguments[0];var __2__=b();if(!__2__.done)__0__--;return __2__;default:;return{done:true}}
+var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(){
+  switch(_0_++){case 0:arguments[0];var _2_=b();if(!_2_.done)_0_--;return _2_;default:;return{done:true}}
 }}();
 ```
 表达式也一样：
@@ -736,7 +736,7 @@ var a=function(){var __0__=0;return function(){return{next:__1__}};function __1_
 }
 ```
 ```js
-~function(){var __0__=0;return function (){return{next:__1__}};function __1__(){
+~function(){var _0_=0;return function (){return{next:_1_}};function _1_(){
 }}()
 ```
 
@@ -746,7 +746,7 @@ var a=function(){var __0__=0;return function(){return{next:__1__}};function __1_
 var [a] = [1]
 ```
 ```js
-var a;!function(){var __0__= [1];a=__0__[0];}()
+var a;!function(){var _0_= [1];a=_0_[0];}()
 ```
 > 变量名会被前置，同时包裹执行一个匿名函数，将变量名赋值对应到正确的索引。
 
@@ -755,14 +755,14 @@ var a;!function(){var __0__= [1];a=__0__[0];}()
 var [a,b,,c] = [1]
 ```
 ```js
-var c;var b;var a;!function(){var __1__= [1];a=__1__[0];b=__1__[1];c=__1__[3]}()
+var c;var b;var a;!function(){var _1_= [1];a=_1_[0];b=_1_[1];c=_1_[3]}()
 ```
 也可以是对象：
 ```js
 var {a} = {"a":1}
 ```
 ```js
-var a;!function(){var __0__= {"a":1};a=__0__["a"]}()
+var a;!function(){var _0_= {"a":1};a=_0_["a"]}()
 ```
 > 注意变量名和键名要一致。
 
@@ -771,33 +771,33 @@ var a;!function(){var __0__= {"a":1};a=__0__["a"]}()
 var {a,b:c} = {"a":1,"b":2}
 ```
 ```js
-var a;!function(){var __0__= {"a":1,"b":2};a=__0__["a"];c=__0__["b"]}()
+var a;!function(){var _0_= {"a":1,"b":2};a=_0_["a"];c=_0_["b"]}()
 ```
 它们甚至可以互相嵌套递归：
 ```js
 var [a,{b},{c:[d]}] = [1,{"b":2},{"c":[3]}]
 ```
 ```js
-var d;var b;var a;!function(){var __0__= [1,{"b":2},{"c":[3]}];a=__0__[0];var __1__=__0__[1];b=__1__["b"];var __2__=__0__[2];var __3__=__2__["c"];d=__3__[0]}()
+var d;var b;var a;!function(){var _0_= [1,{"b":2},{"c":[3]}];a=_0_[0];var _1_=_0_[1];b=_1_["b"];var _2_=_0_[2];var _3_=_2_["c"];d=_3_[0]}()
 ```
 解构还允许在未定义的情况下默认赋值：
 ```js
 var [a=1] = []
 ```
 ```js
-var a;!function(){var __0__= [];a=__0__[0];if(a===void 0)a=1}()
+var a;!function(){var _0_= [];a=_0_[0];if(a===void 0)a=1}()
 ```
 表达式赋值也可以：
 ```js
 ({a=1} = {})
 ```
 ```js
-(!function(){var __0__= {};a=__0__["a"];if(a===void 0)a=1}())
+(!function(){var _0_= {};a=_0_["a"];if(a===void 0)a=1}())
 ```
 数组解构最后允许`rest`运算符：
 ```js
 var [a, ...b] = [1, 2, 3]
 ```
 ```js
-var b;var a;!function(){var __0__= [1, 2, 3];a=__0__[0];b=__0__.slice(1)}()
+var b;var a;!function(){var _0_= [1, 2, 3];a=_0_[0];b=_0_.slice(1)}()
 ```
