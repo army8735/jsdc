@@ -352,7 +352,7 @@ function A{}
 A.prototype.method=function(){}
 
 ```
-getter/setter会巧妙地设置到原型上：
+getter/setter会通过`Object.defineProperty`巧妙地设置到原型上：
 ```js
 class A{
   get b(){}
@@ -361,11 +361,11 @@ class A{
 ```
 ```js
 function A(){}
-  A.prototype.b={get b(){}}["b"];
-  A.prototype.c={set c(d){}}["c"];
+  Object.defineProperty(A.prototype, "b", {get :function(){}});
+  Object.defineProperty(A.prototype, "c", {set :function(d){}});
 
 ```
-`static`静态属性会附加在`function`本身：
+`static`静态方法会附加在`function`本身：
 ```js
 class A{
 static F(){}

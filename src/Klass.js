@@ -8,6 +8,7 @@ var Klass = Class(function(jsdc) {
   this.jsdc = jsdc;
   this.hash = {};
   this.sup = {};
+  this.gs = {};
 }).methods({
   parse: function(node, start) {
     if(node.name() == JsNode.CLASSDECL) {
@@ -115,8 +116,12 @@ var Klass = Class(function(jsdc) {
       else {
         var token = first.token();
         if(start) {
+          var prptn = first.next();
+          this.gs[prptn.nid()] = true;
+          this.jsdc.ignore(prptn);
+          this.jsdc.append('Object.defineProperty(');
           this.jsdc.append(o.name);
-          this.jsdc.append('.prototype.');
+          this.jsdc.append('.prototype, "');
           if(token.content() == 'get') {
             var n = first.next().first().first().token();
             o.g = n.content();
@@ -127,17 +132,10 @@ var Klass = Class(function(jsdc) {
             o.s = n.content();
             this.jsdc.append(o.s);
           }
-          this.jsdc.append('={');
+          this.jsdc.append('", {');
         }
         else {
-          this.jsdc.appendBefore('}["');
-          if(token.content() == 'get') {
-            this.jsdc.appendBefore(o.g);
-          }
-          else {
-            this.jsdc.appendBefore(o.s);
-          }
-          this.jsdc.appendBefore('"];');
+          this.jsdc.appendBefore('});');
         }
       }
     }
@@ -147,6 +145,11 @@ var Klass = Class(function(jsdc) {
         this.jsdc.ignore(first.token());
         this.jsdc.append(o.name + '.');
       }
+    }
+  },
+  prptn: function(node) {
+    if(this.gs.hasOwnProperty(node.nid())) {
+      this.jsdc.append(':function');
     }
   },
   super: function(node) {

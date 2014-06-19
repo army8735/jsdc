@@ -379,7 +379,7 @@ describe('es6', function() {
     it('getter/setter', function() {
       var s = 'class A{get b(){}set c(d){}}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function A(){}A.prototype.b={get b(){}}["b"];A.prototype.c={set c(d){}}["c"];');
+      expect(res).to.eql('function A(){}Object.defineProperty(A.prototype, "b", {get :function(){}});Object.defineProperty(A.prototype, "c", {set :function(d){}});');
     });
     it('static', function() {
       var s = 'class A extends B{\nstatic F(){super.b()}\n}';

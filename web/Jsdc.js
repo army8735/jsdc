@@ -244,6 +244,9 @@ define(function(require, exports, module) {
         case JsNode.CLASSELEM:
           this.klass.elem(node, true);
           break;
+        case JsNode.PROPTNAME:
+          this.klass.prptn(node);
+          break;
         case JsNode.MODULEBODY:
           this.module.enter(node);
           break;
