@@ -11,13 +11,17 @@ function recursion(node, res) {
   var isToken = node.name() == JsNode.TOKEN;
   var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
   if(isToken) {
+    var token = node.token();
     if(!isVirtual) {
-      var token = node.token();
       if(res.word && [Token.ID, Token.NUMBER, Token.KEYWORD].indexOf(token.type()) > -1) {
         res.s += ' ';
       }
       res.s += token.content();
       res.word = [Token.ID, Token.NUMBER, Token.KEYWORD].indexOf(token.type()) > -1;
+    }
+    else if(token.content() == ';') {
+      res.s += ';';
+      res.word = false;
     }
   }
   else {
