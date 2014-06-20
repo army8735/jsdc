@@ -3,6 +3,7 @@ var JsNode = homunculus.getClass('Node', 'es6');
 var Token = homunculus.getClass('Token');
 
 var Class = require('./util/Class');
+var join = require('./join');
 
 var Obj = Class(function(jsdc) {
   this.jsdc = jsdc;
@@ -39,7 +40,7 @@ var Obj = Class(function(jsdc) {
             var temp = this.jsdc.uid();
             this.hash[objltr.nid()].temp.push({
               temp: temp,
-              id: this.join(first)
+              id: join(first)
             });
             this.jsdc.append(temp);
             this.jsdc.ignore(first);
@@ -86,23 +87,6 @@ var Obj = Class(function(jsdc) {
         self.jsdc.appendBefore(';return ' + id + '}()');
       }
     }
-  },
-  join: function(node, res) {
-    res = res || { s: '' };
-    var self = this;
-    var isToken = node.name() == JsNode.TOKEN;
-    var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
-    if(isToken) {
-      if(!isVirtual) {
-        res.s += node.token().content();
-      }
-    }
-    else {
-      node.leaves().forEach(function(leaf) {
-        self.join(leaf, res);
-      });
-    }
-    return res.s;
   }
 });
 

@@ -3,6 +3,7 @@ var JsNode = homunculus.getClass('Node', 'es6');
 var Token = homunculus.getClass('Token');
 
 var Class = require('./util/Class');
+var join = require('./join');
 
 var Klass = Class(function(jsdc) {
   this.jsdc = jsdc;
@@ -25,7 +26,7 @@ var Klass = Class(function(jsdc) {
         else {
           this.jsdc.ignore(node.leaf(3));
           this.jsdc.ignore(node.leaf(5));
-          o.extend = this.join(node.leaf(2).last());
+          o.extend = join(node.leaf(2).last());
           this.body(node.last().prev(), o.name, o.extend);
           this.jsdc.append('!function(){');
           this.jsdc.append('var _=Object.create(' + o.extend + '.prototype);');
@@ -53,7 +54,7 @@ var Klass = Class(function(jsdc) {
           && node.leaf(2).token().content() == '{') {
           this.jsdc.ignore(node.leaf(2));
           if(node.leaf(1).name() == JsNode.HERITAGE) {
-            o.extend = this.join(node.leaf(1).last());
+            o.extend = join(node.leaf(1).last());
             o.name = this.jsdc.uid();
           }
           else {
@@ -64,7 +65,7 @@ var Klass = Class(function(jsdc) {
           && node.leaf(3).token().content() == '{') {
           this.jsdc.ignore(node.leaf(3));
           o.name = node.leaf(1).first().token().content();
-          o.extend = this.join(node.leaf(2).last());
+          o.extend = join(node.leaf(2).last());
         }
         else {
           o.name = this.jsdc.uid();
@@ -235,26 +236,6 @@ var Klass = Class(function(jsdc) {
         || parent.name() == JsNode.CLASSEXPR) {
         return parent;
       }
-    }
-  },
-  join: function(node) {
-    var res = { s: '' };
-    this.recursion(node, res);
-    return res.s;
-  },
-  recursion: function(node, res) {
-    var self = this;
-    var isToken = node.name() == JsNode.TOKEN;
-    var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
-    if(isToken) {
-      if(!isVirtual) {
-        res.s += node.token().content();
-      }
-    }
-    else {
-      node.leaves().forEach(function(leaf) {
-        self.recursion(leaf, res);
-      });
     }
   }
 });

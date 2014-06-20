@@ -223,7 +223,7 @@ function method(a, b = 1) {
 }
 ```
 ```js
-function method(a, b ) {if(b ===void 0) b = 1;
+function method(a, b ) {if(b ===void 0)b=1;
 }
 ```
 
@@ -412,7 +412,7 @@ constructor(){super.a()}
 ```
 ```js
 !function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();
-function A(){B.a.call(this)}
+function A(){B.prototype.a.call(this)}
 Object.keys(B).forEach(function(k){A[k]=B[k]});
 ```
 默认构造器函数则会自动调用`super()`：

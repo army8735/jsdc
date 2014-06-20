@@ -4,6 +4,7 @@ define(function(require, exports, module) {
   var Token = homunculus.getClass('Token');
   
   var Class = require('./util/Class');
+  var join = require('./join');
   
   var Forof = Class(function(jsdc) {
     this.jsdc = jsdc;
@@ -46,7 +47,7 @@ define(function(require, exports, module) {
             k = k.last().first().first().token().content();
           }
           else {
-            k = this.join(k);
+            k = join(k);
           }
           this.jsdc.append(k + '.done;')
         }
@@ -79,29 +80,9 @@ define(function(require, exports, module) {
         k = k.last().first().first().token().content();
       }
       else {
-        k = this.join(k);
+        k = join(k);
       }
       this.jsdc.append(k + '=' + k + '.value;');
-    },
-    join: function(node) {
-      var res = { s: '' };
-      this.recursion(node, res);
-      return res.s;
-    },
-    recursion: function(node, res) {
-      var self = this;
-      var isToken = node.name() == JsNode.TOKEN;
-      var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
-      if(isToken) {
-        if(!isVirtual) {
-          res.s += node.token().content();
-        }
-      }
-      else {
-        node.leaves().forEach(function(leaf) {
-          self.recursion(leaf, res);
-        });
-      }
     }
   });
   

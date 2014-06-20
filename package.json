@@ -1,6 +1,6 @@
 {
   "name": "jsdc",
-  "version": "0.3.5",
+  "version": "0.3.5-1",
   "description": "transform ecmascript6 to ecmascript5",
   "maintainers": [
     {
@@ -28,7 +28,8 @@
         "jsdc/src/Scope.js",
         "jsdc/src/Template.js",
         "jsdc/src/Str.js",
-        "jsdc/src/Obj.js"
+        "jsdc/src/Obj.js",
+        "jsdc/src/join.js"
       ]
     }
   },

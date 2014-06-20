@@ -3,6 +3,7 @@ var JsNode = homunculus.getClass('Node', 'es6');
 var Token = homunculus.getClass('Token');
 
 var Class = require('./util/Class');
+var join = require('./join');
 
 var Destruct = Class(function(jsdc) {
   this.jsdc = jsdc;
@@ -104,7 +105,7 @@ var Destruct = Class(function(jsdc) {
                 if(leaf.size() == 2) {
                   var init = leaf.last();
                   self.jsdc.appendBefore((end ? ';' : '') + 'if(' + id + '===void 0)')
-                  self.jsdc.appendBefore(id + self.join(init) + (end ? '' : ';'));
+                  self.jsdc.appendBefore(id + join(init) + (end ? '' : ';'));
                 }
                 break;
               case JsNode.BINDELEM:
@@ -151,7 +152,7 @@ var Destruct = Class(function(jsdc) {
                 if(leaf.size() == 2) {
                   var init = leaf.last();
                   self.jsdc.appendBefore((end ? ';' : '') + 'if(' + id + '===void 0)')
-                  self.jsdc.appendBefore(id + self.join(init) + (end ? '' : ';'));
+                  self.jsdc.appendBefore(id + join(init) + (end ? '' : ';'));
                 }
                 break;
               case JsNode.PROPTNAME:
@@ -201,7 +202,7 @@ var Destruct = Class(function(jsdc) {
               if(leaf.size() == 2) {
                 var init = leaf.last();
                 self.jsdc.appendBefore((end ? ';' : '') + 'if(' + id + '===void 0)')
-                self.jsdc.appendBefore(id + self.join(init) + (end ? '' : ';'));
+                self.jsdc.appendBefore(id + join(init) + (end ? '' : ';'));
               }
               break;
             case JsNode.BINDELEM:
@@ -237,7 +238,7 @@ var Destruct = Class(function(jsdc) {
               if(leaf.size() == 2) {
                 var init = leaf.last();
                 self.jsdc.appendBefore((end ? ';' : '') + 'if(' + id + '===void 0)')
-                self.jsdc.appendBefore(id + self.join(init) + (end ? '' : ';'));
+                self.jsdc.appendBefore(id + join(init) + (end ? '' : ';'));
               }
               break;
             case JsNode.PROPTNAME:
@@ -321,7 +322,7 @@ var Destruct = Class(function(jsdc) {
                 var id = leaf.first().token().content();
                 self.jsdc.appendBefore(id + '=' + temp + '[' + i + '];');
                 self.jsdc.appendBefore('if(' + id + '===void 0)')
-                self.jsdc.appendBefore(id + '=' + self.join(leaf.next().next()) + (end ? '' : ';'));
+                self.jsdc.appendBefore(id + '=' + join(leaf.next().next()) + (end ? '' : ';'));
                 break;
               case JsNode.ARRLTR:
               case JsNode.OBJLTR:
@@ -386,7 +387,7 @@ var Destruct = Class(function(jsdc) {
                 if(leaf.next()) {
                   var init = leaf.next();
                   self.jsdc.appendBefore((end ? ';' : '') + 'if(' + id + '===void 0)')
-                  self.jsdc.appendBefore(id + self.join(init) + (end ? '' : ';'));
+                  self.jsdc.appendBefore(id + join(init) + (end ? '' : ';'));
                 }
                 break;
               case JsNode.PROPTNAME:
@@ -456,7 +457,7 @@ var Destruct = Class(function(jsdc) {
               var id = leaf.first().token().content();
               self.jsdc.appendBefore(id + '=' + temp + '[' + i + '];');
               self.jsdc.appendBefore('if(' + id + '===void 0)')
-              self.jsdc.appendBefore(id + '=' + self.join(leaf.next().next()) + (end ? '' : ';'));
+              self.jsdc.appendBefore(id + '=' + join(leaf.next().next()) + (end ? '' : ';'));
               break;
             case JsNode.ARRLTR:
             case JsNode.OBJLTR:
@@ -487,7 +488,7 @@ var Destruct = Class(function(jsdc) {
               if(leaf.next()) {
                 var init = leaf.next();
                 self.jsdc.appendBefore((end ? ';' : '') + 'if(' + id + '===void 0)')
-                self.jsdc.appendBefore(id + self.join(init) + (end ? '' : ';'));
+                self.jsdc.appendBefore(id + join(init) + (end ? '' : ';'));
               }
               break;
             case JsNode.PROPTNAME:
@@ -534,23 +535,6 @@ var Destruct = Class(function(jsdc) {
     return leaves.filter(function(leaf, i) {
       return i % 2 == 1 && i != leaves.length - 1;
     });
-  },
-  join: function(node, res) {
-    res = res || { s: '' };
-    var self = this;
-    var isToken = node.name() == JsNode.TOKEN;
-    var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
-    if(isToken) {
-      if(!isVirtual) {
-        res.s += node.token().content();
-      }
-    }
-    else {
-      node.leaves().forEach(function(leaf) {
-        self.join(leaf, res);
-      });
-    }
-    return res.s;
   }
 });
 

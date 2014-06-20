@@ -4,6 +4,7 @@ define(function(require, exports, module) {
   var Token = homunculus.getClass('Token');
   
   var Class = require('./util/Class');
+  var join = require('./join');
   
   var Rest = Class(function(jsdc) {
     this.jsdc = jsdc;
@@ -56,36 +57,16 @@ define(function(require, exports, module) {
       if(parent.name() == JsNode.CALLEXPR && this.hash2.hasOwnProperty(parent.nid())) {
         var mmb = this.hash2[parent.nid()];
         //主表达式无需设置apply的context，成员需设
-        this.jsdc.append(mmb.name() == JsNode.MMBEXPR ? this.join(mmb.first()) : 'this');
+        this.jsdc.append(mmb.name() == JsNode.MMBEXPR ? join(mmb.first()) : 'this');
         this.jsdc.append(', [');
         var leaves = node.leaves();
         for(var i = 0; i < leaves.length - 3; i++) {
-          this.jsdc.append(this.join(leaves[i]));
+          this.jsdc.append(join(leaves[i]));
         }
         this.jsdc.append(']');
         this.jsdc.append('.concat(');
         this.jsdc.append(node.last().first().token().content());
         this.jsdc.append(')');
-      }
-    },
-    join: function(node) {
-      var res = { s: '' };
-      this.recursion(node, res);
-      return res.s;
-    },
-    recursion: function(node, res) {
-      var self = this;
-      var isToken = node.name() == JsNode.TOKEN;
-      var isVirtual = isToken && node.token().type() == Token.VIRTUAL;
-      if(isToken) {
-        if(!isVirtual) {
-          res.s += node.token().content();
-        }
-      }
-      else {
-        node.leaves().forEach(function(leaf) {
-          self.recursion(leaf, res);
-        });
       }
     }
   });
