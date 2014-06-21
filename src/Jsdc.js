@@ -356,7 +356,7 @@ var Jsdc = Class(function(code) {
       node.ignore = true;
     }
     else if(node.name() == JsNode.TOKEN) {
-      node.token().ignore = true;
+      this.ignore(node.token());
     }
     else {
       node.leaves().forEach(function(leaf) {

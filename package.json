@@ -1,6 +1,6 @@
 {
   "name": "jsdc",
-  "version": "0.3.5-2",
+  "version": "0.3.5-3",
   "description": "transform ecmascript6 to ecmascript5",
   "maintainers": [
     {
@@ -14,22 +14,7 @@
   "config": {
     "blanket": {
       "pattern": [
-        "jsdc/src/ArrayCmph.js",
-        "jsdc/src/ArrowFn.js",
-        "jsdc/src/DefaultValue.js",
-        "jsdc/src/Destruct.js",
-        "jsdc/src/Forof.js",
-        "jsdc/src/Generator.js",
-        "jsdc/src/Jsdc.js",
-        "jsdc/src/Klass.js",
-        "jsdc/src/Module.js",
-        "jsdc/src/Num.js",
-        "jsdc/src/Rest.js",
-        "jsdc/src/Scope.js",
-        "jsdc/src/Template.js",
-        "jsdc/src/Str.js",
-        "jsdc/src/Obj.js",
-        "jsdc/src/join.js"
+        "join.js"
       ]
     }
   },
@@ -50,13 +35,13 @@
     "main": "./index.js"
   },
   "dependencies": {
-    "homunculus": "^0.3.0-2"
+    "homunculus": "^0.3.2"
   },
   "devDependencies": {
     "blanket": "^1.1.6",
     "coveralls": "^2.10.0",
     "expect.js": "^0.3.1",
-    "gulp": "^3.6.0",
+    "gulp": "^3.8.1",
     "gulp-clean": "^0.2.4",
     "gulp-util": "^2.2.14",
     "mocha": "^1.18.2",

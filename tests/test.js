@@ -144,7 +144,7 @@ describe('es6', function() {
     it('let in block', function() {
       var s = '{let b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){var b;}();')
+      expect(res).to.eql('!function(){var b;}();');
     });
     it('let and var in block', function() {
       var s = '{var a;let b;}';
@@ -239,7 +239,7 @@ describe('es6', function() {
     it('use new', function() {
       var s = '{const a}';
       var res = new Jsdc().parse(s);
-      expect(res).to.eql('!function(){var a}();')
+      expect(res).to.eql('!function(){var a}();');
     });
     it('function in block', function() {
       var s = '{function a(){}}';
@@ -256,39 +256,44 @@ describe('es6', function() {
     it('only one id', function() {
       var s = 'function a(b = 1){}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function a(b ){if(b===void 0)b=1;}')
+      expect(res).to.eql('function a(b ){if(b===void 0)b=1;}');
     });
     it('after an id', function() {
       var s = 'function a(b, c = fn()){}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function a(b, c ){if(c===void 0)c=fn();}')
+      expect(res).to.eql('function a(b, c ){if(c===void 0)c=fn();}');
     });
     it('multi', function() {
       var s = 'function a(b = 1, c = []){}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function a(b , c ){if(b===void 0)b=1;if(c===void 0)c=[];}')
+      expect(res).to.eql('function a(b , c ){if(b===void 0)b=1;if(c===void 0)c=[];}');
+    });
+    it('cross line', function() {
+      var s = 'function a(b = function() {var c = 1\n}) {}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function a(b \n) {if(b===void 0)b=function(){var c=1};}');
     });
   });
   describe('rest params', function() {
     it('fmparams', function() {
       var s = 'function a(...b){}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function a(b){b=[].slice.call(arguments, 0);}')
+      expect(res).to.eql('function a(b){b=[].slice.call(arguments, 0);}');
     });
     it('callexpr single spread', function() {
       var s = 'Math.max(...a)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('Math.max.apply(Math, [].concat(a))')
+      expect(res).to.eql('Math.max.apply(Math, [].concat(a))');
     });
     it('callexpr mult spread', function() {
       var s = 'Math.max(a, ...b)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('Math.max.apply(Math, [a].concat(b))')
+      expect(res).to.eql('Math.max.apply(Math, [a].concat(b))');
     });
     it('callexpr with prmrexpr', function() {
       var s = 'fn(a, b, ...c)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('fn.apply(this, [a,b].concat(c))')
+      expect(res).to.eql('fn.apply(this, [a,b].concat(c))');
     });
   });
   describe('template', function() {

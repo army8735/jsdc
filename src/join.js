@@ -16,6 +16,9 @@ function recursion(node, res) {
       if(res.word && [Token.ID, Token.NUMBER, Token.KEYWORD].indexOf(token.type()) > -1) {
         res.s += ' ';
       }
+      if(token.content() == '}' && res.s.charAt(res.s.length - 1) == ';') {
+        res.s = res.s.replace(/;$/, '');
+      }
       res.s += token.content();
       res.word = [Token.ID, Token.NUMBER, Token.KEYWORD].indexOf(token.type()) > -1;
     }
