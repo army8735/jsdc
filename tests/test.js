@@ -327,32 +327,32 @@ describe('es6', function() {
     it('normal', function() {
       var s = 'for(a of o){}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(a =o.next();!a.done;){a=a.value;}');
+      expect(res).to.eql('for(a =o.next();!a.done;a=o.next()){a=a.value;}');
     });
     it('without blockstmt', function() {
       var s = 'for(a of b);';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(a =b.next();!a.done;){a=a.value;;}');
+      expect(res).to.eql('for(a =b.next();!a.done;a=b.next()){a=a.value;;}');
     });
     it('without blockstmt and append comment', function() {
       var s = 'for(a of b);//';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(a =b.next();!a.done;){a=a.value;;}//');
+      expect(res).to.eql('for(a =b.next();!a.done;a=b.next()){a=a.value;;}//');
     });
     it('without blockstmt and append mulit comment', function() {
       var s = 'for(a of b);/**/\n//\n';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(a =b.next();!a.done;){a=a.value;;}/**/\n//\n');
+      expect(res).to.eql('for(a =b.next();!a.done;a=b.next()){a=a.value;;}/**/\n//\n');
     });
     it('varstmt', function() {
       var s = 'for(var a of {}){a}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(var a ={}.next();!a.done;){a=a.value;a}');
+      expect(res).to.eql('for(var a ={}.next();!a.done;a={}.next()){a=a.value;a}');
     });
     it('varstmt without blockstmt', function() {
       var s = 'for(var a of {})a';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(var a ={}.next();!a.done;){a=a.value;a}');
+      expect(res).to.eql('for(var a ={}.next();!a.done;a={}.next()){a=a.value;a}');
     });
   });
   describe('class', function() {

@@ -42,13 +42,15 @@ var Forof = Class(function(jsdc) {
         this.jsdc.append('.next();!');
         var k = parent.leaf(2);
         //forof的varstmt只能有一个id，其它为mmbexpr
+        var v = join(parent.leaf(4));
         if(k.name() == JsNode.VARSTMT) {
           k = k.last().first().first().token().content();
         }
         else {
           k = join(k);
         }
-        this.jsdc.append(k + '.done;')
+        this.jsdc.append(k + '.done;');
+        this.jsdc.append(k + '=' + v + '.next()');
       }
       else {
         var last = parent.last();
