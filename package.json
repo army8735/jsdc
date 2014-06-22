@@ -14,7 +14,23 @@
   "config": {
     "blanket": {
       "pattern": [
-        "join.js"
+        "jsdc/src/ArrayCmph.js",
+        "jsdc/src/ArrowFn.js",
+        "jsdc/src/DefaultValue.js",
+        "jsdc/src/Destruct.js",
+        "jsdc/src/Forof.js",
+        "jsdc/src/Generator.js",
+        "jsdc/src/Jsdc.js",
+        "jsdc/src/Klass.js",
+        "jsdc/src/Module.js",
+        "jsdc/src/Num.js",
+        "jsdc/src/Rest.js",
+        "jsdc/src/Scope.js",
+        "jsdc/src/Template.js",
+        "jsdc/src/Str.js",
+        "jsdc/src/Obj.js",
+        "jsdc/src/join.js",
+        "jsdc/src/eventbus.js"
       ]
     }
   },

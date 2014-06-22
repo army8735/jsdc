@@ -594,15 +594,15 @@ function *a() {
 ```
 > `Generator`语句本身尚未做处理，后面会提到。
 
-语句前会加上`arguments[0]`，模拟`next()`带上的一个参数：
+赋值语句后会加上一个临时唯一id，模拟下次调用`next()`传入的一个参数：
 ```js
 function *a() {
   var a = yield
 }
 ```
 ```js
-function *a() {
-  var a = arguments[0];return
+function *a(_0_) {
+  var a = void 0;return;a=_0_
 }
 ```
 `yield`的返回值将变成一个对象的value：
@@ -612,8 +612,8 @@ function *a() {
 }
 ```
 ```js
-function *a() {
-  var a = arguments[0];return {value:1}
+function *a(_0_) {
+  var a = void 0;return {value:1};a=_0_
 }
 ```
 
@@ -627,8 +627,8 @@ function *a(){
 ```
 ```js
 function a(){
-  arguments[0];return {value:1,done:false}
-  arguments[0];return {value:2,done:false}
+  return{value:1,done:false}
+  return{value:2,done:false}
 }
 ```
 然后包裹：
@@ -639,9 +639,9 @@ function *a(){
 }
 ```
 ```js
-var a=function(){return function(){return {next:a}};function a(){
-  arguments[0];return {value:1,done:false}
-  arguments[0];return {value:2,done:false}
+var a=function(){return function(){return{next:a}};function a(){
+  return{value:1,done:false}
+  return{value:2,done:false}
 }}();
 ```
 > 这样每次调用它便能得到像es6中一样的一个具有`next()`方法的对象。
@@ -654,9 +654,9 @@ function *a(){
 }
 ```
 ```js
-var a=function(){return function(){return {next:_0_}};function _0_(){
-  arguments[0];return {value:1,done:false}
-  arguments[0];return {value:2,done:false}
+var a=function(){return function(){return{next:_0_}};function _0_(){
+  return{value:1,done:false}
+  return{value:2,done:false}
 }}();
 ```
 再次添加一个唯一临时id作为state标识，来为实现`yield`功能做准备：
@@ -667,9 +667,9 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var _1_=0;return function(){return {next:_0_}};function _0_(){
-  arguments[0];return {value:1,done:false}
-  arguments[0];return {value:2,done:false}
+var a=function(){var _1_=0;return function(){return{next:_0_}};function _0_(){
+  return{value:1,done:false}
+  return{value:2,done:false}
 }}();
 ```
 当出现`yield`语句时，添加`switch`语句来模拟顺序执行：
@@ -680,9 +680,9 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var _1_=0;return function(){return {next:_0_}};function _0_(){
-  switch(_1_++){case 0:arguments[0];return {value:1,done:false}
-  case 1:arguments[0];return {value:1,done:false}}
+var a=function(){var _1_=0;return function(){return{next:_0_}};function _0_(){
+  switch(_1_){case 0:_1_++;return{value:1,done:false}
+  case 1:return{value:1,done:false}}
 }}();
 ```
 同时函数里面的`var`声明需要前置，以免每次调用`next()`方法时又重新声明一遍失去了状态：
@@ -694,10 +694,10 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var _1_=0;return function(){return {next:_0_}};var a;function _0_(){
-  switch(_1_++){case 0:a = 1;
-  arguments[0];return {value:a++,done:false};
-  case 1:arguments[0];return {value:a++,done:false;}
+var a=function(){var _1_=0;return function(){return{next:_0_}};var a;function _0_(){
+  switch(_1_){case 0:a = 1;
+  _1_++;return{value:a++,done:false};
+  case 1:_1_++;return{value:a++,done:false;}
 }}();
 ```
 > 函数则不需要前置。
@@ -713,10 +713,10 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var _6_=0;return function(){return {next:_7_}};var a;function _7_(){
- switch(_6_++){case 0:a = 1;
-  arguments[0];return {value:a++,done:false};
-  case 1:arguments[0];return {value:a++,done:true};default:;;return{done:true}}
+var a=function(){var _0_=0;return function(){return{next:_1_}};var a;function _1_(_2_){
+  switch(_0_){case 0:a = 1;
+  _0_++;return{value:a++,done:false};case 1:
+  _0_++;return{value:a++,done:true};default:return{done:true}}
 }}();
 ```
 `yield`还支持返回一个`Generator`，这就是一个递归：
@@ -726,8 +726,8 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(){
-  switch(_0_++){case 0:arguments[0];var _2_=b();if(!_2_.done)_0_--;return _2_;default:;return{done:true}}
+var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){
+  switch(_0_){case 0:_0_++;var _3_=b();if(!_3_.done)_0_--;return _3_;default:return{done:true}}
 }}();
 ```
 表达式也一样：
@@ -736,7 +736,7 @@ var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(){
 }
 ```
 ```js
-~function(){var _0_=0;return function (){return{next:_1_}};function _1_(){
+~function(){var _0_=0;return function(){return{next:_1_}};function _1_(){
 }}()
 ```
 
@@ -785,14 +785,14 @@ var d;var b;var a;!function(){var _0_= [1,{"b":2},{"c":[3]}];a=_0_[0];var _1_=_0
 var [a=1] = []
 ```
 ```js
-var a;!function(){var _0_= [];a=_0_[0];if(a===void 0)a=1}()
+var a;!function(){var _0_= [];a=_0_[0];if(_0_.indexOf(a)!=0)a=1}()
 ```
 表达式赋值也可以：
 ```js
 ({a=1} = {})
 ```
 ```js
-(!function(){var _0_= {};a=_0_["a"];if(a===void 0)a=1}())
+(!function(){var _0_= {};a=_0_["a"];if(a===void 0)a=1;return _0_}())
 ```
 数组解构最后允许`rest`运算符：
 ```js
