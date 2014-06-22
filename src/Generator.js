@@ -4,12 +4,13 @@ var Token = homunculus.getClass('token');
 
 var Class = require('./util/Class');
 var join = require('./join');
+var eventbus = require('./eventbus');
 
 var Generator = Class(function(jsdc) {
   this.jsdc = jsdc;
   this.hash = {};
   this.star = {};
-  this.brace = {};
+  this.block = {};
 }).methods({
   parse: function(node, start) {
     if(start) {
@@ -108,14 +109,15 @@ var Generator = Class(function(jsdc) {
     }
   },
   yield: function(node, start) {
-    var top = this.closest(node);
-    var o = this.hash[top.nid()];
+    var self = this;
+    var top = self.closest(node);
+    var o = self.hash[top.nid()];
     if(start) {
-      this.jsdc.ignore(node.first());
+      self.jsdc.ignore(node.first());
       var parent = node.parent();
       //赋值语句需要添加上参数，先默认undefined，并记录在变量中为下次添加做标记
       if([JsNode.INITLZ, JsNode.ASSIGNEXPR].indexOf(parent.name()) > -1) {
-        this.jsdc.append('void 0;');
+        self.jsdc.append('void 0;');
         if(parent.name() == JsNode.INITLZ) {
           o.last = join(parent.prev());
         }
@@ -125,61 +127,59 @@ var Generator = Class(function(jsdc) {
       }
       else {
         o.last = null;
-        //省略{}的ifstmt等要加上
+        //省略{}的ifstmt/iteratorstmt等要加上
         var parent = node.parent();
         if(parent.name() == JsNode.EXPRSTMT) {
           var grand = parent.parent();
           if(grand.name() == JsNode.IFSTMT && !parent.next()) {
-            this.jsdc.append('{');
-            this.brace[node.nid()] = true;
+            self.jsdc.append('{');
+            eventbus.on(grand.nid(), function(node, start) {
+              if(!start) {
+                self.jsdc.appendBefore('}');
+              }
+            });
           }
         }
       }
       //加上状态变更
-      this.jsdc.append(o.state + '++;');
+      self.jsdc.append(o.state + '++;');
       //yield *
       if(node.size() > 2
         && node.leaf(1).name() == JsNode.TOKEN
         && node.leaf(1).token().content() == '*') {
-        this.jsdc.ignore(node.leaf(1));
-        var temp = this.star[node.nid()] = this.jsdc.uid();
-        this.jsdc.append('var ' + temp + '=');
+        self.jsdc.ignore(node.leaf(1));
+        var temp = this.star[node.nid()] = self.jsdc.uid();
+        self.jsdc.append('var ' + temp + '=');
       }
       else {
-        this.jsdc.append('return{value:');
+        self.jsdc.append('return{value:');
       }
     }
     else {
-      if(this.star.hasOwnProperty(node.nid())) {
-        var temp = this.star[node.nid()];
-        this.jsdc.appendBefore('();if(!' + temp + '.done)' + o.state + '--;return ' + temp + ';');
+      if(self.star.hasOwnProperty(node.nid())) {
+        var temp = self.star[node.nid()];
+        self.jsdc.appendBefore('();if(!' + temp + '.done)' + o.state + '--;return ' + temp + ';');
         o.yield.push({
-          i: this.jsdc.i,
+          i: self.jsdc.i,
           star: temp
         });
       }
       else {
-        this.jsdc.appendBefore(',done:' + (o.index == o.count - 1) + '}');
-        if(!this.brace.hasOwnProperty(node.nid())) {
-          this.jsdc.appendBefore(';');
-        }
+        self.jsdc.appendBefore(',done:' + (o.index == o.count - 1) + '};');
         o.yield.push({
-          i: this.jsdc.i
+          i: self.jsdc.i
         });
       }
-      if(this.brace.hasOwnProperty(node.nid())) {
-        this.jsdc.appendBefore('}');
-      }
       if(o.index++ < o.count - 1) {
-        this.jsdc.appendBefore('case ' + o.index + ':');
+        self.jsdc.appendBefore('case ' + o.index + ':');
       }
       else {
-        this.jsdc.appendBefore('default:');
+        self.jsdc.appendBefore('default:');
       }
-      this.ignoreNext(node, ';');
+      self.ignoreNext(node, ';');
       //有赋值需要先赋值
       if(o.last) {
-        this.jsdc.appendBefore(o.last + '=' + o.param + ';');
+        self.jsdc.appendBefore(o.last + '=' + o.param + ';');
       }
       o.last = null;
     }

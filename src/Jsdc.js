@@ -4,6 +4,7 @@ var Token = homunculus.getClass('Token');
 
 var character = require('./util/character');
 var Class = require('./util/Class');
+var eventbus = require('./eventbus');
 
 var Scope = require('./Scope');
 var DefaultValue = require('./DefaultValue');
@@ -284,6 +285,7 @@ var Jsdc = Class(function(code) {
         this.obj.parse(node, true);
         break;
     }
+    eventbus.emit(node.nid(), [node, true]);
   },
   after: function(node) {
     switch(node.name()) {
@@ -347,6 +349,7 @@ var Jsdc = Class(function(code) {
         this.obj.parse(node);
         break;
     }
+    eventbus.emit(node.nid(), [node]);
   },
   ignore: function(node) {
     var self = this;

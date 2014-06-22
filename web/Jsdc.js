@@ -5,6 +5,7 @@ define(function(require, exports, module) {
   
   var character = require('./util/character');
   var Class = require('./util/Class');
+  var eventbus = require('./eventbus');
   
   var Scope = require('./Scope');
   var DefaultValue = require('./DefaultValue');
@@ -285,6 +286,7 @@ define(function(require, exports, module) {
           this.obj.parse(node, true);
           break;
       }
+      eventbus.emit(node.nid(), [node, true]);
     },
     after: function(node) {
       switch(node.name()) {
@@ -348,6 +350,7 @@ define(function(require, exports, module) {
           this.obj.parse(node);
           break;
       }
+      eventbus.emit(node.nid(), [node]);
     },
     ignore: function(node) {
       var self = this;

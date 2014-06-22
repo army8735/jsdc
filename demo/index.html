@@ -130,47 +130,54 @@ seajs.config({
 });
 seajs.use(['../index', './jssc'], function(jsdc, jssc) {
   jsdc.define(true);
-	function init() {
-		var nodes = Array.prototype.slice.call(document.getElementsByTagName('code'), 0);
-		nodes.forEach(function(node, i) {
-      var res = jsdc.parse(node.textContent || node.innerText || node.firstChild && node.firstChild.nodeValue);
-      var ast = jsdc.ast();
-      var tokens = jsdc.tokens();
-      var pre = node.parentNode;
-      var ncode = document.createElement('code');
-      var npre = document.createElement('pre');
-			ncode.innerHTML = res;
-			ncode.className = node.className;
-			npre.appendChild(ncode);
-			pre.parentNode.insertBefore(npre, pre.nextSibling);
-			if(ast) {
-				draw(i, ast, npre.nextSibling);
-			}
-      if(tokens) {
-        console.table(tokens, ['t', 'c', 'v', 'id', 'si', 'ignore']);
-      }
-		});
-		jssc.exec();
-	}
-	var ta = document.getElementById('ta');
-	var input = document.getElementById('btn');
-	input.onclick = function() {
-		var s = ta.value;
-		Array.prototype.slice.call(document.getElementsByTagName('div'), 0).forEach(function(o) {
-			o.parentNode.removeChild(o);
-		});
-		var pre = document.getElementsByTagName('pre');
-		pre[1] && pre[1].parentNode.removeChild(pre[1]);
-		document.getElementsByTagName('code')[0].innerHTML = s;
-		pre[0].style.display = 'block';
-		init();
-    location.hash = encodeURIComponent(s);
-	}
-  var s = location.hash.replace(/^#/, '');
-  if(s) {
-    ta.value = decodeURIComponent(s);
-    input.onclick();
+  function init() {
+      var nodes = Array.prototype.slice.call(document.getElementsByTagName('code'), 0);
+      nodes.forEach(function(node, i) {
+    var res = jsdc.parse(node.textContent || node.innerText || node.firstChild && node.firstChild.nodeValue);
+    var ast = jsdc.ast();
+    var tokens = jsdc.tokens();
+    var pre = node.parentNode;
+    var ncode = document.createElement('code');
+    var npre = document.createElement('pre');
+          ncode.innerHTML = res;
+          ncode.className = node.className;
+          npre.appendChild(ncode);
+          pre.parentNode.insertBefore(npre, pre.nextSibling);
+          if(ast) {
+              draw(i, ast, npre.nextSibling);
+          }
+    if(tokens) {
+      console.table(tokens, ['t', 'c', 'v', 'id', 'si', 'ignore']);
+    }
+      });
+      jssc.exec();
   }
+  var ta = document.getElementById('ta');
+  var input = document.getElementById('btn');
+  input.onclick = function() {
+      var s = ta.value;
+      Array.prototype.slice.call(document.getElementsByTagName('div'), 0).forEach(function(o) {
+          o.parentNode.removeChild(o);
+      });
+      var pre = document.getElementsByTagName('pre');
+      pre[1] && pre[1].parentNode.removeChild(pre[1]);
+      document.getElementsByTagName('code')[0].innerHTML = s;
+      pre[0].style.display = 'block';
+      init();
+      location.hash = encodeURIComponent(s);
+  }
+  function hashChange() {
+    var s = location.hash.replace(/^#/, '');
+    if(s) {
+      s = decodeURIComponent(s);
+      if(s != ta.value) {
+        ta.value = s;
+        input.onclick();
+      }
+    }
+  }
+  hashChange();
+  window.onhashchange = hashChange;
 });
 </script>
 </body>
