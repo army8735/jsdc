@@ -1,13 +1,16 @@
 define(function(require, exports, module) {
   var homunculus = require('homunculus');
   var JsNode = homunculus.getClass('Node', 'es6');
+  var Token = homunculus.getClass('token');
   
   var Class = require('./util/Class');
+  var join = require('./join');
   
   var Generator = Class(function(jsdc) {
     this.jsdc = jsdc;
     this.hash = {};
     this.star = {};
+    this.brace = {};
   }).methods({
     parse: function(node, start) {
       if(start) {
@@ -25,13 +28,32 @@ define(function(require, exports, module) {
         }
         var state = this.jsdc.uid();
         var temp = this.jsdc.uid();
+        var param = node.leaf(4).first();
+        var count = this.count(node.last().prev());
+        if(!param) {
+          if(count) {
+            param = this.jsdc.uid();
+          }
+          else {
+            param = '';
+          }
+        }
+        else if(param.name() == JsNode.SINGLENAME) {
+          param = param.first().first().token().content();
+        }
+        else if(param.name() == JsNode.BINDREST) {
+          param = param.last().first().token().content();
+        }
         var o = this.hash[node.nid()] = {
           state: state,
           index: 0,
+          count: count,
           temp: temp,
+          param: param,
+          last: null,
           yield: []
         };
-        this.jsdc.append('function(){');
+        this.jsdc.append('function(' + param + '){');
         this.jsdc.append('var ' + state + '=0;');
         this.jsdc.append('return ');
         this.jsdc.append('function(){return{next:' + temp + '}};');
@@ -51,16 +73,34 @@ define(function(require, exports, module) {
         }
         var state = this.jsdc.uid();
         var temp = this.jsdc.uid();
+        var count = this.count(node.last().prev());
+        var param = node.leaf(4).first();
+        if(!param) {
+          if(count) {
+            param = this.jsdc.uid();
+          }
+          else {
+            param = '';
+          }
+        }
+        else if(param.name() == JsNode.SINGLENAME) {
+          param = param.first().first().token().content();
+        }
+        else if(param.name() == JsNode.BINDREST) {
+          param = param.last().first().token().content();
+        }
         var o = this.hash[node.nid()] = {
           state: state,
           index: 0,
+          count: count,
           temp: temp,
+          param: param,
+          last: null,
           yield: []
         };
-        this.jsdc.append('function(){');
+        this.jsdc.append('function(' + param + '){');
         this.jsdc.append('var ' + state + '=0;');
-        this.jsdc.append('return ');
-        this.jsdc.append('function(){return{next:' + temp + '}};');
+        this.jsdc.append('return function(){return{next:' + temp + '}};');
         o.pos = this.jsdc.res.length;
         this.jsdc.append('function ' + temp);
       }
@@ -72,11 +112,32 @@ define(function(require, exports, module) {
       var top = this.closest(node);
       var o = this.hash[top.nid()];
       if(start) {
-        if(o.index++ != 0) {
-          this.jsdc.append('case ' + (o.index - 1) + ':');
-        }
         this.jsdc.ignore(node.first());
-        this.jsdc.append('arguments[0];');
+        var parent = node.parent();
+        //赋值语句需要添加上参数，先默认undefined，并记录在变量中为下次添加做标记
+        if([JsNode.INITLZ, JsNode.ASSIGNEXPR].indexOf(parent.name()) > -1) {
+          this.jsdc.append('void 0;');
+          if(parent.name() == JsNode.INITLZ) {
+            o.last = join(parent.prev());
+          }
+          else {
+            o.last = join(parent.first());
+          }
+        }
+        else {
+          o.last = null;
+          //省略{}的ifstmt等要加上
+          var parent = node.parent();
+          if(parent.name() == JsNode.EXPRSTMT) {
+            var grand = parent.parent();
+            if(grand.name() == JsNode.IFSTMT && !parent.next()) {
+              this.jsdc.append('{');
+              this.brace[node.nid()] = true;
+            }
+          }
+        }
+        //加上状态变更
+        this.jsdc.append(o.state + '++;');
         //yield *
         if(node.size() > 2
           && node.leaf(1).name() == JsNode.TOKEN
@@ -92,18 +153,36 @@ define(function(require, exports, module) {
       else {
         if(this.star.hasOwnProperty(node.nid())) {
           var temp = this.star[node.nid()];
-          this.jsdc.appendBefore('();if(!' + temp + '.done)' + o.state + '--;return ' + temp);
+          this.jsdc.appendBefore('();if(!' + temp + '.done)' + o.state + '--;return ' + temp + ';');
           o.yield.push({
             i: this.jsdc.i,
             star: temp
           });
         }
         else {
-          this.jsdc.appendBefore(',done:false}');
+          this.jsdc.appendBefore(',done:' + (o.index == o.count - 1) + '}');
+          if(!this.brace.hasOwnProperty(node.nid())) {
+            this.jsdc.appendBefore(';');
+          }
           o.yield.push({
             i: this.jsdc.i
           });
         }
+        if(this.brace.hasOwnProperty(node.nid())) {
+          this.jsdc.appendBefore('}');
+        }
+        if(o.index++ < o.count - 1) {
+          this.jsdc.appendBefore('case ' + o.index + ':');
+        }
+        else {
+          this.jsdc.appendBefore('default:');
+        }
+        this.ignoreNext(node, ';');
+        //有赋值需要先赋值
+        if(o.last) {
+          this.jsdc.appendBefore(o.last + '=' + o.param + ';');
+        }
+        o.last = null;
       }
     },
     body: function(node, start) {
@@ -111,22 +190,16 @@ define(function(require, exports, module) {
       if(top.name() == JsNode.GENDECL) {
         var o = this.hash[top.nid()];
         if(start) {
-          this.jsdc.append('switch(' + o.state + '++){case 0:');
+          this.jsdc.append('switch(' + o.state + '){case 0:');
         }
         else {
-          if(o.index) {
-            var yie = o.yield[o.yield.length - 1];
-            var i;
-            if(yie.star) {
-              i = this.jsdc.res.lastIndexOf(yie.star, i);
-              this.jsdc.replace(';default:', i + yie.star.length, 0);
-            }
-            else {
-              i = this.jsdc.res.lastIndexOf(',done:false}', i);
-              this.jsdc.replace('true};default:', i + 6, 6);
+          var last = this.getLast(node);
+          if(last) {
+            if([';', '}'].indexOf(last.token().content()) == -1) {
+              this.jsdc.appendBefore(';');
             }
           }
-          this.jsdc.appendBefore(';return{done:true}}');
+          this.jsdc.appendBefore('return{done:true}}');
         }
       }
     },
@@ -144,6 +217,47 @@ define(function(require, exports, module) {
       if(top) {
         this.jsdc.ignore(varstmt.first());
         this.jsdc.insert('var ' + varstmt.leaf(1).first().first().token().content() + ';', this.hash[top.nid()].pos);
+      }
+    },
+    count: function(node, res) {
+      res = res || { count: 0 };
+      var self = this;
+      var isToken = node.name() == JsNode.TOKEN;
+      if(!isToken) {
+        if(node.name() == JsNode.YIELDEXPR) {
+          res.count++;
+        }
+        node.leaves().forEach(function(leaf) {
+          self.count(leaf, res);
+        });
+      }
+      return res.count;
+    },
+    getLast: function(node) {
+      while(node = node.last()) {
+        if(node.name() == JsNode.TOKEN) {
+          return node;
+        }
+      }
+    },
+    ignoreNext: function(node, value) {
+      node = this.getLast(node);
+      if(node) {
+        var token = node.token();
+        while(token = token.next()) {
+          if(token.type() == Token.COMMENT
+            || token.type() == Token.BLANK
+            || token.type() == Token.LINE) {
+            continue;
+          }
+          if(token.content() == value) {
+            this.jsdc.ignore(token);
+            return;
+          }
+          else {
+            return;
+          }
+        }
       }
     }
   });

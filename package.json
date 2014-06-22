@@ -35,7 +35,7 @@
     "main": "./index.js"
   },
   "dependencies": {
-    "homunculus": "^0.3.3"
+    "homunculus": "^0.3.4"
   },
   "devDependencies": {
     "blanket": "^1.1.6",

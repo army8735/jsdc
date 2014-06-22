@@ -178,8 +178,6 @@ var Jsdc = Class(function(code) {
       }
     }
     var ignore = token.ignore;
-    //firefox的奇怪bug，调试时不显示，重新赋值就好了
-    token.ignore = token.ignore;
     this.i = this.res.length;
     //加上ignore
     var ig;
