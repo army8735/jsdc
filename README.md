@@ -298,7 +298,7 @@ for(a of b){
 }
 ```
 ```js
-for(a =b.next();!a.done;){
+for(a =b.next();!a.done;a=b.next()){
 }
 ```
 循环体内先赋值`.value`：
@@ -307,7 +307,7 @@ for(a of b){
 }
 ```
 ```js
-for(a =b.next();!a.done;){a=a.value;
+for(a =b.next();!a.done;a=b.next()){a=a.value;
 }
 ```
 `var`语句同样处理：
@@ -316,7 +316,7 @@ for(var a of b){
 }
 ```
 ```js
-for(var a =b.next();!a.done;){a=a.value;
+for(var a =b.next();!a.done;a=b.next()){a=a.value;
 }
 ```
 
