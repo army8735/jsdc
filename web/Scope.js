@@ -24,10 +24,11 @@ define(function(require, exports, module) {
       var isToken = node.name() == JsNode.TOKEN;
       if(!isToken) {
         var name = node.name();
-        //每个{}作用域记录是否有lexdecl或fn或generator
+        //每个{}作用域记录是否有lexdecl或fn或generator或classdecl
         if(name == JsNode.LEXDECL
           || name == JsNode.FNDECL
-          || name == JsNode.GENDECL) {
+          || name == JsNode.GENDECL
+          || name == JsNode.CLASSDECL) {
           var parent = self.closest(node);
           //全局lexdecl没有作用域无需记录，fnbody的也无需记录
           if(parent && parent.name() != JsNode.FNBODY) {
@@ -155,6 +156,7 @@ define(function(require, exports, module) {
       while(parent = parent.parent()) {
         switch(parent.name()) {
           case JsNode.GENDECL:
+          case JsNode.GENEXPR:
             return parent;
           case JsNode.FNDECL:
           case JsNode.FNEXPR:

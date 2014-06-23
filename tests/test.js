@@ -201,6 +201,21 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('var a;!function(){a;function a(){}}();');
     });
+    it('block with classdecl', function() {
+      var s = '{class A{}}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){function A(){}}();');
+    });
+    it('block with classdecl and varstmt', function() {
+      var s = '{class A{}var a = 1}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a;!function(){function A(){}a = 1}();');
+    });
+    it('if with classdecl and varstmt', function() {
+      var s = 'if(true){class A{}var a = 1}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a;if(true){!function(){function A(){}a = 1}();}');
+    });
     it('var in method', function() {
       var s = 'class A{m(){var a}}';
       var res = Jsdc.parse(s);
