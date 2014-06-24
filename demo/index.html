@@ -131,26 +131,27 @@ seajs.config({
 seajs.use(['../index', './jssc'], function(jsdc, jssc) {
   jsdc.define(true);
   function init() {
-      var nodes = Array.prototype.slice.call(document.getElementsByTagName('code'), 0);
-      nodes.forEach(function(node, i) {
-    var res = jsdc.parse(node.textContent || node.innerText || node.firstChild && node.firstChild.nodeValue);
-    var ast = jsdc.ast();
-    var tokens = jsdc.tokens();
-    var pre = node.parentNode;
-    var ncode = document.createElement('code');
-    var npre = document.createElement('pre');
-          ncode.innerHTML = res;
-          ncode.className = node.className;
-          npre.appendChild(ncode);
-          pre.parentNode.insertBefore(npre, pre.nextSibling);
-          if(ast) {
-              draw(i, ast, npre.nextSibling);
-          }
-    if(tokens) {
-      console.table(tokens, ['t', 'c', 'v', 'id', 'si', 'ignore']);
-    }
-      });
-      jssc.exec();
+    console.clear();
+    var nodes = Array.prototype.slice.call(document.getElementsByTagName('code'), 0);
+    nodes.forEach(function(node, i) {
+      var res = jsdc.parse(node.textContent || node.innerText || node.firstChild && node.firstChild.nodeValue);
+      var ast = jsdc.ast();
+      var tokens = jsdc.tokens();
+      var pre = node.parentNode;
+      var ncode = document.createElement('code');
+      var npre = document.createElement('pre');
+      ncode.innerHTML = res;
+      ncode.className = node.className;
+      npre.appendChild(ncode);
+      pre.parentNode.insertBefore(npre, pre.nextSibling);
+      if(ast) {
+        draw(i, ast, npre.nextSibling);
+      }
+      if(tokens) {
+        console.table(tokens, ['t', 'c', 'v', 'id', 'si', 'ignore']);
+      }
+    });
+    jssc.exec();
   }
   var ta = document.getElementById('ta');
   var input = document.getElementById('btn');

@@ -11,63 +11,28 @@ define(function(require, exports, module) {
     this.jsdc = jsdc;
     this.hash = {};
     this.star = {};
-    this.block = {};
+    this.stmt = {};
   }).methods({
     parse: function(node, start) {
       var self = this;
       if(start) {
         self.jsdc.ignore(node.leaf(1));
         var token = node.leaf(2).first().token();
+        self.jsdc.ignore(token);
         //有可能被scope前置过
         var hasPre = token.ignore;
-        //忽略本身
-        self.jsdc.ignore(node.first());
-        self.jsdc.ignore(token);
         if(!hasPre) {
           self.jsdc.append('var ');
           self.jsdc.append(node.leaf(2).first().token().content());
           self.jsdc.append('=');
         }
-        var state = self.jsdc.uid();
-        var temp = self.jsdc.uid();
-        var param = node.leaf(4).first();
-        var count = self.count(node.last().prev());
-        if(!param) {
-          if(count) {
-            param = self.jsdc.uid();
-          }
-          else {
-            param = '';
-          }
-        }
-        else if(param.name() == JsNode.SINGLENAME) {
-          param = param.first().first().token().content();
-        }
-        else if(param.name() == JsNode.BINDREST) {
-          param = param.last().first().token().content();
-        }
-        eventbus.on(node.leaf(4).nid(), function(node, start) {
-          start && self.jsdc.append(param);
-        });
-        var o = self.hash[node.nid()] = {
-          state: state,
-          index: 0,
-          count: count,
-          temp: temp,
-          param: param,
-          last: null,
-          yield: []
-        };
-        self.jsdc.append('function(){');
-        self.jsdc.append('var ' + state + '=0;');
-        self.jsdc.append('return ');
-        self.jsdc.append('function(){return{next:' + temp + '}};');
-        o.pos = self.jsdc.res.length;
-        self.jsdc.append('function ' + temp);
+        self.gen(node, start);
       }
       else {
+        self.gen(node, start);
         self.jsdc.appendBefore('}();');
       }
+  
     },
     expr: function(node, start) {
       var self = this;
@@ -77,10 +42,22 @@ define(function(require, exports, module) {
         if(node.leaf(2).name() == JsNode.BINDID) {
           self.jsdc.ignore(node.leaf(2));
         }
+        self.gen(node, start);
+      }
+      else {
+        self.gen(node, start);
+        self.jsdc.appendBefore('}()');
+      }
+    },
+    gen: function(node, start) {
+      var self = this;
+      if(start) {
+        self.jsdc.ignore(node.first());
         var state = self.jsdc.uid();
         var temp = self.jsdc.uid();
-        var count = self.count(node.last().prev());
         var param = node.leaf(4).first();
+        var count = self.count(node.last().prev());
+        self.pre(node.last().prev(), node.nid(), count);
         if(!param) {
           if(count) {
             param = self.jsdc.uid();
@@ -102,6 +79,7 @@ define(function(require, exports, module) {
           state: state,
           index: 0,
           count: count,
+          if: 0,
           temp: temp,
           param: param,
           last: null,
@@ -113,9 +91,6 @@ define(function(require, exports, module) {
         o.pos = self.jsdc.res.length;
         self.jsdc.append('function ' + temp);
       }
-      else {
-        self.jsdc.appendBefore('}()');
-      }
     },
     yield: function(node, start) {
       var self = this;
@@ -125,33 +100,20 @@ define(function(require, exports, module) {
         self.jsdc.ignore(node.first());
         var parent = node.parent();
         //赋值语句需要添加上参数，先默认undefined，并记录在变量中为下次添加做标记
-        if([JsNode.INITLZ, JsNode.ASSIGNEXPR].indexOf(parent.name()) > -1) {
-          self.jsdc.append('void 0;');
-          if(parent.name() == JsNode.INITLZ) {
+        var parent = node.parent();
+        switch(parent.name()) {
+          case JsNode.INITLZ:
             o.last = join(parent.prev());
-          }
-          else {
+            break;
+          case JsNode.ASSIGNEXPR:
             o.last = join(parent.first());
-          }
-        }
-        else {
-          o.last = null;
-          //省略{}的ifstmt/iteratorstmt等要加上
-          var parent = node.parent();
-          if(parent.name() == JsNode.EXPRSTMT) {
-            var grand = parent.parent();
-            if(grand.name() == JsNode.IFSTMT && !parent.next()) {
-              self.jsdc.append('{');
-              eventbus.on(grand.nid(), function(node, start) {
-                if(!start) {
-                  self.jsdc.appendBefore('}');
-                }
-              });
-            }
-          }
+            break;
+          default:
+            o.last = null;
         }
         //加上状态变更
-        self.jsdc.append(o.state + '++;');
+        var index = ++o.index;
+        self.jsdc.append(o.state + '=' + index + ';');
         //yield *
         if(node.size() > 2
           && node.leaf(1).name() == JsNode.TOKEN
@@ -165,27 +127,25 @@ define(function(require, exports, module) {
         }
       }
       else {
+        //yield *
         if(self.star.hasOwnProperty(node.nid())) {
           var temp = self.star[node.nid()];
-          self.jsdc.appendBefore('();if(!' + temp + '.done)' + o.state + '--;return ' + temp + ';');
+          self.jsdc.appendBefore('.next();return{done:(!' + temp + '.done&&' + o.state + '--),value:' + temp + '}');
           o.yield.push({
             i: self.jsdc.i,
             star: temp
           });
         }
         else {
-          self.jsdc.appendBefore(',done:' + (o.index == o.count - 1) + '};');
+          self.jsdc.appendBefore(',done:' + (o.index == o.count - 1) + '}');
           o.yield.push({
             i: self.jsdc.i
           });
         }
-        if(o.index++ < o.count - 1) {
-          self.jsdc.appendBefore('case ' + o.index + ':');
-        }
-        else {
-          self.jsdc.appendBefore('default:');
-        }
         self.ignoreNext(node, ';');
+        if(o.index < o.count) {
+          self.jsdc.appendBefore(';case ' + o.index + ':');
+        }
         //有赋值需要先赋值
         if(o.last) {
           self.jsdc.appendBefore(o.last + '=' + o.param + ';');
@@ -198,16 +158,17 @@ define(function(require, exports, module) {
       if(top.name() == JsNode.GENDECL) {
         var o = this.hash[top.nid()];
         if(start) {
-          this.jsdc.append('switch(' + o.state + '){case 0:');
+          if(o.count) {
+            this.jsdc.append('while(1){switch(' + o.state + '){case 0:');
+          }
         }
         else {
-          var last = this.getLast(node);
-          if(last) {
-            if([';', '}'].indexOf(last.token().content()) == -1) {
-              this.jsdc.appendBefore(';');
-            }
+          if(o.count) {
+            this.jsdc.appendBefore(';default:return{done:true}}}');
           }
-          this.jsdc.appendBefore('return{done:true}}');
+          else {
+            this.jsdc.appendBefore('return{done:true}');
+          }
         }
       }
     },
@@ -232,14 +193,86 @@ define(function(require, exports, module) {
       var self = this;
       var isToken = node.name() == JsNode.TOKEN;
       if(!isToken) {
-        if(node.name() == JsNode.YIELDEXPR) {
-          res.count++;
+        switch(node.name()) {
+          case JsNode.YIELDEXPR:
+            res.count++;
+            //赋值语句忽略
+            var parent = node.parent();
+            switch(parent.name()) {
+              case JsNode.INITLZ:
+                self.jsdc.ignore(parent.prev());
+                self.jsdc.ignore(node.prev());
+                break;
+              case JsNode.ASSIGNEXPR:
+                self.jsdc.ignore(parent.first());
+                self.jsdc.ignore(node.prev());
+                break;
+            }
+            var belong = self.belong(node);
+            if(belong) {
+              self.stmt[belong.nid()] = true;
+            }
+            break;
+          //忽略这些节点中的yield语句
+          case JsNode.CLASSDECL:
+          case JsNode.CLASSEXPR:
+          case JsNode.FNDECL:
+          case JsNode.FNEXPR:
+          case JsNode.GENDECL:
+          case JsNode.GENEXPR:
+          case JsNode.METHOD:
+            return;
         }
         node.leaves().forEach(function(leaf) {
           self.count(leaf, res);
         });
       }
       return res.count;
+    },
+    pre: function(node, nid, count) {
+      var self = this;
+      var isToken = node.name() == JsNode.TOKEN;
+      if(!isToken) {
+        switch(node.name()) {
+          case JsNode.IFSTMT:
+            if(self.stmt.hasOwnProperty(node.nid())) {
+              count++;
+              var last = node.last();
+              //改写if语句
+              self.jsdc.ignore(node.first());
+              self.jsdc.ignore(node.leaf(1));
+              self.jsdc.ignore(node.leaf(2));
+              self.jsdc.ignore(node.leaf(3));
+              if(last.name() == JsNode.BLOCKSTMT) {
+                self.jsdc.ignore(node.leaf(4));
+                self.jsdc.ignore(last);
+              }
+              eventbus.on(node.nid(), function(node, start) {
+                var top = self.hash[nid];
+                if(start) {
+                  self.jsdc.append('if(');
+                  self.jsdc.append(join(node.leaf(2)));
+                  self.jsdc.append('){');
+                  self.jsdc.append(top.state + '=' + res.index);
+                  self.jsdc.append(';break}');
+                }
+              });
+            }
+            break;
+          //忽略这些节点中的所有逻辑
+          case JsNode.CLASSDECL:
+          case JsNode.CLASSEXPR:
+          case JsNode.FNDECL:
+          case JsNode.FNEXPR:
+          case JsNode.GENDECL:
+          case JsNode.GENEXPR:
+          case JsNode.METHOD:
+            return;
+        }
+        node.leaves().forEach(function(leaf) {
+          self.pre(leaf, nid, count);
+        });
+      }
     },
     getLast: function(node) {
       while(node = node.last()) {
@@ -267,9 +300,20 @@ define(function(require, exports, module) {
           }
         }
       }
+    },
+    belong: function(node) {
+      while(node = node.parent()) {
+        switch(node.name()) {
+          case JsNode.IFSTMT:
+          case JsNode.ITERSTMT:
+            return node;
+          case JsNode.GENDECL:
+          case JsNode.GENEXPR:
+            return;
+        }
+      }
     }
   });
   
   module.exports = Generator;
-  
 });
