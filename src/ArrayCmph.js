@@ -17,8 +17,8 @@ var ArrayCmph = Class(function(jsdc) {
         id: '',
         f: 0
       };
-      self.jsdc.ignore(node.first());
-      self.jsdc.ignore(node.last());
+      self.jsdc.ignore(node.first(), 'arrcmph1');
+      self.jsdc.ignore(node.last(), 'arrcmph2');
       self.jsdc.append('function(){');
       //forbinding的变量要提出来声明
       var leaves = node.leaf(1).leaves();
@@ -73,7 +73,7 @@ var ArrayCmph = Class(function(jsdc) {
   },
   of: function(node) {
     if(node.parent().name() == JsNode.CMPHFOR) {
-      this.jsdc.ignore(node);
+      this.jsdc.ignore(node, 'arrcmph3');
       this.jsdc.append('in ');
     }
   }

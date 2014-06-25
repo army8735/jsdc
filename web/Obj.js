@@ -44,7 +44,7 @@ define(function(require, exports, module) {
                 id: join(first)
               });
               this.jsdc.append(temp);
-              this.jsdc.ignore(first);
+              this.jsdc.ignore(first, 'obj1');
             }
           }
         }

@@ -17,16 +17,16 @@ define(function(require, exports, module) {
         if(start) {
           var o = {};
           o.name = node.leaf(1).first().token().content();
-          this.jsdc.ignore(node.leaf(0));
-          this.jsdc.ignore(node.leaf(1));
-          this.jsdc.ignore(node.leaf(2));
+          this.jsdc.ignore(node.leaf(0), 'klass1');
+          this.jsdc.ignore(node.leaf(1), 'klass2');
+          this.jsdc.ignore(node.leaf(2), 'klass3');
           if(node.leaf(3).name() == JsNode.CLASSBODY) {
-            this.jsdc.ignore(node.leaf(4));
+            this.jsdc.ignore(node.leaf(4), 'klass4');
             this.body(node.last().prev(), o.name);
           }
           else {
-            this.jsdc.ignore(node.leaf(3));
-            this.jsdc.ignore(node.leaf(5));
+            this.jsdc.ignore(node.leaf(3), 'klass5');
+            this.jsdc.ignore(node.leaf(5), 'klass6');
             o.extend = join(node.leaf(2).last());
             this.body(node.last().prev(), o.name, o.extend);
             this.jsdc.append('!function(){');
@@ -49,11 +49,11 @@ define(function(require, exports, module) {
         if(start) {
           this.jsdc.append('function(){');
           var o = {};
-          this.jsdc.ignore(node.leaf(0));
-          this.jsdc.ignore(node.leaf(1));
+          this.jsdc.ignore(node.leaf(0), 'klass7');
+          this.jsdc.ignore(node.leaf(1), 'klass8');
           if(node.leaf(2).name() == JsNode.TOKEN
             && node.leaf(2).token().content() == '{') {
-            this.jsdc.ignore(node.leaf(2));
+            this.jsdc.ignore(node.leaf(2), 'klass9');
             if(node.leaf(1).name() == JsNode.HERITAGE) {
               o.extend = join(node.leaf(1).last());
               o.name = this.jsdc.uid();
@@ -64,15 +64,15 @@ define(function(require, exports, module) {
           }
           else if(node.leaf(3).name() == JsNode.TOKEN
             && node.leaf(3).token().content() == '{') {
-            this.jsdc.ignore(node.leaf(3));
+            this.jsdc.ignore(node.leaf(3), 'klass10');
             o.name = node.leaf(1).first().token().content();
             o.extend = join(node.leaf(2).last());
           }
           else {
             o.name = this.jsdc.uid();
-            this.jsdc.ignore(node.leaf(1));
+            this.jsdc.ignore(node.leaf(1), 'klass11');
           }
-          this.jsdc.ignore(node.last());
+          this.jsdc.ignore(node.last(), 'klass12');
           var classbody = node.last().prev();
           this.body(classbody, o.name, o.extend);
           if(o.extend) {
@@ -104,7 +104,7 @@ define(function(require, exports, module) {
         if(first.name() == JsNode.PROPTNAME) {
           if(start) {
             var token = first.first().first().token();
-            this.jsdc.ignore(token);
+            this.jsdc.ignore(token, 'klass13');
             if(token.content() == 'constructor') {
               this.jsdc.append('function ');
               this.jsdc.append(o.name);
@@ -120,7 +120,7 @@ define(function(require, exports, module) {
           if(start) {
             var prptn = first.next();
             this.gs[prptn.nid()] = true;
-            this.jsdc.ignore(prptn);
+            this.jsdc.ignore(prptn, 'klass14');
             this.jsdc.append('Object.defineProperty(');
             this.jsdc.append(o.name);
             this.jsdc.append('.prototype, "');
@@ -144,7 +144,7 @@ define(function(require, exports, module) {
       else if(first.name() == JsNode.TOKEN
         && first.token().content() == 'static') {
         if(start) {
-          this.jsdc.ignore(first.token());
+          this.jsdc.ignore(first.token(), 'klass15');
           this.jsdc.append(o.name + '.');
         }
       }
@@ -155,7 +155,7 @@ define(function(require, exports, module) {
       }
     },
     super: function(node) {
-      this.jsdc.ignore(node);
+      this.jsdc.ignore(node, 'klass16');
       var top = this.closest(node);
       if(this.hash.hasOwnProperty(top.nid())) {
         this.jsdc.append(this.hash[top.nid()].extend);

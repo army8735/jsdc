@@ -15,11 +15,11 @@ var Generator = Class(function(jsdc) {
   parse: function(node, start) {
     var self = this;
     if(start) {
-      self.jsdc.ignore(node.leaf(1));
+      self.jsdc.ignore(node.leaf(1), 'gen1');
       var token = node.leaf(2).first().token();
-      self.jsdc.ignore(token);
       //有可能被scope前置过
       var hasPre = token.ignore;
+      self.jsdc.ignore(token, 'gen2');
       if(!hasPre) {
         self.jsdc.append('var ');
         self.jsdc.append(node.leaf(2).first().token().content());
@@ -36,10 +36,10 @@ var Generator = Class(function(jsdc) {
   expr: function(node, start) {
     var self = this;
     if(start) {
-      self.jsdc.ignore(node.first());
-      self.jsdc.ignore(node.leaf(1));
+      self.jsdc.ignore(node.first(), 'gen3');
+      self.jsdc.ignore(node.leaf(1), 'gen4');
       if(node.leaf(2).name() == JsNode.BINDID) {
-        self.jsdc.ignore(node.leaf(2));
+        self.jsdc.ignore(node.leaf(2), 'gen5');
       }
       self.gen(node, start);
     }
@@ -51,11 +51,11 @@ var Generator = Class(function(jsdc) {
   gen: function(node, start) {
     var self = this;
     if(start) {
-      self.jsdc.ignore(node.first());
+      self.jsdc.ignore(node.first(), 'gen6');
       var state = self.jsdc.uid();
       var temp = self.jsdc.uid();
       var param = node.leaf(4).first();
-      var res = self.count(node.last().prev());
+      var res = self.count(node.last().prev(), node);
       var count = res.count;
       var ret = res.return;
       if(res.pre) {
@@ -103,7 +103,7 @@ var Generator = Class(function(jsdc) {
     var top = self.closest(node);
     var o = self.hash[top.nid()];
     if(start) {
-      self.jsdc.ignore(node.first());
+      self.jsdc.ignore(node.first(), 'gen7');
       var parent = node.parent();
       //赋值语句需要添加上参数，先默认undefined，并记录在变量中为下次添加做标记
       var parent = node.parent();
@@ -119,13 +119,12 @@ var Generator = Class(function(jsdc) {
       }
       //加上状态变更
       o.index++;
-      o.index2++;
-      self.jsdc.append(o.state + '=' + o.index2 + ';');
+      self.jsdc.append(o.state + '=' + ++o.index2 + ';');
       //yield *
       if(node.size() > 2
         && node.leaf(1).name() == JsNode.TOKEN
         && node.leaf(1).token().content() == '*') {
-        self.jsdc.ignore(node.leaf(1));
+        self.jsdc.ignore(node.leaf(1), 'gen8');
         var temp = this.star[node.nid()] = self.jsdc.uid();
         self.jsdc.append('var ' + temp + '=');
       }
@@ -172,8 +171,9 @@ var Generator = Class(function(jsdc) {
           this.jsdc.append('while(1){switch(' + o.state + '){case 0:');
         }
       }
-      else {
+      else if(!o.return) {
         if(o.count) {
+          this.jsdc.appendBefore(';' + o.state + '=-1');
           this.jsdc.appendBefore(';default:return{done:true}}}');
         }
         else {
@@ -194,11 +194,11 @@ var Generator = Class(function(jsdc) {
   prevar: function(varstmt) {
     var top = varstmt.gen;
     if(top) {
-      this.jsdc.ignore(varstmt.first());
+      this.jsdc.ignore(varstmt.first(), 'gen9');
       this.jsdc.insert('var ' + varstmt.leaf(1).first().first().token().content() + ';', this.hash[top.nid()].pos);
     }
   },
-  count: function(node, res) {
+  count: function(node, top, res) {
     res = res || { count: 0, return: false, pre: false };
     var self = this;
     var isToken = node.name() == JsNode.TOKEN;
@@ -210,22 +210,36 @@ var Generator = Class(function(jsdc) {
           var parent = node.parent();
           switch(parent.name()) {
             case JsNode.INITLZ:
-              self.jsdc.ignore(parent.prev());
-              self.jsdc.ignore(node.prev());
+              self.jsdc.ignore(parent.prev(), 'gen10');
+              self.jsdc.ignore(node.prev(), 'gen11');
               break;
             case JsNode.ASSIGNEXPR:
-              self.jsdc.ignore(parent.first());
-              self.jsdc.ignore(node.prev());
+              self.jsdc.ignore(parent.first(), 'gen12');
+              self.jsdc.ignore(node.prev(), 'gen13');
               break;
           }
           var belong = self.belong(node);
-          if(belong) {
-            self.stmt[belong.nid()] = true;
+          belong.forEach(function(f) {
+            self.stmt[f.nid()] = true;
             res.pre = true;
-          }
+          });
           break;
         case JsNode.RETSTMT:
-          res.return = true;
+          res.return = node;
+          eventbus.on(node.nid(), function(node, start) {
+            if(start) {
+              var o = self.hash[top.nid()];
+              self.jsdc.appendBefore(';' + o.state + '=-1;default:');
+            }
+          });
+          eventbus.on(node.leaf(1).nid(), function(node, start) {
+            if(start) {
+              self.jsdc.append('{value:');
+            }
+            else {
+              self.jsdc.appendBefore(',done:true}');
+            }
+          });
           break;
         //忽略这些节点中的yield语句
         case JsNode.CLASSDECL:
@@ -238,7 +252,7 @@ var Generator = Class(function(jsdc) {
           return;
       }
       node.leaves().forEach(function(leaf) {
-        self.count(leaf, res);
+        self.count(leaf, top, res);
       });
     }
     return res;
@@ -254,18 +268,24 @@ var Generator = Class(function(jsdc) {
             res.index++;
             var block = node.leaf(4);
             //改写if语句
-            self.jsdc.ignore(node.first());
-            self.jsdc.ignore(node.leaf(1));
-            self.jsdc.ignore(node.leaf(2));
-            self.jsdc.ignore(node.leaf(3));
+            self.jsdc.ignore(node.first(), 'gen14');
+            self.jsdc.ignore(node.leaf(1), 'gen15');
+            self.jsdc.ignore(node.leaf(2), 'gen16');
+            self.jsdc.ignore(node.leaf(3), 'gen17');
             if(block.name() == JsNode.BLOCKSTMT) {
-              self.jsdc.ignore(block.first().first());
-              self.jsdc.ignore(block.first().last());
+              self.jsdc.ignore(block.first().first(), 'gen18');
+              self.jsdc.ignore(block.first().last(), 'gen19');
             }
-            var index;
-            var elseindex;
+            var temp;
+            var ifEndTemp;
             var top;
             var ifstmt = node;
+            //if结束后的状态
+            eventbus.on(node.nid(), function(node, start) {
+              if(!start) {
+                self.jsdc.append('case ' + ifEndTemp + ':');
+              }
+            });
             //根据表达式true/false分2个state
             eventbus.on(block.nid(), function(node, start) {
               if(start) {
@@ -274,33 +294,33 @@ var Generator = Class(function(jsdc) {
                 self.jsdc.append(top.state + '=');
                 self.jsdc.append(join(ifstmt.leaf(2)));
                 self.jsdc.append('?');
-                self.jsdc.append(++index + ':' + ++index + ';break;');
-                elseindex = index;
-                self.jsdc.append('case ' + (index - 1) + ':');
-                top.index2 = index;
+                self.jsdc.append(++top.index2 + ':' + ++top.index2 + ';break;');
+                self.jsdc.append('case ' + (top.index2 - 1) + ':');
+                temp = top.index2;
+                ifEndTemp = ++top.index2;
               }
               else {
-                //可能的yield语句改写index2
-                index = top.index2;
                 self.jsdc.appendBefore(top.state + '=');
-                self.jsdc.appendBefore(++index + ';');
-                self.jsdc.appendBefore('break;');
+                self.jsdc.appendBefore(ifEndTemp);
+                self.jsdc.appendBefore(';break;');
               }
             });
             //else语句忽略{}
             var elset = block.next();
             if(elset && elset.name() == JsNode.TOKEN) {
-              self.jsdc.ignore(elset);
+              self.jsdc.ignore(elset, 'gen20');
               block = elset.next();
               if(block.name() == JsNode.BLOCKSTMT) {
-                self.jsdc.ignore(block.first().first());
-                self.jsdc.ignore(block.first().last());
+                self.jsdc.ignore(block.first().first(), 'gen21');
+                self.jsdc.ignore(block.first().last(), 'gen22');
               }
               eventbus.on(block.nid(), function(node, start) {
                 if(start) {
-                  self.jsdc.append('case ' + elseindex + ':');
+                  self.jsdc.append('case ' + temp + ':');
                 }
                 else {
+                  self.jsdc.appendBefore(top.state + '=');
+                  self.jsdc.appendBefore(ifEndTemp);
                   self.jsdc.appendBefore('break;');
                 }
               });
@@ -340,7 +360,7 @@ var Generator = Class(function(jsdc) {
           continue;
         }
         if(token.content() == value) {
-          this.jsdc.ignore(token);
+          this.jsdc.ignore(token, 'gen23');
           return;
         }
         else {
@@ -350,16 +370,18 @@ var Generator = Class(function(jsdc) {
     }
   },
   belong: function(node) {
+    var res = [];
     while(node = node.parent()) {
       switch(node.name()) {
         case JsNode.IFSTMT:
         case JsNode.ITERSTMT:
-          return node;
+          res.push(node);
         case JsNode.GENDECL:
         case JsNode.GENEXPR:
-          return;
+          break;
       }
     }
+    return res;
   }
 });
 

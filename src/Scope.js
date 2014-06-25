@@ -70,14 +70,14 @@ var Scope = Class(function(jsdc) {
           }
         });
         if(vardecl.first().name() == JsNode.BINDID) {
-          self.jsdc.ignore(varstmt.first().token());
+          self.jsdc.ignore(varstmt.first().token(), 'scope1');
         }
         else {
           //destruct需忽略前后可能的,再改为; var也需忽略
-          self.jsdc.ignore(vardecl.prev());
+          self.jsdc.ignore(vardecl.prev(), 'scope2');
           var next = vardecl.next();
           if(next.token().content() == ',') {
-            self.jsdc.ignore(next);
+            self.jsdc.ignore(next, 'scope3');
           }
         }
       }

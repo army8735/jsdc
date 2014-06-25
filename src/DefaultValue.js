@@ -17,7 +17,7 @@ var DefaultValue = Class(function(jsdc) {
         if(sgname.name() == JsNode.SINGLENAME && sgname.size() == 2) {
           var init = sgname.last();
           if(init.name() == JsNode.INITLZ) {
-            self.jsdc.ignore(init);
+            self.jsdc.ignore(init, 'default1');
             (self.hash[fnbody] = self.hash[fnbody] || []).push(sgname);
           }
         }

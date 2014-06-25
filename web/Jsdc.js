@@ -352,17 +352,17 @@ define(function(require, exports, module) {
       }
       eventbus.emit(node.nid(), [node]);
     },
-    ignore: function(node) {
+    ignore: function(node, msg) {
       var self = this;
       if(node instanceof Token) {
-        node.ignore = true;
+        node.ignore = msg || true;
       }
       else if(node.name() == JsNode.TOKEN) {
         this.ignore(node.token());
       }
       else {
         node.leaves().forEach(function(leaf) {
-          self.ignore(leaf);
+          self.ignore(leaf, msg);
         });
       }
     },

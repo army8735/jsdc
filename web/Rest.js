@@ -17,7 +17,7 @@ define(function(require, exports, module) {
         var fnbody = fmparams.next().next().next();
         if(last.name() == JsNode.BINDREST) {
           var rest = last.first();
-          this.jsdc.ignore(rest);
+          this.jsdc.ignore(rest, 'rest1');
           this.hash[fnbody.nid()] = {
             index: fmparams.size() - 1,
             token: last.last().first().token()
@@ -42,7 +42,7 @@ define(function(require, exports, module) {
         if(spread.name() == JsNode.TOKEN && spread.token().content() == '...') {
           var first = node.first();
           this.hash2[node.nid()] = first;
-          this.jsdc.ignore(arglist);
+          this.jsdc.ignore(arglist, 'rest2');
         }
       }
     },

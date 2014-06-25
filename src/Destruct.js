@@ -15,7 +15,7 @@ var Destruct = Class(function(jsdc) {
     if(this.idCache.hasOwnProperty(node.nid())) {
       return this.idCache[node.nid()];
     }
-    this.jsdc.ignore(node);
+    this.jsdc.ignore(node, 'destruct1');
     var res = { arr: [] };
     this.recursion(node, res);
     this.idCache[node.nid()] = res.arr;
@@ -288,17 +288,17 @@ var Destruct = Class(function(jsdc) {
     switch(first.name()) {
       case JsNode.ARRLTR:
         if(start) {
-          this.jsdc.ignore(first);
+          this.jsdc.ignore(first, 'destruct2');
           if(assignexpr.parent().name() == JsNode.ASSIGNEXPR) {
             self.hash[first.nid()] = self.hash[assignexpr.parent().first().first().nid()];
-            this.jsdc.ignore(assignexpr.leaf(1));
+            this.jsdc.ignore(assignexpr.leaf(1), 'destruct3');
           }
           else if(assignexpr.parent().name() == JsNode.INITLZ) {
             var bindpat = assignexpr.parent().prev();
             if(bindpat.name() == JsNode.ARRBINDPAT
               || bindpat.name() == JsNode.OBJBINDPAT) {
               self.hash[first.nid()] = self.hash[assignexpr.parent().prev().nid()];
-              this.jsdc.ignore(assignexpr.leaf(1));
+              this.jsdc.ignore(assignexpr.leaf(1), 'destruct4');
             }
             else {
               self.jsdc.append('function(){var ');
@@ -362,10 +362,10 @@ var Destruct = Class(function(jsdc) {
         break;
       case JsNode.OBJLTR:
         if(start) {
-          self.jsdc.ignore(first);
+          self.jsdc.ignore(first, 'destruct5');
           if(assignexpr.parent().name() == JsNode.ASSIGNEXPR) {
             self.hash[first.nid()] = self.hash[assignexpr.parent().first().first().nid()];
-            this.jsdc.ignore(assignexpr.leaf(1));
+            this.jsdc.ignore(assignexpr.leaf(1), 'destruct6');
             return;
           }
           else if(assignexpr.parent().name() == JsNode.INITLZ) {
@@ -373,7 +373,7 @@ var Destruct = Class(function(jsdc) {
             if(bindpat.name() == JsNode.ARRBINDPAT
               || bindpat.name() == JsNode.OBJBINDPAT) {
               self.hash[first.nid()] = self.hash[assignexpr.parent().prev().nid()];
-              this.jsdc.ignore(assignexpr.leaf(1));
+              this.jsdc.ignore(assignexpr.leaf(1), 'destruct7');
             }
             else {
               self.jsdc.append('function(){var ');

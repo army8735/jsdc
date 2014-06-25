@@ -11,7 +11,7 @@ define(function(require, exports, module) {
     parse: function(t) {
     },
     module: function(node) {
-      this.jsdc.ignore(node);
+      this.jsdc.ignore(node, 'module1');
       this.jsdc.append('var ');
       this.jsdc.append(node.leaf(1).first().token().content());
       this.jsdc.append('=require(');
@@ -20,7 +20,7 @@ define(function(require, exports, module) {
     },
     import: function(node) {
       var self = this;
-      self.jsdc.ignore(node);
+      self.jsdc.ignore(node, 'module2');
       var one = node.leaf(1);
       //import "string"
       if(one.name() == JsNode.TOKEN
@@ -66,12 +66,12 @@ define(function(require, exports, module) {
             this.jsdc.append('Object.keys(' + temp + ').forEach(function(k){');
             this.jsdc.append('module.exports[k]=' + temp + '[k];');
             this.jsdc.append('});}();');
-            this.jsdc.ignore(node);
+            this.jsdc.ignore(node, 'module3');
           }
           else if(s == 'default') {
             this.jsdc.append('module.exports=');
-            this.jsdc.ignore(node.leaf(0));
-            this.jsdc.ignore(node.leaf(1));
+            this.jsdc.ignore(node.leaf(0), 'module4');
+            this.jsdc.ignore(node.leaf(1), 'module5');
           }
           break;
         case JsNode.VARSTMT:
@@ -82,8 +82,8 @@ define(function(require, exports, module) {
           var id = vardecl.first().first().token().content();
           this.jsdc.append(id);
           this.jsdc.append(';exports.' + id + '=');
-          this.jsdc.ignore(varstmt.first());
-          this.jsdc.ignore(node.first());
+          this.jsdc.ignore(varstmt.first(), 'module6');
+          this.jsdc.ignore(node.first(), 'module7');
           break;
         case JsNode.FNDECL:
         case JsNode.CLASSDECL:
@@ -91,7 +91,7 @@ define(function(require, exports, module) {
           this.jsdc.append('exports.' + id + '=');
           this.jsdc.append(id);
           this.jsdc.append(';');
-          this.jsdc.ignore(node.first());
+          this.jsdc.ignore(node.first(), 'module8');
           break;
       }
     },

@@ -11,11 +11,11 @@ define(function(require, exports, module) {
     parse: function(t) {
       var s = t.content();
       if(s.toLowerCase().indexOf('0b') == 0) {
-        this.jsdc.ignore(t);
+        this.jsdc.ignore(t, 'num1');
         this.jsdc.append('parseInt("' + t.content().slice(2) + '", 2)');
       }
       else if(s.toLowerCase().indexOf('0o') == 0) {
-        this.jsdc.ignore(t);
+        this.jsdc.ignore(t, 'num2');
         this.jsdc.append('parseInt("' + t.content().slice(2) + '", 8)');
       }
     }

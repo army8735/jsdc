@@ -16,7 +16,7 @@ var Forof = Class(function(jsdc) {
         && of.name() == JsNode.TOKEN
         && of.token().content() == 'of') {
         this.hash[node.nid()] = true;
-        this.jsdc.ignore(of);
+        this.jsdc.ignore(of, 'forof1');
       }
     }
     else if(this.hash.hasOwnProperty(node.nid())) {

@@ -31,7 +31,7 @@ var String = Class(function(jsdc) {
       return '\\u' + arr.join('\\u');
     });
     if(res != s) {
-      this.jsdc.ignore(t);
+      this.jsdc.ignore(t, 'str1');
       this.jsdc.append(res);
     }
   }

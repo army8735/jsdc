@@ -21,7 +21,7 @@ var ArrowFn = Class(function(jsdc) {
     }
   },
   arrow: function(t) {
-    this.jsdc.ignore(t);
+    this.jsdc.ignore(t, 'arrow1');
   },
   body: function(node, start) {
     //表达式只有1个需要加{return }

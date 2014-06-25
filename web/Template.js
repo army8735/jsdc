@@ -9,7 +9,7 @@ define(function(require, exports, module) {
     this.jsdc = jsdc;
   }).methods({
     parse: function(t) {
-      this.jsdc.ignore(t);
+      this.jsdc.ignore(t, 'template1');
       var s = t.content();
       var res = '"';
       var has = false;

@@ -43,7 +43,7 @@ var Obj = Class(function(jsdc) {
               id: join(first)
             });
             this.jsdc.append(temp);
-            this.jsdc.ignore(first);
+            this.jsdc.ignore(first, 'obj1');
           }
         }
       }
