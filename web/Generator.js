@@ -56,11 +56,18 @@ define(function(require, exports, module) {
         var state = self.jsdc.uid();
         var temp = self.jsdc.uid();
         var param = node.leaf(4).first();
-        var count = self.count(node.last().prev());
-        self.pre(node.last().prev(), node.nid(), count);
+        var res = self.count(node.last().prev());
+        var count = res.count;
+        var ret = res.return;
+        if(res.pre) {
+          self.pre(node.last().prev(), node.nid(), node.last().prev().nid());
+        }
         if(!param) {
           if(count) {
             param = self.jsdc.uid();
+            eventbus.on(node.leaf(4).nid(), function(node, start) {
+              start && self.jsdc.append(param);
+            });
           }
           else {
             param = '';
@@ -70,20 +77,20 @@ define(function(require, exports, module) {
           param = param.first().first().token().content();
         }
         else if(param.name() == JsNode.BINDREST) {
-          param = param.last().first().token().content();
+          param = param.last().first().token().content() + '[0]';
         }
-        eventbus.on(node.leaf(4).nid(), function(node, start) {
-          start && self.jsdc.append(param);
-        });
         var o = self.hash[node.nid()] = {
           state: state,
           index: 0,
+          index2: 0,
           count: count,
+          return: ret,
           if: 0,
           temp: temp,
           param: param,
           last: null,
-          yield: []
+          yield: [],
+          pre: res.pre
         };
         self.jsdc.append('function(){');
         self.jsdc.append('var ' + state + '=0;');
@@ -112,8 +119,9 @@ define(function(require, exports, module) {
             o.last = null;
         }
         //加上状态变更
-        var index = ++o.index;
-        self.jsdc.append(o.state + '=' + index + ';');
+        o.index++;
+        o.index2++;
+        self.jsdc.append(o.state + '=' + o.index2 + ';');
         //yield *
         if(node.size() > 2
           && node.leaf(1).name() == JsNode.TOKEN
@@ -137,14 +145,17 @@ define(function(require, exports, module) {
           });
         }
         else {
-          self.jsdc.appendBefore(',done:' + (o.index == o.count - 1) + '}');
+          self.jsdc.appendBefore(',done:' + (o.index == o.count) + '}');
           o.yield.push({
             i: self.jsdc.i
           });
         }
         self.ignoreNext(node, ';');
         if(o.index < o.count) {
-          self.jsdc.appendBefore(';case ' + o.index + ':');
+          self.jsdc.appendBefore(';case ' + o.index2 + ':');
+        }
+        else {
+          self.jsdc.appendBefore(';case ' + o.index2 + ':');
         }
         //有赋值需要先赋值
         if(o.last) {
@@ -189,7 +200,7 @@ define(function(require, exports, module) {
       }
     },
     count: function(node, res) {
-      res = res || { count: 0 };
+      res = res || { count: 0, return: false, pre: false };
       var self = this;
       var isToken = node.name() == JsNode.TOKEN;
       if(!isToken) {
@@ -211,7 +222,11 @@ define(function(require, exports, module) {
             var belong = self.belong(node);
             if(belong) {
               self.stmt[belong.nid()] = true;
+              res.pre = true;
             }
+            break;
+          case JsNode.RETSTMT:
+            res.return = true;
             break;
           //忽略这些节点中的yield语句
           case JsNode.CLASSDECL:
@@ -227,36 +242,70 @@ define(function(require, exports, module) {
           self.count(leaf, res);
         });
       }
-      return res.count;
+      return res;
     },
-    pre: function(node, nid, count) {
+    pre: function(node, nid, bid, res) {
+      res = res || { index: 0 };
       var self = this;
       var isToken = node.name() == JsNode.TOKEN;
       if(!isToken) {
         switch(node.name()) {
           case JsNode.IFSTMT:
             if(self.stmt.hasOwnProperty(node.nid())) {
-              count++;
-              var last = node.last();
+              res.index++;
+              var block = node.leaf(4);
               //改写if语句
               self.jsdc.ignore(node.first());
               self.jsdc.ignore(node.leaf(1));
               self.jsdc.ignore(node.leaf(2));
               self.jsdc.ignore(node.leaf(3));
-              if(last.name() == JsNode.BLOCKSTMT) {
-                self.jsdc.ignore(node.leaf(4));
-                self.jsdc.ignore(last);
+              if(block.name() == JsNode.BLOCKSTMT) {
+                self.jsdc.ignore(block.first().first());
+                self.jsdc.ignore(block.first().last());
               }
-              eventbus.on(node.nid(), function(node, start) {
-                var top = self.hash[nid];
+              var index;
+              var elseindex;
+              var top;
+              var ifstmt = node;
+              //根据表达式true/false分2个state
+              eventbus.on(block.nid(), function(node, start) {
                 if(start) {
-                  self.jsdc.append('if(');
-                  self.jsdc.append(join(node.leaf(2)));
-                  self.jsdc.append('){');
-                  self.jsdc.append(top.state + '=' + res.index);
-                  self.jsdc.append(';break}');
+                  top = self.hash[nid];
+                  index = top.index2;
+                  self.jsdc.append(top.state + '=');
+                  self.jsdc.append(join(ifstmt.leaf(2)));
+                  self.jsdc.append('?');
+                  self.jsdc.append(++index + ':' + ++index + ';break;');
+                  elseindex = index;
+                  self.jsdc.append('case ' + (index - 1) + ':');
+                  top.index2 = index;
+                }
+                else {
+                  //可能的yield语句改写index2
+                  index = top.index2;
+                  self.jsdc.appendBefore(top.state + '=');
+                  self.jsdc.appendBefore(++index + ';');
+                  self.jsdc.appendBefore('break;');
                 }
               });
+              //else语句忽略{}
+              var elset = block.next();
+              if(elset && elset.name() == JsNode.TOKEN) {
+                self.jsdc.ignore(elset);
+                block = elset.next();
+                if(block.name() == JsNode.BLOCKSTMT) {
+                  self.jsdc.ignore(block.first().first());
+                  self.jsdc.ignore(block.first().last());
+                }
+                eventbus.on(block.nid(), function(node, start) {
+                  if(start) {
+                    self.jsdc.append('case ' + elseindex + ':');
+                  }
+                  else {
+                    self.jsdc.appendBefore('break;');
+                  }
+                });
+              }
             }
             break;
           //忽略这些节点中的所有逻辑
@@ -270,7 +319,7 @@ define(function(require, exports, module) {
             return;
         }
         node.leaves().forEach(function(leaf) {
-          self.pre(leaf, nid, count);
+          self.pre(leaf, nid, bid, res);
         });
       }
     },
