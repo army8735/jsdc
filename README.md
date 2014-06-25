@@ -1,5 +1,5 @@
 # Javascript Downcast
-### transform ecmascript6 to ecmascript5
+### compiler ecmascript6 to ecmascript5
 
 [![NPM version](https://badge.fury.io/js/jsdc.png)](https://npmjs.org/package/jsdc)
 [![Build Status](https://travis-ci.org/army8735/jsdc.svg?branch=master)](https://travis-ci.org/army8735/jsdc)
@@ -602,10 +602,10 @@ function *a() {
 ```
 ```js
 function *a(_0_) {
-  var a = void 0;return;a=_0_
+  var a;return;a=_0_
 }
 ```
-`yield`的返回值将变成一个对象的value：
+`yield`的返回值将变成一个对象的`value`，同时添加`done`属性标明是否结束：
 ```js
 function *a() {
   var a = yield 1
@@ -613,7 +613,7 @@ function *a() {
 ```
 ```js
 function *a(_0_) {
-  var a = void 0;return {value:1};a=_0_
+  var a;return {value:1,done:true};a=_0_
 }
 ```
 
@@ -628,7 +628,7 @@ function *a(){
 ```js
 function a(){
   return{value:1,done:false}
-  return{value:2,done:false}
+  return{value:2,done:true}
 }
 ```
 然后包裹：
@@ -641,7 +641,7 @@ function *a(){
 ```js
 var a=function(){return function(){return{next:a}};function a(){
   return{value:1,done:false}
-  return{value:2,done:false}
+  return{value:2,done:true}
 }}();
 ```
 > 这样每次调用它便能得到像es6中一样的一个具有`next()`方法的对象。
@@ -656,7 +656,7 @@ function *a(){
 ```js
 var a=function(){return function(){return{next:_0_}};function _0_(){
   return{value:1,done:false}
-  return{value:2,done:false}
+  return{value:2,done:true}
 }}();
 ```
 再次添加一个唯一临时id作为state标识，来为实现`yield`功能做准备：
@@ -669,10 +669,10 @@ function *a(){
 ```js
 var a=function(){var _1_=0;return function(){return{next:_0_}};function _0_(){
   return{value:1,done:false}
-  return{value:2,done:false}
+  return{value:2,done:true}
 }}();
 ```
-当出现`yield`语句时，添加`switch`语句来模拟顺序执行：
+当出现`yield`语句时，添加`while`和`switch`语句来模拟顺序执行：
 ```js
 function *a(){
   yield 1
@@ -681,10 +681,12 @@ function *a(){
 ```
 ```js
 var a=function(){var _1_=0;return function(){return{next:_0_}};function _0_(){
-  switch(_1_){case 0:_1_++;return{value:1,done:false}
-  case 1:return{value:1,done:false}}
+  while(1){switch(_1_){case 0:_1_=1;return{value:1,done:false}
+  case 1:_1_=-1;return{value:1,done:true};default:return{done:true}}}
 }}();
 ```
+> 注意状态在`switch`各分支语句之间的跳转，以及最后的`default`
+
 同时函数里面的`var`声明需要前置，以免每次调用`next()`方法时又重新声明一遍失去了状态：
 ```js
 function *a(){
@@ -695,9 +697,9 @@ function *a(){
 ```
 ```js
 var a=function(){var _1_=0;return function(){return{next:_0_}};var a;function _0_(){
-  switch(_1_){case 0:a = 1;
-  _1_++;return{value:a++,done:false};
-  case 1:_1_++;return{value:a++,done:false;}
+  while(1){switch(_1_){case 0:a = 1;
+  _1_=1;return{value:a++,done:false};
+  case 1:_1_=-1;return{value:a++,done:true;};default:return{done:true}}}
 }}();
 ```
 > 函数则不需要前置。
@@ -714,9 +716,9 @@ function *a(){
 ```
 ```js
 var a=function(){var _0_=0;return function(){return{next:_1_}};var a;function _1_(_2_){
-  switch(_0_){case 0:a = 1;
-  _0_++;return{value:a++,done:false};case 1:
-  _0_++;return{value:a++,done:true};default:return{done:true}}
+  while(1){switch(_0_){case 0:a = 1;
+  _0_=1;return{value:a++,done:false};case 1:
+  _0_=-1;return{value:a++,done:true};default:return{done:true}}}
 }}();
 ```
 `yield`还支持返回一个`Generator`，这就是一个递归：
@@ -727,10 +729,10 @@ function *a(){
 ```
 ```js
 var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){
-  switch(_0_){case 0:_0_++;var _3_=b();if(!_3_.done)_0_--;return _3_;default:return{done:true}}
+  while(1){switch(_0_){case 0:_0_=1;var _3_=b();if(!_3_.done)_0_=0;return _3_;default:return{done:true}}}
 }}();
 ```
-表达式也一样：
+表达式也一样，没有`yield`则不会添加`while`和`switch`语句：
 ```js
 ~function *(){
 }
