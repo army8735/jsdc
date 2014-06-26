@@ -379,8 +379,6 @@ var Generator = Class(function(jsdc) {
               self.jsdc.ignore(node.leaf(1), 'gen26');
               self.jsdc.ignore(block.prev(), 'gen27');
               switch(itstmt.leaf(3).token().content()) {
-                case 'of':
-                  break;
                 case 'in':
                   var keys = self.jsdc.uid();
                   var len = self.jsdc.uid();
@@ -409,7 +407,7 @@ var Generator = Class(function(jsdc) {
                       endTemp = ++top.index2;
                       self.jsdc.appendBefore('case ' + endTemp + ':');
                       self.jsdc.appendBefore(top.state + '=');
-                      self.jsdc.appendBefore(index + '<' + len + '?');
+                      self.jsdc.appendBefore(index + '++<' + len + '?');
                       itTemp = ++top.index2;
                       itEndTemp = ++top.index2;
                       self.jsdc.appendBefore(itTemp + ':' + itEndTemp + ';break;');
@@ -420,6 +418,53 @@ var Generator = Class(function(jsdc) {
                       self.jsdc.append('case ' + itTemp + ':');
                       self.jsdc.append(id + '=' + obj);
                       self.jsdc.append('[' + index + ']');
+                    }
+                    else {
+                      self.jsdc.appendBefore(top.state + '=' + endTemp);
+                      self.jsdc.appendBefore(';break;case ' +  itEndTemp + ':');
+                    }
+                  });
+                  break;
+                case 'of':
+                  var iterator;
+                  //标记使Forof类处理失效
+                  itstmt.gen = true;
+                  var next = self.jsdc.uid();
+                  var id;
+                  if(node.leaf(2).name() == JsNode.VARSTMT) {
+                    id = join(node.leaf(2).last());
+                  }
+                  else {
+                    id = join(node.leaf(2));
+                  }
+                  var obj = self.jsdc.uid();
+                  self.jsdc.ignore(node.leaf(2), 'gen30');
+                  self.jsdc.ignore(node.leaf(3), 'gen31');
+                  eventbus.on(itstmt.leaf(4).nid(), function(node, start) {
+                    if(start) {
+                      self.jsdc.append('var ' + obj + '=');
+                      top = self.hash[nid];
+                    }
+                    else {
+                      self.jsdc.appendBefore(',' + next);
+                      self.jsdc.appendBefore('=' + obj + '.next();');
+                      endTemp = ++top.index2;
+                      self.jsdc.appendBefore('case ' + endTemp + ':');
+                      self.jsdc.appendBefore(top.state + '=');
+                      self.jsdc.appendBefore(next + '.done' + '?');
+                      iterator = ++top.index2;
+                      itTemp = ++top.index2;
+                      itEndTemp = ++top.index2;
+                      self.jsdc.appendBefore(itTemp + ':' + itEndTemp + ';break;');
+                    }
+                  });
+                  eventbus.on(block.nid(), function(node, start) {
+                    if(start) {
+                      self.jsdc.append('case ' + iterator + ':');
+                      self.jsdc.append(next + '=' + obj + '.next();');
+                      self.jsdc.append(top.state + '=' + endTemp);
+                      self.jsdc.append(';break;case ' + itTemp + ':');
+                      self.jsdc.append(id + '=' + next + '.value;');
                     }
                     else {
                       self.jsdc.appendBefore(top.state + '=' + endTemp);

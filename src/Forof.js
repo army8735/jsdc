@@ -10,19 +10,40 @@ var Forof = Class(function(jsdc) {
   this.hash = {};
 }).methods({
   parse: function(node, start) {
+    //有可能被Generator中该写过
+    if(node.gen) {
+      return;
+    }
     if(start) {
       var of = node.leaf(3);
       if(node.first().token().content() == 'for'
         && of.name() == JsNode.TOKEN
         && of.token().content() == 'of') {
-        this.hash[node.nid()] = true;
+        //存放临时li供block首尾改写引用
+        this.hash[node.nid()] = {
+          temp: this.jsdc.uid()
+        };
         this.jsdc.ignore(of, 'forof1');
       }
     }
     else if(this.hash.hasOwnProperty(node.nid())) {
       var last = node.last();
+      var s = '';
+      if(!this.jsdc.endsWith(';')
+        && !this.jsdc.endsWith(':')
+        && !this.jsdc.endsWith('{')
+        && !this.jsdc.endsWith('\n')) {
+        s = ';';
+      }
+      s += this.hash[node.nid()].id + '=' + this.hash[node.nid()].temp;
       if(last.name() != JsNode.BLOCKSTMT) {
+        //临时引用写回，使循环正常
+        this.jsdc.appendBefore(s);
+        //}闭合
         this.jsdc.appendBefore('}');
+      }
+      else {
+        this.jsdc.insert(s, this.jsdc.res.length - 1);
       }
     }
   },
@@ -34,7 +55,6 @@ var Forof = Class(function(jsdc) {
     }
   },
   prts: function(node, start) {
-    //for of的语句如果省略{}则加上
     var parent = node.parent();
     if(parent.name() == JsNode.ITERSTMT
       && this.hash.hasOwnProperty(parent.nid())) {
@@ -53,9 +73,10 @@ var Forof = Class(function(jsdc) {
         this.jsdc.append(k + '=' + v + '.next()');
       }
       else {
+        //for of的语句如果省略{}则加上
         var last = parent.last();
         if(last.name() != JsNode.BLOCKSTMT) {
-          this.jsdc.append('{');
+          this.jsdc.appendBefore('{');
           this.assign(parent);
         }
       }
@@ -83,7 +104,11 @@ var Forof = Class(function(jsdc) {
     else {
       k = join(k);
     }
-    this.jsdc.append(k + '=' + k + '.value;');
+    //先存下临时引用
+    var o = this.hash[node.nid()];
+    o.id = k;
+    this.jsdc.append('var ' + o.temp + '=' + k + ';');
+    this.jsdc.append(k + '=' + o.temp + '.value;');
   }
 });
 

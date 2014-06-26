@@ -341,33 +341,39 @@ describe('es6', function() {
   describe('for of', function() {
     it('normal', function() {
       var s = 'for(a of o){}';
+      Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(a =o.next();!a.done;a=o.next()){a=a.value;}');
+      expect(res).to.eql('for(a =o.next();!a.done;a=o.next()){var _0_=a;a=_0_.value;;a=_0_}');
     });
     it('without blockstmt', function() {
       var s = 'for(a of b);';
+      Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(a =b.next();!a.done;a=b.next()){a=a.value;;}');
+      expect(res).to.eql('for(a =b.next();!a.done;a=b.next()){var _0_=a;a=_0_.value;;a=_0_}');
     });
     it('without blockstmt and append comment', function() {
       var s = 'for(a of b);//';
+      Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(a =b.next();!a.done;a=b.next()){a=a.value;;}//');
+      expect(res).to.eql('for(a =b.next();!a.done;a=b.next()){var _0_=a;a=_0_.value;;a=_0_}//');
     });
     it('without blockstmt and append mulit comment', function() {
       var s = 'for(a of b);/**/\n//\n';
+      Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(a =b.next();!a.done;a=b.next()){a=a.value;;}/**/\n//\n');
+      expect(res).to.eql('for(a =b.next();!a.done;a=b.next()){var _0_=a;a=_0_.value;;a=_0_}/**/\n//\n');
     });
     it('varstmt', function() {
       var s = 'for(var a of {}){a}';
+      Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(var a ={}.next();!a.done;a={}.next()){a=a.value;a}');
+      expect(res).to.eql('for(var a ={}.next();!a.done;a={}.next()){var _0_=a;a=_0_.value;a;a=_0_}');
     });
     it('varstmt without blockstmt', function() {
       var s = 'for(var a of {})a';
+      Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(var a ={}.next();!a.done;a={}.next()){a=a.value;a}');
+      expect(res).to.eql('for(var a ={}.next();!a.done;a={}.next()){var _0_=a;a=_0_.value;a;a=_0_}');
     });
   });
   describe('class', function() {
