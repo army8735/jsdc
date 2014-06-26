@@ -273,28 +273,28 @@ define(function(require, exports, module) {
         switch(node.name()) {
           case JsNode.IFSTMT:
             if(self.stmt.hasOwnProperty(node.nid())) {
+              var ifstmt = node;
               res.index++;
-              var block = node.leaf(4);
+              var block = ifstmt.leaf(4);
               //改写if语句
-              self.jsdc.ignore(node.first(), 'gen14');
-              self.jsdc.ignore(node.leaf(1), 'gen15');
-              self.jsdc.ignore(node.leaf(2), 'gen16');
-              self.jsdc.ignore(node.leaf(3), 'gen17');
+              self.jsdc.ignore(ifstmt.first(), 'gen14');
+              self.jsdc.ignore(ifstmt.leaf(1), 'gen15');
+              self.jsdc.ignore(ifstmt.leaf(2), 'gen16');
+              self.jsdc.ignore(ifstmt.leaf(3), 'gen17');
               if(block.name() == JsNode.BLOCKSTMT) {
                 self.jsdc.ignore(block.first().first(), 'gen18');
                 self.jsdc.ignore(block.first().last(), 'gen19');
               }
-              var temp;
+              var elseTemp;
               var ifEndTemp;
               var top;
-              var ifstmt = node;
               var elset = block.next();
               var elseblock;
               if(elset && elset.name() == JsNode.TOKEN) {
                 elseblock = elset.next();
               }
               //if结束后的状态
-              eventbus.on(node.nid(), function(node, start) {
+              eventbus.on(ifstmt.nid(), function(node, start) {
                 if(!start) {
                   if(!self.jsdc.endsWith(';')
                     && !self.jsdc.endsWith(':')
@@ -317,7 +317,7 @@ define(function(require, exports, module) {
                   self.jsdc.append(++top.index2 + ':');
                   self.jsdc.append((elseblock ? ++top.index2 : top.index2 + 1) + ';break;');
                   self.jsdc.append('case ' + (elseblock ? top.index2 - 1 : top.index2) + ':');
-                  temp = top.index2;
+                  elseTemp = top.index2;
                   ifEndTemp = ++top.index2;
                 }
                 else {
@@ -342,7 +342,7 @@ define(function(require, exports, module) {
                 }
                 eventbus.on(elseblock.nid(), function(node, start) {
                   if(start) {
-                    self.jsdc.append('case ' + temp + ':');
+                    self.jsdc.append('case ' + elseTemp + ':');
                   }
                   else if(elseblock.name() != JsNode.IFSTMT
                     && elseblock.parent().name() != JsNode.IFSTMT) {
@@ -359,6 +359,118 @@ define(function(require, exports, module) {
                   }
                 });
               }
+            }
+            break;
+          case JsNode.ITERSTMT:
+            var itstmt = node;
+            var first = itstmt.first();
+            var top;
+            var loopTemp;
+            var itTemp;
+            var itEndTemp;
+            var endTemp;
+            switch(first.token().content()) {
+              case 'for':
+                var block = itstmt.last();
+                if(block.name() == JsNode.BLOCKSTMT) {
+                  self.jsdc.ignore(block.first().first(), 'gen23');
+                  self.jsdc.ignore(block.first().last(), 'gen24');
+                }
+                self.jsdc.ignore(first, 'gen25');
+                self.jsdc.ignore(node.leaf(1), 'gen26');
+                self.jsdc.ignore(block.prev(), 'gen27');
+                switch(itstmt.leaf(3).token().content()) {
+                  case 'of':
+                    break;
+                  case 'in':
+                    var keys = self.jsdc.uid();
+                    var len = self.jsdc.uid();
+                    var index = self.jsdc.uid();
+                    var id;
+                    if(node.leaf(2).name() == JsNode.VARSTMT) {
+                      id = join(node.leaf(2).last());
+                    }
+                    else {
+                      id = join(node.leaf(2));
+                    }
+                    var obj = self.jsdc.uid();
+                    self.jsdc.ignore(node.leaf(2), 'gen28');
+                    self.jsdc.ignore(node.leaf(3), 'gen29');
+                    eventbus.on(itstmt.leaf(4).nid(), function(node, start) {
+                      if(start) {
+                        self.jsdc.append('var ' + obj + '=');
+                        top = self.hash[nid];
+                      }
+                      else {
+                        self.jsdc.appendBefore(',' + keys + '=Object.keys(');
+                        self.jsdc.appendBefore(obj);
+                        self.jsdc.appendBefore('),' + len);
+                        self.jsdc.appendBefore('=' + keys + '.length,');
+                        self.jsdc.appendBefore(index + '=0;');
+                        endTemp = ++top.index2;
+                        self.jsdc.appendBefore('case ' + endTemp + ':');
+                        self.jsdc.appendBefore(top.state + '=');
+                        self.jsdc.appendBefore(index + '<' + len + '?');
+                        itTemp = ++top.index2;
+                        itEndTemp = ++top.index2;
+                        self.jsdc.appendBefore(itTemp + ':' + itEndTemp + ';break;');
+                      }
+                    });
+                    eventbus.on(block.nid(), function(node, start) {
+                      if(start) {
+                        self.jsdc.append('case ' + itTemp + ':');
+                        self.jsdc.append(id + '=' + obj);
+                        self.jsdc.append('[' + index + ']');
+                      }
+                      else {
+                        self.jsdc.appendBefore(top.state + '=' + endTemp);
+                        self.jsdc.appendBefore(';break;case ' +  itEndTemp + ':');
+                      }
+                    });
+                    break;
+                  default:
+                    eventbus.on(itstmt.leaf(4).nid(), function(node, start) {
+                      if(start) {
+                        top = self.hash[nid];
+                        loopTemp = ++top.index2;
+                        self.jsdc.append('case ' + loopTemp + ':');
+                        self.jsdc.append(top.state + '=');
+                        //防止优先级错误
+                        if(itstmt.leaf(4).name() == JsNode.ASSIGNEXPR) {
+                          self.jsdc.append('(');
+                        }
+                        itTemp = ++top.index2;
+                      }
+                      else {
+                        if(itstmt.leaf(4).name() == JsNode.ASSIGNEXPR) {
+                          self.jsdc.appendBefore(')');
+                        }
+                        itEndTemp = ++top.index2;
+                        endTemp = ++top.index2;
+                        self.jsdc.appendBefore('?' +  itTemp + ':' + itEndTemp);
+                        self.jsdc.appendBefore(';break');
+                      }
+                    });
+                    eventbus.on(itstmt.leaf(6).nid(), function(node, start) {
+                      if(start) {
+                        self.jsdc.append('case ' + endTemp + ':');
+                      }
+                      else {
+                        self.jsdc.appendBefore(';' + top.state + '=' + loopTemp);
+                        self.jsdc.appendBefore(';break');
+                      }
+                    });
+                    eventbus.on(block.nid(), function(node, start) {
+                      if(start) {
+                        self.jsdc.append(';case ' + itTemp + ':');
+                      }
+                      else {
+                        self.jsdc.appendBefore(top.state + '=' + endTemp);
+                        self.jsdc.appendBefore(';break;case ' +  itEndTemp + ':');
+                      }
+                    });
+                }
+                break;
             }
             break;
           //忽略这些节点中的所有逻辑
