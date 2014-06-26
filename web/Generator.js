@@ -150,13 +150,20 @@ define(function(require, exports, module) {
               return o.done || 0;
             });
             done.push((o.index == o.count) ? 1 : 0);
+            done.push((o.return) ? 0 : 1);
             if(done.indexOf(0) > -1) {
               done = [false];
             }
+            var hash = {};
+            done = done.filter(function(o) {
+              var res = !hash.hasOwnProperty(o);
+              hash[o] = true;
+              return res;
+            });
             self.jsdc.appendBefore(',done:' + done.join('&&') + '}');
           }
           else {
-            self.jsdc.appendBefore(',done:' + (o.index == o.count) + '}');
+            self.jsdc.appendBefore(',done:' + (o.index == o.count && !o.return) + '}');
           }
           o.yield.push({
             i: self.jsdc.i
@@ -253,14 +260,30 @@ define(function(require, exports, module) {
                 self.jsdc.appendBefore(';' + o.state + '=-1;default:');
               }
             });
-            eventbus.on(node.leaf(1).nid(), function(node, start) {
-              if(start) {
-                self.jsdc.append('{value:');
-              }
-              else {
-                self.jsdc.appendBefore(',done:true}');
-              }
-            });
+            //无return内容分开侦听
+            if(node.leaf(1).name() == JsNode.TOKEN) {
+              eventbus.on(node.leaf(0).nid(), function(node, start) {
+                if(!start) {
+                  self.jsdc.append('{value:');
+                }
+              });
+              eventbus.on(node.nid(), function(node, start) {
+                if(!start) {
+                  self.jsdc.appendBefore(',done:true}');
+                }
+              });
+            }
+            //有则侦听内容
+            else {
+              eventbus.on(node.leaf(1).nid(), function(node, start) {
+                if(start) {
+                  self.jsdc.append('{value:');
+                }
+                else {
+                  self.jsdc.appendBefore(',done:true}');
+                }
+              });
+            }
             break;
           //忽略这些节点中的yield语句
           case JsNode.CLASSDECL:

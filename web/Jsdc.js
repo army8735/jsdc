@@ -161,6 +161,10 @@ define(function(require, exports, module) {
           this.arrowFn.arrow(token);
         }
         else if(token.type() == Token.KEYWORD
+          && content == 'return') {
+          eventbus.emit(node.nid(), [node, true]);
+        }
+        else if(token.type() == Token.KEYWORD
           && content == 'super'){
           this.klass.super(node);
         }
@@ -189,6 +193,9 @@ define(function(require, exports, module) {
         }
         else if(content == '(') {
           this.klass.prts(node);
+        }
+        else if(content == 'return') {
+          eventbus.emit(node.nid(), [node]);
         }
       }
       var ignore = token.ignore;
