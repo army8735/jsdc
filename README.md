@@ -682,10 +682,10 @@ function *a(){
 ```js
 var a=function(){var _1_=0;return function(){return{next:_0_}};function _0_(){
   while(1){switch(_1_){case 0:_1_=1;return{value:1,done:false}
-  case 1:_1_=-1;return{value:1,done:true};default:return{done:true}}}
+  case 1:_1_=-1;return{value:1,done:true}}}
 }}();
 ```
-> 注意状态在`switch`各分支语句之间的跳转，以及最后的`default`
+> 注意状态在`switch`各分支语句之间的跳转
 
 同时函数里面的`var`声明需要前置，以免每次调用`next()`方法时又重新声明一遍失去了状态：
 ```js
@@ -699,14 +699,14 @@ function *a(){
 var a=function(){var _1_=0;return function(){return{next:_0_}};var a;function _0_(){
   while(1){switch(_1_){case 0:a = 1;
   _1_=1;return{value:a++,done:false};
-  case 1:_1_=-1;return{value:a++,done:true;};default:return{done:true}}}
+  case 1:_1_=-1;return{value:a++,done:true;}}}
 }}();
 ```
 > 函数则不需要前置。
 
 > 注意函数内有个同名变量`a`，这就是前面为什么要改函数名的原因。
 
-添加`default`语句，更改最后一个`yield`的`done`为`true`：
+添加`default`语句：
 ```js
 function *a(){
   var a = 1;

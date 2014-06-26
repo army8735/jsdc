@@ -85,10 +85,12 @@ var Jsdc = Class(function(code) {
     return this.ts;
   },
   append: function(s) {
+    s = String(s);
     this.res += s;
     this.i = this.res.length;
   },
   appendBefore: function(s) {
+    s = String(s);
     if(this.i < this.res.length) {
       this.insert(s, this.i);
       this.i += s.length;
@@ -98,11 +100,21 @@ var Jsdc = Class(function(code) {
     }
   },
   insert: function(s, i) {
+    s = String(s);
     this.res = this.res.slice(0, i) + s + this.res.slice(i);
   },
   replace: function(s, i, len) {
     this.res = this.res.slice(0, i) + s + this.res.slice(i + len);
     this.i += s.length - len;
+  },
+  endsWith: function(s) {
+    s = String(s);
+    if(this.i < this.res.length) {
+      return this.res.slice(this.i - s.length, this.i) == s;
+    }
+    else {
+      return this.res.slice(this.res.length - s.length) == s;
+    }
   },
   next: function() {
     var i = ++this.index;

@@ -173,7 +173,14 @@ var Generator = Class(function(jsdc) {
       }
       else if(!o.return) {
         if(o.count) {
-          this.jsdc.appendBefore(';' + o.state + '=-1');
+          if(!this.jsdc.endsWith(';')
+            && !this.jsdc.endsWith(':')
+            && !this.jsdc.endsWith('{')
+            && !this.jsdc.endsWith('}')
+            && !this.jsdc.endsWith('\n')) {
+            this.jsdc.appendBefore(';');
+          }
+          this.jsdc.appendBefore(o.state + '=-1');
           this.jsdc.appendBefore(';default:return{done:true}}}');
         }
         else {
@@ -280,9 +287,21 @@ var Generator = Class(function(jsdc) {
             var ifEndTemp;
             var top;
             var ifstmt = node;
+            var elset = block.next();
+            var elseblock;
+            if(elset && elset.name() == JsNode.TOKEN) {
+              elseblock = elset.next();
+            }
             //if结束后的状态
             eventbus.on(node.nid(), function(node, start) {
               if(!start) {
+                if(!self.jsdc.endsWith(';')
+                  && !self.jsdc.endsWith(':')
+                  && !self.jsdc.endsWith('{')
+                  && !self.jsdc.endsWith('}')
+                  && !self.jsdc.endsWith('\n')) {
+                  self.jsdc.appendBefore(';');
+                }
                 self.jsdc.append('case ' + ifEndTemp + ':');
               }
             });
@@ -294,34 +313,48 @@ var Generator = Class(function(jsdc) {
                 self.jsdc.append(top.state + '=');
                 self.jsdc.append(join(ifstmt.leaf(2)));
                 self.jsdc.append('?');
-                self.jsdc.append(++top.index2 + ':' + ++top.index2 + ';break;');
-                self.jsdc.append('case ' + (top.index2 - 1) + ':');
+                self.jsdc.append(++top.index2 + ':');
+                self.jsdc.append((elseblock ? ++top.index2 : top.index2 + 1) + ';break;');
+                self.jsdc.append('case ' + (elseblock ? top.index2 - 1 : top.index2) + ':');
                 temp = top.index2;
                 ifEndTemp = ++top.index2;
               }
               else {
+                if(!self.jsdc.endsWith(';')
+                  && !self.jsdc.endsWith(':')
+                  && !self.jsdc.endsWith('{')
+                  && !self.jsdc.endsWith('}')
+                  && !self.jsdc.endsWith('\n')) {
+                  self.jsdc.appendBefore(';');
+                }
                 self.jsdc.appendBefore(top.state + '=');
                 self.jsdc.appendBefore(ifEndTemp);
                 self.jsdc.appendBefore(';break;');
               }
             });
             //else语句忽略{}
-            var elset = block.next();
-            if(elset && elset.name() == JsNode.TOKEN) {
+            if(elseblock) {
               self.jsdc.ignore(elset, 'gen20');
-              block = elset.next();
-              if(block.name() == JsNode.BLOCKSTMT) {
-                self.jsdc.ignore(block.first().first(), 'gen21');
-                self.jsdc.ignore(block.first().last(), 'gen22');
+              if(elseblock.name() == JsNode.BLOCKSTMT) {
+                self.jsdc.ignore(elseblock.first().first(), 'gen21');
+                self.jsdc.ignore(elseblock.first().last(), 'gen22');
               }
-              eventbus.on(block.nid(), function(node, start) {
+              eventbus.on(elseblock.nid(), function(node, start) {
                 if(start) {
                   self.jsdc.append('case ' + temp + ':');
                 }
-                else {
+                else if(elseblock.name() != JsNode.IFSTMT
+                  && elseblock.parent().name() != JsNode.IFSTMT) {
+                  if(!self.jsdc.endsWith(';')
+                    && !self.jsdc.endsWith(':')
+                    && !self.jsdc.endsWith('{')
+                    && !self.jsdc.endsWith('}')
+                    && !self.jsdc.endsWith('\n')) {
+                    self.jsdc.appendBefore(';');
+                  }
                   self.jsdc.appendBefore(top.state + '=');
                   self.jsdc.appendBefore(ifEndTemp);
-                  self.jsdc.appendBefore('break;');
+                  self.jsdc.appendBefore(';break;');
                 }
               });
             }

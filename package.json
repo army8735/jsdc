@@ -1,7 +1,7 @@
 {
   "name": "jsdc",
-  "version": "0.3.6",
-  "description": "transform ecmascript6 to ecmascript5",
+  "version": "0.4.0",
+  "description": "compiler ecmascript6 to ecmascript5",
   "maintainers": [
     {
       "name": "army8735",
@@ -42,6 +42,7 @@
     "jsdc",
     "ecmascript6",
     "ecmascript5",
+    "es6toes6",
     "transform",
     "compiler"
   ],
