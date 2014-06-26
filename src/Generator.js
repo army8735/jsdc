@@ -143,7 +143,20 @@ var Generator = Class(function(jsdc) {
         });
       }
       else {
-        self.jsdc.appendBefore(',done:' + (o.index == o.count) + '}');
+        var belong = self.belong(node);
+        if(belong.length) {
+          var done = belong.map(function(o) {
+            return o.done || 0;
+          });
+          done.push((o.index == o.count) ? 1 : 0);
+          if(done.indexOf(0) > -1) {
+            done = [false];
+          }
+          self.jsdc.appendBefore(',done:' + done.join('&&') + '}');
+        }
+        else {
+          self.jsdc.appendBefore(',done:' + (o.index == o.count) + '}');
+        }
         o.yield.push({
           i: self.jsdc.i
         });
@@ -411,13 +424,16 @@ var Generator = Class(function(jsdc) {
                       itTemp = ++top.index2;
                       itEndTemp = ++top.index2;
                       self.jsdc.appendBefore(itTemp + ':' + itEndTemp + ';break;');
+                      //供yield判断
+                      itstmt.done = index + '<' + len;
                     }
                   });
                   eventbus.on(block.nid(), function(node, start) {
                     if(start) {
                       self.jsdc.append('case ' + itTemp + ':');
-                      self.jsdc.append(id + '=' + obj);
-                      self.jsdc.append('[' + index + ']');
+                      self.jsdc.append(id + '=');
+                      self.jsdc.append(keys + '[');
+                      self.jsdc.append(index + '];');
                     }
                     else {
                       self.jsdc.appendBefore(top.state + '=' + endTemp);
@@ -456,6 +472,8 @@ var Generator = Class(function(jsdc) {
                       itTemp = ++top.index2;
                       itEndTemp = ++top.index2;
                       self.jsdc.appendBefore(itTemp + ':' + itEndTemp + ';break;');
+                      //供yield判断
+                      itstmt.done = next + '.done';
                     }
                   });
                   eventbus.on(block.nid(), function(node, start) {
@@ -493,6 +511,8 @@ var Generator = Class(function(jsdc) {
                       endTemp = ++top.index2;
                       self.jsdc.appendBefore('?' +  itTemp + ':' + itEndTemp);
                       self.jsdc.appendBefore(';break');
+                      //供yield判断
+                      itstmt.done = join(itstmt.leaf(4));
                     }
                   });
                   eventbus.on(itstmt.leaf(6).nid(), function(node, start) {
@@ -517,6 +537,7 @@ var Generator = Class(function(jsdc) {
               break;
             case 'while':
               self.jsdc.ignore(itstmt.first());
+              loopTemp = self.jsdc.uid();
               var block = itstmt.last();
               if(block.name() == JsNode.BLOCKSTMT) {
                 self.jsdc.ignore(block.first().first(), 'gen32');
@@ -524,10 +545,16 @@ var Generator = Class(function(jsdc) {
               }
               eventbus.on(itstmt.nid(), function(node, start) {
                 if(start) {
+                  self.jsdc.append('var ' + loopTemp + ';');
                   top = self.hash[nid];
                   endTemp = ++top.index2;
                   self.jsdc.append('case ' + endTemp + ':');
                   self.jsdc.append(top.state + '=');
+                }
+              });
+              eventbus.on(itstmt.leaf(2).nid(), function(node, start) {
+                if(start) {
+                  self.jsdc.append(loopTemp + '=');
                 }
               });
               eventbus.on(block.nid(), function(node, start) {
@@ -536,6 +563,8 @@ var Generator = Class(function(jsdc) {
                   itEndTemp = ++top.index2;
                   self.jsdc.append('?' + itTemp + ':' + itEndTemp);
                   self.jsdc.append(';break;case ' + itTemp + ':');
+                  //供yield判断
+                  itstmt.done = loopTemp;
                 }
                 else {
                   self.jsdc.appendBefore(top.state + '=' + endTemp);
@@ -544,6 +573,9 @@ var Generator = Class(function(jsdc) {
               });
               break;
             case 'do':
+              loopTemp = self.jsdc.uid();
+              //供yield判断
+              itstmt.done = loopTemp;
               self.jsdc.ignore(itstmt.first());
               self.jsdc.ignore(itstmt.leaf(2));
               var block = itstmt.leaf(1);
@@ -552,9 +584,17 @@ var Generator = Class(function(jsdc) {
                 self.jsdc.ignore(block.first().last(), 'gen35');
               }
               eventbus.on(itstmt.nid(), function(node, start) {
-                if(!start) {
+                if(start) {
+                  self.jsdc.append('var ' + loopTemp + ';');
+                }
+                else {
                   self.jsdc.appendBefore('?' + itTemp + ':' + itEndTemp);
                   self.jsdc.appendBefore(';break;case ' + itEndTemp + ':');
+                }
+              });
+              eventbus.on(itstmt.leaf(4).nid(), function(node, start) {
+                if(start) {
+                  self.jsdc.append(loopTemp + '=');
                 }
               });
               eventbus.on(block.nid(), function(node, start) {
