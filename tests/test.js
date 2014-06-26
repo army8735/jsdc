@@ -751,6 +751,30 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){while(1){switch(_0_){case 0:_0_=true?1:2;break;case 1:_0_=4;return{value:1,done:false};case 4:_0_=3;break;case 2:_0_=false?5:6;break;case 5:_0_=8;return{value:2,done:false};case 8:_0_=7;break;case 6:_0_=9;return{value:3,done:true};case 9:case 7:case 3:_0_=-1;default:return{done:true}}}}}();');
     });
+    it('in whilestmt', function() {
+      var s = 'function *a(){while(i++<5){yield i}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){while(1){switch(_0_){case 0:case 1:_0_=(i++<5)?2:3;break;case 2:_0_=4;return{value:i,done:true};case 4:_0_=1;break;case 3:_0_=-1;default:return{done:true}}}}}();');
+    });
+    it('in whilestmt no {}', function() {
+      var s = 'function *a(){while(i++<5)yield i}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){while(1){switch(_0_){case 0:case 1:_0_=(i++<5)?2:3;break;case 2:_0_=4;return{value:i,done:true};case 4:_0_=1;break;case 3:_0_=-1;default:return{done:true}}}}}();');
+    });
+    it('in dowhilestmt', function() {
+      var s = 'function *a(){do{yield i}while(i++<5)}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){while(1){switch(_0_){case 0:case 1:_0_=3;return{value:i,done:true};case 3:_0_=2;break;case 2:_0_=(i++<5)?1:4;break;case 4:_0_=-1;default:return{done:true}}}}}();');
+    });
+    it('in dowhilestmt no {}', function() {
+      var s = 'function *a(){do yield i;while(i++<5)}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){while(1){switch(_0_){case 0:case 1:_0_=3;return{value:i,done:true};case 3:_0_=2;break;case 2:_0_=(i++<5)?1:4;break;case 4:_0_=-1;default:return{done:true}}}}}();');
+    });
   });
   describe('destructor', function() {
     it('single in array', function() {

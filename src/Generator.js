@@ -515,6 +515,70 @@ var Generator = Class(function(jsdc) {
                   });
               }
               break;
+            case 'while':
+              self.jsdc.ignore(itstmt.first());
+              var block = itstmt.last();
+              if(block.name() == JsNode.BLOCKSTMT) {
+                self.jsdc.ignore(block.first().first(), 'gen32');
+                self.jsdc.ignore(block.first().last(), 'gen33');
+              }
+              eventbus.on(itstmt.nid(), function(node, start) {
+                if(start) {
+                  top = self.hash[nid];
+                  endTemp = ++top.index2;
+                  self.jsdc.append('case ' + endTemp + ':');
+                  self.jsdc.append(top.state + '=');
+                }
+              });
+              eventbus.on(block.nid(), function(node, start) {
+                if(start) {
+                  itTemp = ++top.index2;
+                  itEndTemp = ++top.index2;
+                  self.jsdc.append('?' + itTemp + ':' + itEndTemp);
+                  self.jsdc.append(';break;case ' + itTemp + ':');
+                }
+                else {
+                  self.jsdc.appendBefore(top.state + '=' + endTemp);
+                  self.jsdc.appendBefore(';break;case ' +  itEndTemp + ':');
+                }
+              });
+              break;
+            case 'do':
+              self.jsdc.ignore(itstmt.first());
+              self.jsdc.ignore(itstmt.leaf(2));
+              var block = itstmt.leaf(1);
+              if(block.name() == JsNode.BLOCKSTMT) {
+                self.jsdc.ignore(block.first().first(), 'gen34');
+                self.jsdc.ignore(block.first().last(), 'gen35');
+              }
+              eventbus.on(itstmt.nid(), function(node, start) {
+                if(!start) {
+                  self.jsdc.appendBefore('?' + itTemp + ':' + itEndTemp);
+                  self.jsdc.appendBefore(';break;case ' + itEndTemp + ':');
+                }
+              });
+              eventbus.on(block.nid(), function(node, start) {
+                if(start) {
+                  top = self.hash[nid];
+                  itTemp = ++top.index2;
+                  endTemp = ++top.index2;
+                  self.jsdc.append('case ' + itTemp + ':');
+                }
+                else {
+                  if(!self.jsdc.endsWith(';')
+                    && !self.jsdc.endsWith(':')
+                    && !self.jsdc.endsWith('{')
+                    && !self.jsdc.endsWith('}')
+                    && !self.jsdc.endsWith('\n')) {
+                    self.jsdc.appendBefore(';');
+                  }
+                  self.jsdc.appendBefore(top.state + '=' + endTemp);
+                  itEndTemp = ++top.index2;
+                  self.jsdc.appendBefore(';break;case ' + endTemp + ':');
+                  self.jsdc.appendBefore(top.state + '=');
+                }
+              });
+              break;
           }
           break;
         //忽略这些节点中的所有逻辑
@@ -531,6 +595,20 @@ var Generator = Class(function(jsdc) {
         self.pre(leaf, nid, bid, res);
       });
     }
+  },
+  belong: function(node) {
+    var res = [];
+    while(node = node.parent()) {
+      switch(node.name()) {
+        case JsNode.IFSTMT:
+        case JsNode.ITERSTMT:
+          res.push(node);
+        case JsNode.GENDECL:
+        case JsNode.GENEXPR:
+          break;
+      }
+    }
+    return res;
   },
   getLast: function(node) {
     while(node = node.last()) {
@@ -550,7 +628,7 @@ var Generator = Class(function(jsdc) {
           continue;
         }
         if(token.content() == value) {
-          this.jsdc.ignore(token, 'gen23');
+          this.jsdc.ignore(token, 'gen36');
           return;
         }
         else {
@@ -558,20 +636,6 @@ var Generator = Class(function(jsdc) {
         }
       }
     }
-  },
-  belong: function(node) {
-    var res = [];
-    while(node = node.parent()) {
-      switch(node.name()) {
-        case JsNode.IFSTMT:
-        case JsNode.ITERSTMT:
-          res.push(node);
-        case JsNode.GENDECL:
-        case JsNode.GENEXPR:
-          break;
-      }
-    }
-    return res;
   }
 });
 
