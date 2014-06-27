@@ -20,30 +20,15 @@ var Forof = Class(function(jsdc) {
         && of.name() == JsNode.TOKEN
         && of.token().content() == 'of') {
         //存放临时li供block首尾改写引用
-        this.hash[node.nid()] = {
-          temp: this.jsdc.uid()
-        };
+        this.hash[node.nid()] = true;
         this.jsdc.ignore(of, 'forof1');
       }
     }
     else if(this.hash.hasOwnProperty(node.nid())) {
       var last = node.last();
-      var s = '';
-      if(!this.jsdc.endsWith(';')
-        && !this.jsdc.endsWith(':')
-        && !this.jsdc.endsWith('{')
-        && !this.jsdc.endsWith('\n')) {
-        s = ';';
-      }
-      s += this.hash[node.nid()].id + '=' + this.hash[node.nid()].temp;
       if(last.name() != JsNode.BLOCKSTMT) {
-        //临时引用写回，使循环正常
-        this.jsdc.appendBefore(s);
         //}闭合
         this.jsdc.appendBefore('}');
-      }
-      else {
-        this.jsdc.insert(s, this.jsdc.res.length - 1);
       }
     }
   },
@@ -104,11 +89,7 @@ var Forof = Class(function(jsdc) {
     else {
       k = join(k);
     }
-    //先存下临时引用
-    var o = this.hash[node.nid()];
-    o.id = k;
-    this.jsdc.append('var ' + o.temp + '=' + k + ';');
-    this.jsdc.append(k + '=' + o.temp + '.value;');
+    this.jsdc.append(k + '=' + k + '.value;');
   }
 });
 
