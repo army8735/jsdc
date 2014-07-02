@@ -204,7 +204,9 @@ define(function(require, exports, module) {
       var ig;
       while(ig = this.next()) {
         if(!ignore || ig.type() != Token.BLANK) {
-          this.res += ig.content();
+          if(!ig.ignore) {
+            this.res += ig.content();
+          }
           ignore && (ig.ignore = true);
           ignore = false;
         }
@@ -371,17 +373,29 @@ define(function(require, exports, module) {
       }
       eventbus.emit(node.nid(), [node]);
     },
-    ignore: function(node, msg) {
+    ignore: function(node, msg, prev) {
       var self = this;
       if(node instanceof Token) {
         node.ignore = msg || true;
+        //忽略前置空格
+        if(prev) {
+          prev = node;
+          while(prev = prev.prev()) {
+            if(prev.type() == Token.BLANK) {
+              prev.ignore = msg || true;
+            }
+            else {
+              break;
+            }
+          }
+        }
       }
       else if(node.name() == JsNode.TOKEN) {
-        this.ignore(node.token());
+        this.ignore(node.token(), msg, prev);
       }
       else {
         node.leaves().forEach(function(leaf) {
-          self.ignore(leaf, msg);
+          self.ignore(leaf, msg, prev);
         });
       }
     },

@@ -223,7 +223,7 @@ function method(a, b = 1) {
 }
 ```
 ```js
-function method(a, b ) {if(b ===void 0)b=1;
+function method(a, b) {if(b ===void 0)b=1;
 }
 ```
 
@@ -794,7 +794,7 @@ var a;!function(){var _0_= [];a=_0_[0];if(_0_.indexOf(a)!=0)a=1}()
 ({a=1} = {})
 ```
 ```js
-(!function(){var _0_= {};a=_0_["a"];if(a===void 0)a=1;return _0_}())
+(!function(){var _0_= {};a=_0_["a"];if(!_0_.hasOwnProperty('a'))a=1;return _0_}())
 ```
 数组解构最后允许`rest`运算符：
 ```js

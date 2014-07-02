@@ -18,7 +18,7 @@ define(function(require, exports, module) {
           if(sgname.name() == JsNode.SINGLENAME && sgname.size() == 2) {
             var init = sgname.last();
             if(init.name() == JsNode.INITLZ) {
-              self.jsdc.ignore(init, 'default1');
+              self.jsdc.ignore(init, 'default1', true);
               (self.hash[fnbody] = self.hash[fnbody] || []).push(sgname);
             }
           }
