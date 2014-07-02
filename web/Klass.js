@@ -29,10 +29,11 @@ define(function(require, exports, module) {
             this.jsdc.ignore(node.leaf(5), 'klass6');
             o.extend = join(node.leaf(2).last());
             this.body(node.last().prev(), o.name, o.extend);
+            var temp = this.jsdc.uid();
             this.jsdc.append('!function(){');
-            this.jsdc.append('var _=Object.create(' + o.extend + '.prototype);');
-            this.jsdc.append('_.constructor=' + o.name + ';');
-            this.jsdc.append(o.name + '.prototype=_');
+            this.jsdc.append('var ' + temp + '=Object.create(' + o.extend + '.prototype);');
+            this.jsdc.append(temp + '.constructor=' + o.name + ';');
+            this.jsdc.append(o.name + '.prototype=' + temp);
             this.jsdc.append('}();');
           }
           this.hash[node.nid()] = o;
@@ -76,10 +77,11 @@ define(function(require, exports, module) {
           var classbody = node.last().prev();
           this.body(classbody, o.name, o.extend);
           if(o.extend) {
+            var temp = this.jsdc.uid();
             this.jsdc.append('!function(){');
-            this.jsdc.append('var _=Object.create(' + o.extend + '.prototype);');
-            this.jsdc.append('_.constructor=' + o.name + ';');
-            this.jsdc.append(o.name + '.prototype=_');
+            this.jsdc.append('var ' + temp + '=Object.create(' + o.extend + '.prototype);');
+            this.jsdc.append(temp + '.constructor=' + o.name + ';');
+            this.jsdc.append(o.name + '.prototype=' + temp);
             this.jsdc.append('}();');
           }
           this.hash[node.nid()] = o;
