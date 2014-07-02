@@ -385,7 +385,7 @@ constructor(){}
 }
 ```
 ```js
-!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();
+!function(){var _0_=Object.create(B.prototype);_0_.constructor=A;A.prototype=_0_;}();
 function A(){}
 Object.keys(B).forEach(function(k){A[k]=B[k]});
 ```
@@ -400,7 +400,7 @@ constructor(){super()}
 }
 ```
 ```js
-!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();
+!function(){var _0_=Object.create(B.prototype);_0_.constructor=A;A.prototype=_0_;}();
 function A(){B.call(this)}
 Object.keys(B).forEach(function(k){A[k]=B[k]});
 ```
@@ -411,7 +411,7 @@ constructor(){super.a()}
 }
 ```
 ```js
-!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_;}();
+!function(){var _0_=Object.create(B.prototype);_0_.constructor=A;A.prototype=_0_;}();
 function A(){B.prototype.a.call(this)}
 Object.keys(B).forEach(function(k){A[k]=B[k]});
 ```
@@ -421,7 +421,7 @@ class A extends B{
 }
 ```
 ```js
-function A(){B.call(this)}!function(){var _=Object.create(B.prototype);_.constructor=A;A.prototype=_}();
+function A(){B.call(this)}!function(){var _0_=Object.create(B.prototype);_0_.constructor=A;A.prototype=_0_}();
 Object.keys(B).forEach(function(k){A[k]=B[k]});
 ```
 
