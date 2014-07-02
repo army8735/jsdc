@@ -9,6 +9,7 @@ var Forof = Class(function(jsdc) {
   this.jsdc = jsdc;
   this.hash = {};
   this.pos = {};
+  this.destruct = {};
 }).methods({
   parse: function(node, start) {
     //有可能被Generator中改写过
@@ -26,6 +27,7 @@ var Forof = Class(function(jsdc) {
           if(leaf.name() == JsNode.PRMREXPR
             && leaf.size() == 1
             && [JsNode.OBJLTR, JsNode.ARRLTR].indexOf(leaf.first().name()) > -1) {
+            this.destruct[node.nid()] = leaf.first();
             this.hash[node.nid()] = this.getLast(leaf.first());
             this.jsdc.ignore(leaf, 'forof1');
           }
@@ -40,6 +42,7 @@ var Forof = Class(function(jsdc) {
           if(of.name() == JsNode.TOKEN
             && of.token().content() == 'of') {
             this.pos[node.nid()] = 4;
+            this.destruct[node.nid()] = node.leaf(3);
             //存放临时id供block首改写引用
             this.hash[node.nid()] = this.getLast(node.leaf(3));
             this.jsdc.ignore(of, 'forof3');
@@ -129,6 +132,27 @@ var Forof = Class(function(jsdc) {
       }
     }
     this.jsdc.append(k + '=' + k + '.value;');
+    if(this.destruct.hasOwnProperty(node.nid())) {
+      var ret = {
+        o: k,
+        s: '',
+        append: function(s) {
+          this.s += s;
+        },
+        appendBefore: function(s) {
+          this.s += s;
+        }
+      };
+      if(this.pos[node.nid()] == 4) {
+        this.jsdc.destruct.parse(this.destruct[node.nid()], true, ret);
+        this.jsdc.destruct.parse(this.destruct[node.nid()], false, ret);
+      }
+      else {
+        this.jsdc.destruct.expr(this.destruct[node.nid()], true, ret);
+        this.jsdc.destruct.expr(this.destruct[node.nid()], false, ret);
+      }
+      this.jsdc.append(ret.s);
+    }
   },
   getLast: function(node) {
     if(node.name() == JsNode.ARRLTR
@@ -143,7 +167,8 @@ var Forof = Class(function(jsdc) {
     for(var leaves = node.leaves(), i = leaves.length - 2; i > 0; i--) {
       var temp = leaves[i];
       var s = temp.name();
-      if(s == JsNode.SINGLENAME) {
+      if(s == JsNode.SINGLENAME
+        || s == JsNode.ASSIGNEXPR) {
         return temp.first().first().token().content();
       }
       else if(s == JsNode.PRMREXPR) {
@@ -167,7 +192,7 @@ var Forof = Class(function(jsdc) {
       var s = temp.name();
       if(s == JsNode.BINDPROPT) {
         leaves = temp.leaves();
-        if(leaves.length == 1) {
+        if(leaves.length < 3) {
           s = leaves[0].name();
           return leaves[0].first().first().token().content();
         }
@@ -184,7 +209,7 @@ var Forof = Class(function(jsdc) {
       }
       else if(s == JsNode.PROPTDEF) {
         leaves = temp.leaves();
-        if(leaves.length == 1) {
+        if(leaves.length < 3) {
           return leaves[0].token().content();
         }
         else {
@@ -192,6 +217,9 @@ var Forof = Class(function(jsdc) {
           s = temp.name();
           if(s == JsNode.TOKEN) {
             return temp.token().content();
+          }
+          else if(s == JsNode.PRMREXPR) {
+            return temp.first().token().content();
           }
           else {
             return this.getLast(temp);

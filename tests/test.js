@@ -375,6 +375,102 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('for(var a ={}.next();!a.done;a={}.next()){a=a.value;a}');
     });
+    it('destruct var arr', function() {
+      var s = 'for(var [a] of o){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(var a=o.next();!a.done;a=o.next()){a=a.value;a=a[0];}');
+    });
+    it('destruct var arr init', function() {
+      var s = 'for(var [a=1] of o){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(var a=o.next();!a.done;a=o.next()){a=a.value;!function(){var _0_=a;a=a[0];if(_0_.indexOf(a)!=0)a=1}();}');
+    });
+    it('destruct var arr multi', function() {
+      var s = 'for(var [a,b] of o){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(var b=o.next();!b.done;b=o.next()){b=b.value;a=b[0];b=b[1];}');
+    });
+    it('destruct var obj', function() {
+      var s = 'for(var {a} of o){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(var a=o.next();!a.done;a=o.next()){a=a.value;a=a["a"];}');
+    });
+    it('destruct var obj init', function() {
+      var s = 'for(var {a=1} of o){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(var a=o.next();!a.done;a=o.next()){a=a.value;!function(){var _0_=a;a=a["a"];if(!_0_.hasOwnProperty("a"))a=1}();}');
+    });
+    it('destruct var obj multi', function() {
+      var s = 'for(var {a,b} of o){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(var b=o.next();!b.done;b=o.next()){b=b.value;a=b["a"];b=b["b"];}');
+    });
+    it('destruct var complex', function() {
+      var s = 'for(var {a,b:c,d:{e=1}} of o){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(var e=o.next();!e.done;e=o.next()){e=e.value;a=e["a"];c=e["b"];var _0_=e["d"];!function(){var _1_=e;e=_0_["e"];if(!_1_.hasOwnProperty("e"))e=1}();}');
+    });
+    it('destruct expr arr', function() {
+      var s = 'for([a] of o){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(a=o.next();!a.done;a=o.next()){a=a.value;a=a[0];}');
+    });
+    it('destruct expr arr init', function() {
+      var s = 'for([a=1] of o){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(a=o.next();!a.done;a=o.next()){a=a.value;!function(){var _0_=a;a=a[0];if(_0_.indexOf(a)!=0)a=1}();}');
+    });
+    it('destruct expr arr multi', function() {
+      var s = 'for([a,b] of o){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(b=o.next();!b.done;b=o.next()){b=b.value;a=b[0];b=b[1];}');
+    });
+    it('destruct expr obj', function() {
+      var s = 'for({a} of o){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(a=o.next();!a.done;a=o.next()){a=a.value;a=a["a"];}');
+    });
+    it('destruct expr obj init', function() {
+      var s = 'for({a=1} of o){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(a=o.next();!a.done;a=o.next()){a=a.value;!function(){var _0_=a;a=a["a"];if(!_0_.hasOwnProperty("a"))a=1}();}');
+    });
+    it('destruct expr obj alias init', function() {
+      var s = 'for({a:b=1} of o){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(b=o.next();!b.done;b=o.next()){b=b.value;!function(){var _0_=b;b=b["a"];if(!_0_.hasOwnProperty("a"))b=1}();}');
+    });
+    it('destruct expr obj multi', function() {
+      var s = 'for({a,b} of o){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(b=o.next();!b.done;b=o.next()){b=b.value;a=b["a"];b=b["b"];}');
+    });
+    it('destruct expr complex', function() {
+      var s = 'for({a,b:c,d:{e=1}} of o){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(e=o.next();!e.done;e=o.next()){e=e.value;a=e["a"];c=e["b"];var _0_=e["d"];e=_0_["e"];if(!_0_.hasOwnProperty("e"))e=1;}');
+    });
+    it('destruct complex', function() {
+      var s = 'for({a=1,b:c=2,d:{e=3},f:[g=4]} of o){}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('for(g=o.next();!g.done;g=o.next()){g=g.value;a=g["a"];if(!g.hasOwnProperty("a"))a=1;c=g["b"];if(!g.hasOwnProperty("b"))c=2;var _0_=g["d"];e=_0_["e"];if(!_0_.hasOwnProperty("e"))e=3;var _1_=g["f"];g=_1_[0];if(_1_.indexOf(g)!=0)g=4;}');
+    });
   });
   describe('class', function() {
     it('empty', function() {
