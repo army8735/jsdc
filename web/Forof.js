@@ -117,9 +117,12 @@ define(function(require, exports, module) {
         }
       }
     },
-    assign: function(node) {
+    assign: function(node, ret) {
       var k;
-      if(typeof this.hash[node.nid()] == 'string') {
+      if(ret) {
+        k = ret.o;
+      }
+      else if(typeof this.hash[node.nid()] == 'string') {
         k = this.hash[node.nid()];
       }
       else {
@@ -132,27 +135,40 @@ define(function(require, exports, module) {
           k = join(k);
         }
       }
-      this.jsdc.append(k + '=' + k + '.value;');
-      if(this.destruct.hasOwnProperty(node.nid())) {
-        var ret = {
-          o: k,
-          s: '',
-          append: function(s) {
-            this.s += s;
-          },
-          appendBefore: function(s) {
-            this.s += s;
-          }
-        };
-        if(this.pos[node.nid()] == 4) {
-          this.jsdc.destruct.parse(this.destruct[node.nid()], true, ret);
-          this.jsdc.destruct.parse(this.destruct[node.nid()], false, ret);
+      if(ret) {
+        if(ret.pos == 4) {
+          this.jsdc.destruct.parse(node, true, ret);
+          this.jsdc.destruct.parse(node, false, ret);
         }
         else {
-          this.jsdc.destruct.expr(this.destruct[node.nid()], true, ret);
-          this.jsdc.destruct.expr(this.destruct[node.nid()], false, ret);
+          this.jsdc.destruct.expr(node, true, ret);
+          this.jsdc.destruct.expr(node, false, ret);
         }
-        this.jsdc.append(ret.s);
+        return ret.s;
+      }
+      else {
+        this.jsdc.append(k + '=' + k + '.value;');
+        if(this.destruct.hasOwnProperty(node.nid())) {
+          var ret2 = {
+            o: k,
+            s: '',
+            append: function(s) {
+              this.s += s;
+            },
+            appendBefore: function(s) {
+              this.s += s;
+            }
+          };
+          if(this.pos[node.nid()] == 4) {
+            this.jsdc.destruct.parse(this.destruct[node.nid()], true, ret2);
+            this.jsdc.destruct.parse(this.destruct[node.nid()], false, ret2);
+          }
+          else {
+            this.jsdc.destruct.expr(this.destruct[node.nid()], true, ret2);
+            this.jsdc.destruct.expr(this.destruct[node.nid()], false, ret2);
+          }
+          this.jsdc.append(ret2.s);
+        }
       }
     },
     getLast: function(node) {

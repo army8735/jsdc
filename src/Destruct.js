@@ -11,12 +11,12 @@ var Destruct = Class(function(jsdc) {
   this.inAssign = {};
   this.idCache = {};
 }).methods({
-  getIds: function(node) {
+  getIds: function(node, res) {
     if(this.idCache.hasOwnProperty(node.nid())) {
       return this.idCache[node.nid()];
     }
     this.jsdc.ignore(node, 'destruct1');
-    var res = { arr: [] };
+    res = res || { arr: [] };
     this.recursion(node, res);
     this.idCache[node.nid()] = res.arr;
     return res.arr;

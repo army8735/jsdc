@@ -131,6 +131,10 @@ define(function(require, exports, module) {
         }
         else {
           self.jsdc.append('return{value:');
+          //无yield返回，则附上undefined
+          if(node.size() == 1) {
+            self.jsdc.append('void 0');
+          }
         }
       }
       else {
@@ -264,7 +268,7 @@ define(function(require, exports, module) {
             if(node.leaf(1).name() == JsNode.TOKEN) {
               eventbus.on(node.leaf(0).nid(), function(node, start) {
                 if(!start) {
-                  self.jsdc.append('{value:');
+                  self.jsdc.append('{value:void 0');
                 }
               });
               eventbus.on(node.nid(), function(node, start) {
@@ -415,148 +419,244 @@ define(function(require, exports, module) {
                 self.jsdc.ignore(first, 'gen25');
                 self.jsdc.ignore(node.leaf(1), 'gen26');
                 self.jsdc.ignore(block.prev(), 'gen27');
-                switch(itstmt.leaf(3).token().content()) {
-                  case 'in':
-                    var keys = self.jsdc.uid();
-                    var len = self.jsdc.uid();
-                    var index = self.jsdc.uid();
-                    var id;
-                    if(node.leaf(2).name() == JsNode.VARSTMT) {
-                      id = join(node.leaf(2).last());
+                //特殊的for(var forbind of语句
+                if(itstmt.leaf(4).name() == JsNode.TOKEN
+                  && itstmt.leaf(4).token().content() == 'of') {
+                  self.jsdc.ignore(itstmt.leaf(2), 'gen36');
+                  var ids = self.jsdc.destruct.getIds(itstmt.leaf(3), { arr: [] });
+                  eventbus.on(itstmt.nid(), function(node, start) {
+                    if(start) {
+                      ids.forEach(function(id) {
+                        self.jsdc.insert('var ' + id + ';', self.hash[nid].pos);
+                      });
+                    }
+                  });
+                  var iterator;
+                  //标记使Forof类处理失效
+                  itstmt.gen = true;
+                  var next = self.jsdc.uid();
+                  var isDestruct = [JsNode.ARRBINDPAT, JsNode.OBJBINDPAT].indexOf(node.leaf(3).name()) > -1 ? node.leaf(3) : false;
+                  var id = isDestruct ? self.jsdc.forof.getLast(isDestruct) : join(node.leaf(3));
+                  var obj = self.jsdc.uid();
+                  self.jsdc.ignore(node.leaf(2), 'gen37');
+                  self.jsdc.ignore(node.leaf(3), 'gen38');
+                  self.jsdc.ignore(node.leaf(4), 'gen39');
+                  eventbus.on(itstmt.leaf(5).nid(), function(node, start) {
+                    if(start) {
+                      self.jsdc.append('var ' + obj + '=');
+                      top = self.hash[nid];
                     }
                     else {
-                      id = join(node.leaf(2));
+                      self.jsdc.appendBefore(',' + next);
+                      self.jsdc.appendBefore('=' + obj + '.next();');
+                      endTemp = ++top.index2;
+                      self.jsdc.appendBefore('case ' + endTemp + ':');
+                      self.jsdc.appendBefore(top.state + '=');
+                      self.jsdc.appendBefore(next + '.done' + '?');
+                      iterator = ++top.index2;
+                      itTemp = ++top.index2;
+                      itEndTemp = ++top.index2;
+                      self.jsdc.appendBefore(itTemp + ':' + itEndTemp + ';break;');
+                      //供yield判断
+                      itstmt.done = next + '.done';
                     }
-                    var obj = self.jsdc.uid();
-                    self.jsdc.ignore(node.leaf(2), 'gen28');
-                    self.jsdc.ignore(node.leaf(3), 'gen29');
-                    eventbus.on(itstmt.leaf(4).nid(), function(node, start) {
-                      if(start) {
-                        self.jsdc.append('var ' + obj + '=');
-                        top = self.hash[nid];
+                  });
+                  eventbus.on(block.nid(), function(node, start) {
+                    if(start) {
+                      self.jsdc.append('case ' + iterator + ':');
+                      self.jsdc.append(next + '=' + obj + '.next();');
+                      self.jsdc.append(top.state + '=' + endTemp);
+                      self.jsdc.append(';break;case ' + itTemp + ':');
+                      self.jsdc.append(id + '=' + next + '.value;');
+                      if(isDestruct) {
+                        var ret = {
+                          o: id,
+                          s: '',
+                          pos: 4,
+                          append: function(s) {
+                            this.s += s;
+                          },
+                          appendBefore: function(s) {
+                            this.s += s;
+                          }
+                        };
+                        self.jsdc.forof.assign(isDestruct, ret);
+                        self.jsdc.appendBefore(ret.s);
                       }
-                      else {
-                        self.jsdc.appendBefore(',' + keys + '=Object.keys(');
-                        self.jsdc.appendBefore(obj);
-                        self.jsdc.appendBefore('),' + len);
-                        self.jsdc.appendBefore('=' + keys + '.length,');
-                        self.jsdc.appendBefore(index + '=0;');
-                        endTemp = ++top.index2;
-                        self.jsdc.appendBefore('case ' + endTemp + ':');
-                        self.jsdc.appendBefore(top.state + '=');
-                        self.jsdc.appendBefore(index + '++<' + len + '?');
-                        itTemp = ++top.index2;
-                        itEndTemp = ++top.index2;
-                        self.jsdc.appendBefore(itTemp + ':' + itEndTemp + ';break;');
-                        //供yield判断
-                        itstmt.done = index + '<' + len;
-                      }
-                    });
-                    eventbus.on(block.nid(), function(node, start) {
-                      if(start) {
-                        self.jsdc.append('case ' + itTemp + ':');
-                        self.jsdc.append(id + '=');
-                        self.jsdc.append(keys + '[');
-                        self.jsdc.append(index + '];');
-                      }
-                      else {
-                        self.jsdc.appendBefore(top.state + '=' + endTemp);
-                        self.jsdc.appendBefore(';break;case ' +  itEndTemp + ':');
-                      }
-                    });
-                    break;
-                  case 'of':
-                    var iterator;
-                    //标记使Forof类处理失效
-                    itstmt.gen = true;
-                    var next = self.jsdc.uid();
-                    var id;
-                    if(node.leaf(2).name() == JsNode.VARSTMT) {
-                      id = join(node.leaf(2).last());
                     }
                     else {
-                      id = join(node.leaf(2));
+                      self.jsdc.appendBefore(top.state + '=' + endTemp);
+                      self.jsdc.appendBefore(';break;case ' + itEndTemp + ':');
                     }
-                    var obj = self.jsdc.uid();
-                    self.jsdc.ignore(node.leaf(2), 'gen30');
-                    self.jsdc.ignore(node.leaf(3), 'gen31');
-                    eventbus.on(itstmt.leaf(4).nid(), function(node, start) {
-                      if(start) {
-                        self.jsdc.append('var ' + obj + '=');
-                        top = self.hash[nid];
+                  });
+                }
+                else {
+                  switch(itstmt.leaf(3).token().content()) {
+                    case 'in':
+                      var keys = self.jsdc.uid();
+                      var len = self.jsdc.uid();
+                      var index = self.jsdc.uid();
+                      var id;
+                      if(node.leaf(2).name() == JsNode.VARSTMT) {
+                        id = join(node.leaf(2).last());
                       }
                       else {
-                        self.jsdc.appendBefore(',' + next);
-                        self.jsdc.appendBefore('=' + obj + '.next();');
-                        endTemp = ++top.index2;
-                        self.jsdc.appendBefore('case ' + endTemp + ':');
-                        self.jsdc.appendBefore(top.state + '=');
-                        self.jsdc.appendBefore(next + '.done' + '?');
-                        iterator = ++top.index2;
-                        itTemp = ++top.index2;
-                        itEndTemp = ++top.index2;
-                        self.jsdc.appendBefore(itTemp + ':' + itEndTemp + ';break;');
-                        //供yield判断
-                        itstmt.done = next + '.done';
+                        id = join(node.leaf(2));
                       }
-                    });
-                    eventbus.on(block.nid(), function(node, start) {
-                      if(start) {
-                        self.jsdc.append('case ' + iterator + ':');
-                        self.jsdc.append(next + '=' + obj + '.next();');
-                        self.jsdc.append(top.state + '=' + endTemp);
-                        self.jsdc.append(';break;case ' + itTemp + ':');
-                        self.jsdc.append(id + '=' + next + '.value;');
-                      }
-                      else {
-                        self.jsdc.appendBefore(top.state + '=' + endTemp);
-                        self.jsdc.appendBefore(';break;case ' +  itEndTemp + ':');
-                      }
-                    });
-                    break;
-                  default:
-                    eventbus.on(itstmt.leaf(4).nid(), function(node, start) {
-                      if(start) {
-                        top = self.hash[nid];
-                        loopTemp = ++top.index2;
-                        self.jsdc.append('case ' + loopTemp + ':');
-                        self.jsdc.append(top.state + '=');
-                        //防止优先级错误
-                        if(itstmt.leaf(4).name() == JsNode.ASSIGNEXPR) {
-                          self.jsdc.append('(');
+                      var obj = self.jsdc.uid();
+                      self.jsdc.ignore(node.leaf(2), 'gen28');
+                      self.jsdc.ignore(node.leaf(3), 'gen29');
+                      eventbus.on(itstmt.leaf(4).nid(), function(node, start) {
+                        if(start) {
+                          self.jsdc.append('var ' + obj + '=');
+                          top = self.hash[nid];
                         }
-                        itTemp = ++top.index2;
-                      }
-                      else {
-                        if(itstmt.leaf(4).name() == JsNode.ASSIGNEXPR) {
-                          self.jsdc.appendBefore(')');
+                        else {
+                          self.jsdc.appendBefore(',' + keys + '=Object.keys(');
+                          self.jsdc.appendBefore(obj);
+                          self.jsdc.appendBefore('),' + len);
+                          self.jsdc.appendBefore('=' + keys + '.length,');
+                          self.jsdc.appendBefore(index + '=0;');
+                          endTemp = ++top.index2;
+                          self.jsdc.appendBefore('case ' + endTemp + ':');
+                          self.jsdc.appendBefore(top.state + '=');
+                          self.jsdc.appendBefore(index + '++<' + len + '?');
+                          itTemp = ++top.index2;
+                          itEndTemp = ++top.index2;
+                          self.jsdc.appendBefore(itTemp + ':' + itEndTemp + ';break;');
+                          //供yield判断
+                          itstmt.done = index + '<' + len;
                         }
-                        itEndTemp = ++top.index2;
-                        endTemp = ++top.index2;
-                        self.jsdc.appendBefore('?' +  itTemp + ':' + itEndTemp);
-                        self.jsdc.appendBefore(';break');
-                        //供yield判断
-                        itstmt.done = join(itstmt.leaf(4));
-                      }
-                    });
-                    eventbus.on(itstmt.leaf(6).nid(), function(node, start) {
-                      if(start) {
-                        self.jsdc.append('case ' + endTemp + ':');
+                      });
+                      eventbus.on(block.nid(), function(node, start) {
+                        if(start) {
+                          self.jsdc.append('case ' + itTemp + ':');
+                          self.jsdc.append(id + '=');
+                          self.jsdc.append(keys + '[');
+                          self.jsdc.append(index + '];');
+                        }
+                        else {
+                          self.jsdc.appendBefore(top.state + '=' + endTemp);
+                          self.jsdc.appendBefore(';break;case ' + itEndTemp + ':');
+                        }
+                      });
+                      break;
+                    case 'of':
+                      var iterator;
+                      //标记使Forof类处理失效
+                      itstmt.gen = true;
+                      var next = self.jsdc.uid();
+                      var id;
+                      var isDestruct;
+                      if(node.leaf(2).name() == JsNode.VARSTMT) {
+                        id = join(node.leaf(2).last());
                       }
                       else {
-                        self.jsdc.appendBefore(';' + top.state + '=' + loopTemp);
-                        self.jsdc.appendBefore(';break');
+                        if(node.leaf(2).name() == JsNode.PRMREXPR
+                          && [JsNode.ARRLTR, JsNode.OBJLTR].indexOf(node.leaf(2).first().name()) > -1) {
+                          isDestruct = node.leaf(2).first();
+                          id = self.jsdc.forof.getLast(isDestruct);
+                        }
+                        else {
+                          id = join(node.leaf(2));
+                        }
                       }
-                    });
-                    eventbus.on(block.nid(), function(node, start) {
-                      if(start) {
-                        self.jsdc.append(';case ' + itTemp + ':');
-                      }
-                      else {
-                        self.jsdc.appendBefore(top.state + '=' + endTemp);
-                        self.jsdc.appendBefore(';break;case ' +  itEndTemp + ':');
-                      }
-                    });
+                      var obj = self.jsdc.uid();
+                      self.jsdc.ignore(node.leaf(2), 'gen30');
+                      self.jsdc.ignore(node.leaf(3), 'gen31');
+                      eventbus.on(itstmt.leaf(4).nid(), function(node, start) {
+                        if(start) {
+                          self.jsdc.append('var ' + obj + '=');
+                          top = self.hash[nid];
+                        }
+                        else {
+                          self.jsdc.appendBefore(',' + next);
+                          self.jsdc.appendBefore('=' + obj + '.next();');
+                          endTemp = ++top.index2;
+                          self.jsdc.appendBefore('case ' + endTemp + ':');
+                          self.jsdc.appendBefore(top.state + '=');
+                          self.jsdc.appendBefore(next + '.done' + '?');
+                          iterator = ++top.index2;
+                          itTemp = ++top.index2;
+                          itEndTemp = ++top.index2;
+                          self.jsdc.appendBefore(itTemp + ':' + itEndTemp + ';break;');
+                          //供yield判断
+                          itstmt.done = next + '.done';
+                        }
+                      });
+                      eventbus.on(block.nid(), function(node, start) {
+                        if(start) {
+                          self.jsdc.append('case ' + iterator + ':');
+                          self.jsdc.append(next + '=' + obj + '.next();');
+                          self.jsdc.append(top.state + '=' + endTemp);
+                          self.jsdc.append(';break;case ' + itTemp + ':');
+                          self.jsdc.append(id + '=' + next + '.value;');
+                          if(isDestruct) {
+                            var ret = {
+                              o: id,
+                              s: '',
+                              pos: 3,
+                              append: function(s) {
+                                this.s += s;
+                              },
+                              appendBefore: function(s) {
+                                this.s += s;
+                              }
+                            };
+                            self.jsdc.forof.assign(isDestruct, ret);
+                            self.jsdc.appendBefore(ret.s);
+                          }
+                        }
+                        else {
+                          self.jsdc.appendBefore(top.state + '=' + endTemp);
+                          self.jsdc.appendBefore(';break;case ' + itEndTemp + ':');
+                        }
+                      });
+                      break;
+                    default:
+                      eventbus.on(itstmt.leaf(4).nid(), function(node, start) {
+                        if(start) {
+                          top = self.hash[nid];
+                          loopTemp = ++top.index2;
+                          self.jsdc.append('case ' + loopTemp + ':');
+                          self.jsdc.append(top.state + '=');
+                          //防止优先级错误
+                          if(itstmt.leaf(4).name() == JsNode.ASSIGNEXPR) {
+                            self.jsdc.append('(');
+                          }
+                          itTemp = ++top.index2;
+                        }
+                        else {
+                          if(itstmt.leaf(4).name() == JsNode.ASSIGNEXPR) {
+                            self.jsdc.appendBefore(')');
+                          }
+                          itEndTemp = ++top.index2;
+                          endTemp = ++top.index2;
+                          self.jsdc.appendBefore('?' + itTemp + ':' + itEndTemp);
+                          self.jsdc.appendBefore(';break');
+                          //供yield判断
+                          itstmt.done = join(itstmt.leaf(4));
+                        }
+                      });
+                      eventbus.on(itstmt.leaf(6).nid(), function(node, start) {
+                        if(start) {
+                          self.jsdc.append('case ' + endTemp + ':');
+                        }
+                        else {
+                          self.jsdc.appendBefore(';' + top.state + '=' + loopTemp);
+                          self.jsdc.appendBefore(';break');
+                        }
+                      });
+                      eventbus.on(block.nid(), function(node, start) {
+                        if(start) {
+                          self.jsdc.append(';case ' + itTemp + ':');
+                        }
+                        else {
+                          self.jsdc.appendBefore(top.state + '=' + endTemp);
+                          self.jsdc.appendBefore(';break;case ' + itEndTemp + ':');
+                        }
+                      });
+                  }
                 }
                 break;
               case 'while':
