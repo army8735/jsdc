@@ -526,12 +526,14 @@ export class A{}
 exports.a=a;function a(){}
 exports.A=A;function A(){}
 ```
-`export default`会直接赋给`module.exports`：
+`export default`会赋给`exports.default`，这样在使用时会判断是否有`default`属性：
 ```js
 export default a
+import b from "a"
 ```
 ```js
 module.exports=a
+var b=function(){var _0_=require("a");return _0_.hasOwnProperty("default")?_0_.default:_0_}()}()
 ```
 
 ### ArrayComprehension数组推导

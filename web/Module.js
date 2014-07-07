@@ -38,10 +38,15 @@ define(function(require, exports, module) {
         if(last.name() != JsNode.FROMCAULSE) {
           last = last.prev();
         }
-        self.jsdc.append('var ' + id);
+        var temp = self.jsdc.uid();
+        self.jsdc.append('var ' + id + '=');
+        self.jsdc.append('function(){var ' + temp);
         self.jsdc.append('=require(');
         self.jsdc.append(last.last().token().content());
-        self.jsdc.append(');');
+        self.jsdc.append(');return ');
+        self.jsdc.append(temp + '.hasOwnProperty("default")?');
+        self.jsdc.append(temp + '.default:' + temp);
+        self.jsdc.append('}()');
       }
       //import ids from "string",import {ids} from "string"
       else {
