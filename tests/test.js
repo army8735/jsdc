@@ -612,7 +612,7 @@ describe('es6', function() {
       var s = 'import a from "a"';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('define(function(require,exports,module){var a;!function(){var _0_=require("a");a=_0_.a;}();});');
+      expect(res).to.eql('define(function(require,exports,module){var a=require("a");});');
     });
     it('import multi id', function() {
       var s = 'import a,b from "a"';
@@ -672,7 +672,7 @@ describe('es6', function() {
       var s = 'export default a';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('define(function(require,exports,module){module.exports=a});');
+      expect(res).to.eql('define(function(require,exports,module){exports.default=a});');
     });
     it('avoid of id __\d__', function() {
       var s = 'import {a as _0_} from "a"';
@@ -693,7 +693,7 @@ describe('es6', function() {
       Jsdc.reset();
       Jsdc.define(true);
       var res = Jsdc.parse(s);
-      expect(res).to.eql('/**/\n//\ndefine(function(require,exports,module){\nmodule.exports=a});');
+      expect(res).to.eql('/**/\n//\ndefine(function(require,exports,module){\nexports.default=a});');
     });
   });
   describe('array comprehension', function() {

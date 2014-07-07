@@ -1,6 +1,7 @@
-# Javascript Downcast
+Javascript Downcast
+====
 
-### compiler ecmascript6 to ecmascript5
+compiler ecmascript6 to ecmascript5
 
 [![NPM version](https://badge.fury.io/js/jsdc.png)](https://npmjs.org/package/jsdc)
 [![Build Status](https://travis-ci.org/army8735/jsdc.svg?branch=master)](https://travis-ci.org/army8735/jsdc)
