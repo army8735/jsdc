@@ -612,7 +612,7 @@ describe('es6', function() {
       var s = 'import a from "a"';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('define(function(require,exports,module){var a=function(){var _0_=require("a");return _0_.hasOwnProperty("default")?_0_.default:_0_}()});');
+      expect(res).to.eql('define(function(require,exports,module){var a=function(){var _0_=require("a");return _0_.hasOwnProperty("a")?_0_.a:_0_.hasOwnProperty("default")?_0_.default:_0_}()});');
     });
     it('import multi id', function() {
       var s = 'import a,b from "a"';

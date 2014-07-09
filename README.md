@@ -533,8 +533,9 @@ import b from "a"
 ```
 ```js
 module.exports=a
-var b=function(){var _0_=require("a");return _0_.hasOwnProperty("default")?_0_.default:_0_}()}()
+var b=function(){var b=function(){var _0_=require("a");return _0_.hasOwnProperty("b")?_0_.b:_0_.hasOwnProperty("default")?_0_.default:_0_}()}()
 ```
+> 注意单id会优先判断使用同名属性，退级使用`default`，最后模块本身
 
 ### ArrayComprehension数组推导
 可以代替`Array.map`方法：
