@@ -404,6 +404,7 @@ define(function(require, exports, module) {
       switch(first.name()) {
         case JsNode.ARRLTR:
           if(start) {
+            first.destruct = true;
             !ret && this.jsdc.ignore(first, 'destruct2');
             if(assignexpr.parent().name() == JsNode.ASSIGNEXPR) {
               self.hash[first.nid()] = self.hash[assignexpr.parent().first().first().nid()];
@@ -442,6 +443,15 @@ define(function(require, exports, module) {
               !ret && self.jsdc.append('function(){var ');
               !ret && self.jsdc.append(temp);
             }
+            self.getArray(first.leaves()).forEach(function(leaf) {
+              if(leaf.name() == JsNode.TOKEN) {
+                return;
+              }
+              leaf = leaf.first();
+              if(leaf.name() == JsNode.ARRLTR) {
+                self.destructExpr(leaf, true);
+              }
+            });
           }
           else {
             !ret && self.jsdc.appendBefore(';');
@@ -638,6 +648,19 @@ define(function(require, exports, module) {
     },
     destructExpr: function(node, data, ret) {
       var self = this;
+      if(data === true) {
+        node.destruct = true;
+        self.getArray(node.leaves()).forEach(function(leaf) {
+          if(leaf.name() == JsNode.TOKEN) {
+            return;
+          }
+          leaf = leaf.first();
+          if(leaf.name() == JsNode.ARRLTR) {
+            self.destructExpr(leaf, true);
+          }
+        });
+        return;
+      }
       switch(node.name()) {
         case JsNode.ARRLTR:
           (ret || self.jsdc).appendBefore('var ');

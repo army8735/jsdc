@@ -305,6 +305,9 @@ var Jsdc = Class(function(code) {
       case JsNode.OBJLTR:
         this.obj.parse(node, true);
         break;
+      case JsNode.ARRLTR:
+        this.rest.arrltr(node, true);
+        break;
     }
     eventbus.emit(node.nid(), [node, true]);
   },
@@ -368,6 +371,9 @@ var Jsdc = Class(function(code) {
         break;
       case JsNode.OBJLTR:
         this.obj.parse(node);
+        break;
+      case JsNode.ARRLTR:
+        this.rest.arrltr(node);
         break;
     }
     eventbus.emit(node.nid(), [node]);

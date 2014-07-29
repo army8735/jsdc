@@ -310,6 +310,16 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('fn.apply(this, [a,b].concat(c))');
     });
+    it('arrltr with rest', function() {
+      var s = '[a, ...b]';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('[a].concat(Object.prototype.toString.call(b)=="[object String]"?b.split(""):b)');
+    });
+    it('arrltr with rest string', function() {
+      var s = '[a, ..."b"]';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('[a].concat("b".split(""))');
+    });
   });
   describe('template', function() {
     it('normal', function() {

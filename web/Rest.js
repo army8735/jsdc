@@ -10,6 +10,7 @@ define(function(require, exports, module) {
     this.jsdc = jsdc;
     this.hash = {};
     this.hash2 = {};
+    this.hash3 = {};
   }).methods({
     param: function(fmparams) {
       if(fmparams.name() == JsNode.FMPARAMS && fmparams.size()) {
@@ -67,6 +68,44 @@ define(function(require, exports, module) {
         this.jsdc.append('.concat(');
         this.jsdc.append(node.last().first().token().content());
         this.jsdc.append(')');
+      }
+    },
+    arrltr: function(node, start) {
+      if(node.destruct) {
+        return;
+      }
+      if(start) {
+        var last = node.last();
+        var spread = last.prev();
+        if(spread && spread.name() == JsNode.SPREAD) {
+          var token = spread.last().last().token();
+          this.hash3[node.nid()] = {
+            isStr: token.type() == Token.STRING,
+            value: token.content()
+          };
+          this.jsdc.ignore(spread, 'rest3', true);
+          var prev = spread.prev();
+          if(prev && prev.name() == JsNode.TOKEN && prev.token().content() == ',') {
+            this.jsdc.ignore(prev, 'rest4', true);
+          }
+        }
+      }
+      else if(this.hash3.hasOwnProperty(node.nid())) {
+        var o = this.hash3[node.nid()];
+        this.jsdc.appendBefore('.concat(');
+        if(o.isStr) {
+          this.jsdc.appendBefore(o.value);
+          this.jsdc.appendBefore('.split("")');
+        }
+        else {
+          this.jsdc.appendBefore('Object.prototype.toString.call(');
+          this.jsdc.appendBefore(o.value);
+          this.jsdc.appendBefore(')=="[object String]"?');
+          this.jsdc.appendBefore(o.value);
+          this.jsdc.appendBefore('.split(""):');
+          this.jsdc.appendBefore(o.value);
+        }
+        this.jsdc.appendBefore(')');
       }
     }
   });

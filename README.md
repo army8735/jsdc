@@ -253,6 +253,15 @@ Math.max(...a)
 ```js
 Math.max.apply(Math, [].concat(a))
 ```
+在数组中则会自动展开，支持string预判断：
+```js
+var codeUnits = [..."this is a string"];
+var codeUnits = [...a];
+```
+```js
+var codeUnits = [].concat("this is a string".split(""));
+var codeUnits = [].concat(Object.prototype.toString.call(a)=="[object String]"?a.split(""):a);
+```
 
 ### template模板
 将模板转换为普通字符串，需要的情况下会包裹括号（确保运算符优先级正确性）：

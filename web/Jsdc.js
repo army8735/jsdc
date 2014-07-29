@@ -306,6 +306,9 @@ define(function(require, exports, module) {
         case JsNode.OBJLTR:
           this.obj.parse(node, true);
           break;
+        case JsNode.ARRLTR:
+          this.rest.arrltr(node, true);
+          break;
       }
       eventbus.emit(node.nid(), [node, true]);
     },
@@ -369,6 +372,9 @@ define(function(require, exports, module) {
           break;
         case JsNode.OBJLTR:
           this.obj.parse(node);
+          break;
+        case JsNode.ARRLTR:
+          this.rest.arrltr(node);
           break;
       }
       eventbus.emit(node.nid(), [node]);
