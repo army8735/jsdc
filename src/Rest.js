@@ -97,12 +97,13 @@ var Rest = Class(function(jsdc) {
         this.jsdc.appendBefore('.split("")');
       }
       else {
-        this.jsdc.appendBefore('Object.prototype.toString.call(');
-        this.jsdc.appendBefore(o.value);
-        this.jsdc.appendBefore(')=="[object String]"?');
-        this.jsdc.appendBefore(o.value);
-        this.jsdc.appendBefore('.split(""):');
-        this.jsdc.appendBefore(o.value);
+        this.jsdc.appendBefore('function(){var ');
+        var temp = this.jsdc.uid();
+        var temp2 = this.jsdc.uid();
+        this.jsdc.appendBefore(temp);
+        this.jsdc.appendBefore('=[],' + temp2);
+        this.jsdc.appendBefore(';while(!' + temp2 + '=' + o.value + '.next().done)');
+        this.jsdc.appendBefore(temp + '.push(' + temp2 + '.value)}()');
       }
       this.jsdc.appendBefore(')');
     }

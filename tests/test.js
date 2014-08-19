@@ -313,7 +313,7 @@ describe('es6', function() {
     it('arrltr with rest', function() {
       var s = '[a, ...b]';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('[a].concat(Object.prototype.toString.call(b)=="[object String]"?b.split(""):b)');
+      expect(res).to.eql('[a].concat(function(){var _0_=[],_1_;while(!_1_=b.next().done)_0_.push(_1_.value)}())');
     });
     it('arrltr with rest string', function() {
       var s = '[a, ..."b"]';
