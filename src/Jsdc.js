@@ -59,23 +59,23 @@ var Jsdc = Class(function(code) {
     } catch(e) {
       return e.toString();
     }
-      self.ignores = parser.ignore();
-      //记录所有id
-      var lexer = parser.lexer;
-      lexer.tokens().forEach(function(token) {
-        if(token.type() == Token.ID) {
-          self.ids[token.content()] = true;
-        }
-      });
-      self.ts = lexer.tokens();
-      //开头部分的ignore
-      while(self.ignores[self.index]) {
-        self.append(self.ignores[self.index++].content());
+    self.ignores = parser.ignore();
+    //记录所有id
+    var lexer = parser.lexer;
+    lexer.tokens().forEach(function(token) {
+      if(token.type() == Token.ID) {
+        self.ids[token.content()] = true;
       }
-      //预分析局部变量，将影响的let和const声明查找出来
-      self.scope.parse(self.node);
-      //递归处理
-      self.recursion(self.node);
+    });
+    self.ts = lexer.tokens();
+    //开头部分的ignore
+    while(self.ignores[self.index]) {
+      self.append(self.ignores[self.index++].content());
+    }
+    //预分析局部变量，将影响的let和const声明查找出来
+    self.scope.parse(self.node);
+    //递归处理
+    self.recursion(self.node);
     return self.res;
   },
   ast: function() {

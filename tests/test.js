@@ -320,6 +320,12 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('[a].concat("b".split(""))');
     });
+    it('callexpr contains a newexpr', function() {
+      Jsdc.reset();
+      var s = 'new a().b(...c)';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var _0_=new a().b;_0_.apply(_0_, [].concat(c))');
+    });
   });
   describe('template', function() {
     it('normal', function() {
