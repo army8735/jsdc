@@ -52,7 +52,7 @@ var Rest = Class(function(jsdc) {
         };
         //主表达式中含有生成的对象，不是直接引用，需创建一个临时变量保存引用
         if(needTemp) {
-          self.jsdc.append('var ' + temp + '=');
+          self.jsdc.append('function(){var ' + temp + '=');
           var first = node.first();
           eventbus.on(first.nid(), function(node2, start) {
             if(!start) {
@@ -113,6 +113,10 @@ var Rest = Class(function(jsdc) {
       this.jsdc.append('.concat(');
       this.jsdc.append(node.last().first().token().content());
       this.jsdc.append(')');
+      if(o.needTemp) {
+        //主表达式中含有生成的对象，不是直接引用，使用临时变量引用
+        this.jsdc.append(';return ' + o.temp + '}');
+      }
     }
   },
   arrltr: function(node, start) {
