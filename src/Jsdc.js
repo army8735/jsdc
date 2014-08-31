@@ -170,6 +170,9 @@ var Jsdc = Class(function(code) {
       else if(content == ')') {
         this.forof.prts(node, true);
       }
+      else if(content == ',') {
+        this.rest.comma (node);
+      }
       else if(token.type() == Token.TEMPLATE) {
         this.template.parse(token);
       }
@@ -305,8 +308,8 @@ var Jsdc = Class(function(code) {
       case JsNode.OBJLTR:
         this.obj.parse(node, true);
         break;
-      case JsNode.ARRLTR:
-        this.rest.arrltr(node, true);
+      case JsNode.SPREAD:
+        this.rest.spread(node, true);
         break;
     }
     eventbus.emit(node.nid(), [node, true]);
@@ -372,8 +375,8 @@ var Jsdc = Class(function(code) {
       case JsNode.OBJLTR:
         this.obj.parse(node);
         break;
-      case JsNode.ARRLTR:
-        this.rest.arrltr(node);
+      case JsNode.SPREAD:
+        this.rest.spread(node);
         break;
     }
     eventbus.emit(node.nid(), [node]);

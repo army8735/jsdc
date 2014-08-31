@@ -171,6 +171,9 @@ define(function(require, exports, module) {
         else if(content == ')') {
           this.forof.prts(node, true);
         }
+        else if(content == ',') {
+          this.rest.comma (node);
+        }
         else if(token.type() == Token.TEMPLATE) {
           this.template.parse(token);
         }
@@ -306,8 +309,8 @@ define(function(require, exports, module) {
         case JsNode.OBJLTR:
           this.obj.parse(node, true);
           break;
-        case JsNode.ARRLTR:
-          this.rest.arrltr(node, true);
+        case JsNode.SPREAD:
+          this.rest.spread(node, true);
           break;
       }
       eventbus.emit(node.nid(), [node, true]);
@@ -373,8 +376,8 @@ define(function(require, exports, module) {
         case JsNode.OBJLTR:
           this.obj.parse(node);
           break;
-        case JsNode.ARRLTR:
-          this.rest.arrltr(node);
+        case JsNode.SPREAD:
+          this.rest.spread(node);
           break;
       }
       eventbus.emit(node.nid(), [node]);

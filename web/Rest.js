@@ -120,28 +120,50 @@ define(function(require, exports, module) {
         }
       }
     },
-    arrltr: function(node, start) {
-      if(node.destruct) {
+    comma: function(node) {
+      var next = node.next();
+      if(next.name() == JsNode.SPREAD && !node.destruct) {
+        this.jsdc.ignore(node);
+      }
+    },
+    spread: function(node, start) {
+      if(node.destruct || node.parent().destruct) {
         return;
       }
       if(start) {
         var last = node.last();
-        var spread = last.prev();
-        if(spread && spread.name() == JsNode.SPREAD) {
-          var token = spread.last().last().token();
-          this.hash3[node.nid()] = {
-            isStr: token.type() == Token.STRING,
-            value: token.content()
-          };
-          this.jsdc.ignore(spread, 'rest3', true);
-          var prev = spread.prev();
-          if(prev && prev.name() == JsNode.TOKEN && prev.token().content() == ',') {
-            this.jsdc.ignore(prev, 'rest4', true);
-          }
-        }
+        var s = join(last);
+        this.hash3[node.nid()] = {
+          isStr: last.name() == JsNode.PRMREXPR
+            && last.first().name() == JsNode.TOKEN
+            && last.first().token().type() == Token.STRING,
+          isPrm: last.name() == JsNode.PRMREXPR,
+          value: join(last)
+        };
+        this.jsdc.ignore(node);
       }
       else if(this.hash3.hasOwnProperty(node.nid())) {
         var o = this.hash3[node.nid()];
+        var prev = node.prev();
+        //开始的[
+        if(prev.token().content() == '[') {
+          this.jsdc.appendBefore(']');
+        }
+        //中间情况是,号
+        else {
+          prev = prev.prev();
+          if(prev.name() != JsNode.SPREAD) {
+            this.jsdc.appendBefore(']');
+            //隔了一个普通数组值之前又是spread，即2个spread不相邻
+            prev = prev.prev();
+            if(prev) {
+              prev = prev.prev();
+              if(prev && prev.name() == JsNode.SPREAD) {
+                this.jsdc.appendBefore(')');
+              }
+            }
+          }
+        }
         this.jsdc.appendBefore('.concat(');
         if(o.isStr) {
           this.jsdc.appendBefore(o.value);
@@ -153,10 +175,26 @@ define(function(require, exports, module) {
           var temp2 = this.jsdc.uid();
           this.jsdc.appendBefore(temp);
           this.jsdc.appendBefore('=[],' + temp2);
-          this.jsdc.appendBefore(';while(!' + temp2 + '=' + o.value + '.next().done)');
-          this.jsdc.appendBefore(temp + '.push(' + temp2 + '.value)}()');
+          var temp3;
+          if(!o.isPrm) {
+            temp3 = this.jsdc.uid();
+            this.jsdc.appendBefore(',' + temp3 + '=' + o.value);
+          }
+          this.jsdc.appendBefore(';while(!' + temp2 + '=' + (o.isPrm ? o.value : temp3) + '.next().done)');
+          this.jsdc.appendBefore(temp + '.push(' + temp2 + '.value);return ' + temp + '}()');
         }
         this.jsdc.appendBefore(')');
+        var next = node.next();
+        if(next.token().content() == ']') {
+          this.jsdc.ignore(next);
+        }
+        else {
+          this.jsdc.ignore(next);
+          next = next.next();
+          if(next.name() != JsNode.SPREAD) {
+            this.jsdc.appendBefore('.concat([');
+          }
+        }
       }
     }
   });
