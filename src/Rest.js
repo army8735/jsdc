@@ -43,7 +43,7 @@ var Rest = Class(function(jsdc) {
       var spread = last.prev();
       if(spread.name() == JsNode.TOKEN && spread.token().content() == '...') {
         var first = node.first();
-        var needTemp = self.needTemp(first).ret;console.log(needTemp)
+        var needTemp = self.needTemp(first).ret;
         var temp = needTemp ? self.jsdc.uid() : '';
         self.hash2[node.nid()] = {
           node: first,
@@ -74,7 +74,7 @@ var Rest = Class(function(jsdc) {
     var isToken = node.name() == JsNode.TOKEN;
     if(!isToken) {
       node.leaves().forEach(function(leaf) {
-        if([JsNode.CALLEXPR, JsNode.NEWEXPR].indexOf(leaf.name()) > -1) {
+        if([JsNode.CALLEXPR, JsNode.NEWEXPR, JsNode.ARGS].indexOf(leaf.name()) > -1) {
           res.ret = true;
         }
         //忽略一些节点
