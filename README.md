@@ -20,6 +20,7 @@ npm install jsdc
 * CommonJS/AMD/CMD自适应
 * as simple as possible
 * 仅转换可实现的语言部分，扩展库（如`Set`和`Map`）请使用`es6-shim`之类的库
+* 特别注意某些实现依赖Iterator，请确保有此扩展
 
 ### 已实现的部分
 * 二进制和八进制的Number扩展
