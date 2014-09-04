@@ -301,6 +301,12 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('Math.max.apply(Math, [].concat(function(){var _0=[],_1;while(!(_1=a.next()).done)_0.push(_1.value)return _0}()))');
     });
+    it('callexpr with a fn spread', function() {
+      Jsdc.reset();
+      var s = 'a(...b())';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('a.apply(this, [].concat(function(){var _0=[],_1,_2=b();while(!(_1=_2.next()).done)_0.push(_1.value)return _0}()))');
+    });
     it('callexpr mult spread', function() {
       Jsdc.reset();
       var s = 'Math.max(a, ...b)';
@@ -330,6 +336,12 @@ describe('es6', function() {
       var s = 'new a().b(...c)';
       var res = Jsdc.parse(s);
       expect(res).to.eql('function(){var _0=new a();return _0.b.apply(_0, [].concat(function(){var _1=[],_2;while(!(_2=c.next()).done)_1.push(_2.value)return _1}()))}()');
+    });
+    it('spread with fn', function() {
+      Jsdc.reset();
+      var s = '[...a()]';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('[].concat(function(){var _0=[],_1,_2=a();while(!(_1=_2.next()).done)_0.push(_1.value);return _0}())');
     });
     it('multi spread 1', function() {
       Jsdc.reset();

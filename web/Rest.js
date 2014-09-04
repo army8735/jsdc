@@ -106,11 +106,23 @@ define(function(require, exports, module) {
         }
         this.jsdc.append(']');
         this.jsdc.append('.concat(function(){');
-        var v = node.last().first().token().content();
+        var last = node.last();
+        var isPrm = last.name() == JsNode.PRMREXPR;
+        var v;
+        if(isPrm) {
+          v = last.first().token().content();
+        }
+        else {
+          v = join(last);
+        }
         var temp = this.jsdc.uid();
         var temp2 = this.jsdc.uid();
         this.jsdc.append('var ' + temp + '=[],' + temp2);
-        this.jsdc.append(';while(!(' + temp2 + '=' + v + '.next()).done)');
+        if(!isPrm) {
+          var temp3 = this.jsdc.uid();
+          this.jsdc.append(',' + temp3 + '=' + v);
+        }
+        this.jsdc.append(';while(!(' + temp2 + '=' + (isPrm ? v : temp3) + '.next()).done)');
         this.jsdc.append(temp + '.push(' + temp2 + '.value' + ')');
         this.jsdc.append('return ' + temp + '}())');
         if(o.needTemp) {
