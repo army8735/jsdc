@@ -48,15 +48,15 @@ var Rest = Class(function(jsdc) {
         self.hash2[node.nid()] = {
           node: first,
           needTemp: needTemp,
-          temp: temp
+          temp: needTemp ? temp : ''
         };
         //主表达式中含有生成的对象，不是直接引用，需创建一个临时变量保存引用
         if(needTemp) {
           self.jsdc.append('function(){var ' + temp + '=');
-          var first = node.first();
+          var first = first.first();
           eventbus.on(first.nid(), function(node2, start) {
             if(!start) {
-              self.jsdc.append(';' + temp);
+              self.jsdc.append(';return ' + temp);
             }
           });
 
@@ -73,15 +73,9 @@ var Rest = Class(function(jsdc) {
     }
     var isToken = node.name() == JsNode.TOKEN;
     if(!isToken) {
-      node.leaves().forEach(function(leaf) {
-        if([JsNode.CALLEXPR, JsNode.NEWEXPR, JsNode.ARGS].indexOf(leaf.name()) > -1) {
-          res.ret = true;
-        }
-        //忽略一些节点
-        else if([JsNode.FNEXPR, JsNode.CLASSEXPR, JsNode.METHOD].indexOf(leaf.name()) == -1) {
-          self.needTemp(leaf, res);
-        }
-      });
+      if([JsNode.CALLEXPR, JsNode.NEWEXPR].indexOf(node.first().name()) > -1) {
+        res.ret = true;
+      }
     }
     return res;
   },
@@ -114,8 +108,8 @@ var Rest = Class(function(jsdc) {
       this.jsdc.append(node.last().first().token().content());
       this.jsdc.append(')');
       if(o.needTemp) {
-        //主表达式中含有生成的对象，不是直接引用，使用临时变量引用
-        this.jsdc.append(';return ' + o.temp + '}');
+        //主表达式中含有生成的对象，不是直接引用
+        this.jsdc.append(')}(');
       }
     }
   },

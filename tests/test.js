@@ -326,7 +326,7 @@ describe('es6', function() {
       Jsdc.reset();
       var s = 'new a().b(...c)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function(){var _0_=new a(),_1_=_0_.b;_1_.apply(_0_, [].concat(c);return _0_})');
+      expect(res).to.eql('function(){var _0_=new a();return _0_.b.apply(_0_, [].concat(c))}()');
     });
     it('multi spread 1', function() {
       Jsdc.reset();
