@@ -104,9 +104,14 @@ var Rest = Class(function(jsdc) {
         this.jsdc.append(join(leaves[i]));
       }
       this.jsdc.append(']');
-      this.jsdc.append('.concat(');
-      this.jsdc.append(node.last().first().token().content());
-      this.jsdc.append(')');
+      this.jsdc.append('.concat(function(){');
+      var v = node.last().first().token().content();
+      var temp = this.jsdc.uid();
+      var temp2 = this.jsdc.uid();
+      this.jsdc.append('var ' + temp + '=[],' + temp2);
+      this.jsdc.append(';while(!(' + temp2 + '=' + v + '.next()).done)');
+      this.jsdc.append(temp + '.push(' + temp2 + '.value' + ')');
+      this.jsdc.append('return ' + temp + '}())');
       if(o.needTemp) {
         //主表达式中含有生成的对象，不是直接引用
         this.jsdc.append(')}(');
@@ -173,7 +178,7 @@ var Rest = Class(function(jsdc) {
           temp3 = this.jsdc.uid();
           this.jsdc.appendBefore(',' + temp3 + '=' + o.value);
         }
-        this.jsdc.appendBefore(';while(!' + temp2 + '=' + (o.isPrm ? o.value : temp3) + '.next().done)');
+        this.jsdc.appendBefore(';while(!(' + temp2 + '=' + (o.isPrm ? o.value : temp3) + '.next()).done)');
         this.jsdc.appendBefore(temp + '.push(' + temp2 + '.value);return ' + temp + '}()');
       }
       this.jsdc.appendBefore(')');

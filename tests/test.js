@@ -296,25 +296,28 @@ describe('es6', function() {
       expect(res).to.eql('function a(b){b=[].slice.call(arguments, 0);}');
     });
     it('callexpr single spread', function() {
+      Jsdc.reset();
       var s = 'Math.max(...a)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('Math.max.apply(Math, [].concat(a))');
+      expect(res).to.eql('Math.max.apply(Math, [].concat(function(){var _0_=[],_1_;while(!(_1_=a.next()).done)_0_.push(_1_.value)return _0_}()))');
     });
     it('callexpr mult spread', function() {
+      Jsdc.reset();
       var s = 'Math.max(a, ...b)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('Math.max.apply(Math, [a].concat(b))');
+      expect(res).to.eql('Math.max.apply(Math, [a].concat(function(){var _0_=[],_1_;while(!(_1_=b.next()).done)_0_.push(_1_.value)return _0_}()))');
     });
     it('callexpr with prmrexpr', function() {
+      Jsdc.reset();
       var s = 'fn(a, b, ...c)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('fn.apply(this, [a,b].concat(c))');
+      expect(res).to.eql('fn.apply(this, [a,b].concat(function(){var _0_=[],_1_;while(!(_1_=c.next()).done)_0_.push(_1_.value)return _0_}()))');
     });
     it('arrltr with rest', function() {
       Jsdc.reset();
       var s = '[a, ...b]';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('[a].concat(function(){var _0_=[],_1_;while(!_1_=b.next().done)_0_.push(_1_.value);return _0_}())');
+      expect(res).to.eql('[a].concat(function(){var _0_=[],_1_;while(!(_1_=b.next()).done)_0_.push(_1_.value);return _0_}())');
     });
     it('arrltr with rest string', function() {
       Jsdc.reset();
@@ -326,25 +329,25 @@ describe('es6', function() {
       Jsdc.reset();
       var s = 'new a().b(...c)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function(){var _0_=new a();return _0_.b.apply(_0_, [].concat(c))}()');
+      expect(res).to.eql('function(){var _0_=new a();return _0_.b.apply(_0_, [].concat(function(){var _1_=[],_2_;while(!(_2_=c.next()).done)_1_.push(_2_.value)return _1_}()))}()');
     });
     it('multi spread 1', function() {
       Jsdc.reset();
       var s = '[...a, ...b]';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('[].concat(function(){var _0_=[],_1_;while(!_1_=a.next().done)_0_.push(_1_.value);return _0_}()).concat(function(){var _2_=[],_3_;while(!_3_=b.next().done)_2_.push(_3_.value);return _2_}())');
+      expect(res).to.eql('[].concat(function(){var _0_=[],_1_;while(!(_1_=a.next()).done)_0_.push(_1_.value);return _0_}()).concat(function(){var _2_=[],_3_;while(!(_3_=b.next()).done)_2_.push(_3_.value);return _2_}())');
     });
     it('multi spread 2', function() {
       Jsdc.reset();
       var s = '[...a, c, ...b]';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('[].concat(function(){var _0_=[],_1_;while(!_1_=a.next().done)_0_.push(_1_.value);return _0_}()).concat([c]).concat(function(){var _2_=[],_3_;while(!_3_=b.next().done)_2_.push(_3_.value);return _2_}())');
+      expect(res).to.eql('[].concat(function(){var _0_=[],_1_;while(!(_1_=a.next()).done)_0_.push(_1_.value);return _0_}()).concat([c]).concat(function(){var _2_=[],_3_;while(!(_3_=b.next()).done)_2_.push(_3_.value);return _2_}())');
     });
     it('multi spread with string', function() {
       Jsdc.reset();
       var s = '[...a, ..."b"]';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('[].concat(function(){var _0_=[],_1_;while(!_1_=a.next().done)_0_.push(_1_.value);return _0_}()).concat("b".split(""))');
+      expect(res).to.eql('[].concat(function(){var _0_=[],_1_;while(!(_1_=a.next()).done)_0_.push(_1_.value);return _0_}()).concat("b".split(""))');
     });
   });
   describe('template', function() {
