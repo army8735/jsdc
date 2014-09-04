@@ -299,25 +299,25 @@ describe('es6', function() {
       Jsdc.reset();
       var s = 'Math.max(...a)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('Math.max.apply(Math, [].concat(function(){var _0_=[],_1_;while(!(_1_=a.next()).done)_0_.push(_1_.value)return _0_}()))');
+      expect(res).to.eql('Math.max.apply(Math, [].concat(function(){var _0=[],_1;while(!(_1=a.next()).done)_0.push(_1.value)return _0}()))');
     });
     it('callexpr mult spread', function() {
       Jsdc.reset();
       var s = 'Math.max(a, ...b)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('Math.max.apply(Math, [a].concat(function(){var _0_=[],_1_;while(!(_1_=b.next()).done)_0_.push(_1_.value)return _0_}()))');
+      expect(res).to.eql('Math.max.apply(Math, [a].concat(function(){var _0=[],_1;while(!(_1=b.next()).done)_0.push(_1.value)return _0}()))');
     });
     it('callexpr with prmrexpr', function() {
       Jsdc.reset();
       var s = 'fn(a, b, ...c)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('fn.apply(this, [a,b].concat(function(){var _0_=[],_1_;while(!(_1_=c.next()).done)_0_.push(_1_.value)return _0_}()))');
+      expect(res).to.eql('fn.apply(this, [a,b].concat(function(){var _0=[],_1;while(!(_1=c.next()).done)_0.push(_1.value)return _0}()))');
     });
     it('arrltr with rest', function() {
       Jsdc.reset();
       var s = '[a, ...b]';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('[a].concat(function(){var _0_=[],_1_;while(!(_1_=b.next()).done)_0_.push(_1_.value);return _0_}())');
+      expect(res).to.eql('[a].concat(function(){var _0=[],_1;while(!(_1=b.next()).done)_0.push(_1.value);return _0}())');
     });
     it('arrltr with rest string', function() {
       Jsdc.reset();
@@ -329,25 +329,25 @@ describe('es6', function() {
       Jsdc.reset();
       var s = 'new a().b(...c)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function(){var _0_=new a();return _0_.b.apply(_0_, [].concat(function(){var _1_=[],_2_;while(!(_2_=c.next()).done)_1_.push(_2_.value)return _1_}()))}()');
+      expect(res).to.eql('function(){var _0=new a();return _0.b.apply(_0, [].concat(function(){var _1=[],_2;while(!(_2=c.next()).done)_1.push(_2.value)return _1}()))}()');
     });
     it('multi spread 1', function() {
       Jsdc.reset();
       var s = '[...a, ...b]';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('[].concat(function(){var _0_=[],_1_;while(!(_1_=a.next()).done)_0_.push(_1_.value);return _0_}()).concat(function(){var _2_=[],_3_;while(!(_3_=b.next()).done)_2_.push(_3_.value);return _2_}())');
+      expect(res).to.eql('[].concat(function(){var _0=[],_1;while(!(_1=a.next()).done)_0.push(_1.value);return _0}()).concat(function(){var _2=[],_3;while(!(_3=b.next()).done)_2.push(_3.value);return _2}())');
     });
     it('multi spread 2', function() {
       Jsdc.reset();
       var s = '[...a, c, ...b]';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('[].concat(function(){var _0_=[],_1_;while(!(_1_=a.next()).done)_0_.push(_1_.value);return _0_}()).concat([c]).concat(function(){var _2_=[],_3_;while(!(_3_=b.next()).done)_2_.push(_3_.value);return _2_}())');
+      expect(res).to.eql('[].concat(function(){var _0=[],_1;while(!(_1=a.next()).done)_0.push(_1.value);return _0}()).concat([c]).concat(function(){var _2=[],_3;while(!(_3=b.next()).done)_2.push(_3.value);return _2}())');
     });
     it('multi spread with string', function() {
       Jsdc.reset();
       var s = '[...a, ..."b"]';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('[].concat(function(){var _0_=[],_1_;while(!(_1_=a.next()).done)_0_.push(_1_.value);return _0_}()).concat("b".split(""))');
+      expect(res).to.eql('[].concat(function(){var _0=[],_1;while(!(_1=a.next()).done)_0.push(_1.value);return _0}()).concat("b".split(""))');
     });
   });
   describe('template', function() {
@@ -424,7 +424,7 @@ describe('es6', function() {
       var s = 'for(var [a=1] of o){}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(var a=o.next();!a.done;a=o.next()){a=a.value;!function(){var _0_=a;a=a[0];if(_0_.indexOf(a)!=0)a=1}();}');
+      expect(res).to.eql('for(var a=o.next();!a.done;a=o.next()){a=a.value;!function(){var _0=a;a=a[0];if(_0.indexOf(a)!=0)a=1}();}');
     });
     it('destruct var arr multi', function() {
       var s = 'for(var [a,b] of o){}';
@@ -442,7 +442,7 @@ describe('es6', function() {
       var s = 'for(var {a=1} of o){}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(var a=o.next();!a.done;a=o.next()){a=a.value;!function(){var _0_=a;a=a["a"];if(!_0_.hasOwnProperty("a"))a=1}();}');
+      expect(res).to.eql('for(var a=o.next();!a.done;a=o.next()){a=a.value;!function(){var _0=a;a=a["a"];if(!_0.hasOwnProperty("a"))a=1}();}');
     });
     it('destruct var obj multi', function() {
       var s = 'for(var {a,b} of o){}';
@@ -454,7 +454,7 @@ describe('es6', function() {
       var s = 'for(var {a,b:c,d:{e=1}} of o){}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(var e=o.next();!e.done;e=o.next()){e=e.value;a=e["a"];c=e["b"];var _0_=e["d"];!function(){var _1_=e;e=_0_["e"];if(!_1_.hasOwnProperty("e"))e=1}();}');
+      expect(res).to.eql('for(var e=o.next();!e.done;e=o.next()){e=e.value;a=e["a"];c=e["b"];var _0=e["d"];!function(){var _1=e;e=_0["e"];if(!_1.hasOwnProperty("e"))e=1}();}');
     });
     it('destruct expr arr', function() {
       var s = 'for([a] of o){}';
@@ -466,7 +466,7 @@ describe('es6', function() {
       var s = 'for([a=1] of o){}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(a=o.next();!a.done;a=o.next()){a=a.value;!function(){var _0_=a;a=a[0];if(_0_.indexOf(a)!=0)a=1}();}');
+      expect(res).to.eql('for(a=o.next();!a.done;a=o.next()){a=a.value;!function(){var _0=a;a=a[0];if(_0.indexOf(a)!=0)a=1}();}');
     });
     it('destruct expr arr multi', function() {
       var s = 'for([a,b] of o){}';
@@ -484,13 +484,13 @@ describe('es6', function() {
       var s = 'for({a=1} of o){}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(a=o.next();!a.done;a=o.next()){a=a.value;!function(){var _0_=a;a=a["a"];if(!_0_.hasOwnProperty("a"))a=1}();}');
+      expect(res).to.eql('for(a=o.next();!a.done;a=o.next()){a=a.value;!function(){var _0=a;a=a["a"];if(!_0.hasOwnProperty("a"))a=1}();}');
     });
     it('destruct expr obj alias init', function() {
       var s = 'for({a:b=1} of o){}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(b=o.next();!b.done;b=o.next()){b=b.value;!function(){var _0_=b;b=b["a"];if(!_0_.hasOwnProperty("a"))b=1}();}');
+      expect(res).to.eql('for(b=o.next();!b.done;b=o.next()){b=b.value;!function(){var _0=b;b=b["a"];if(!_0.hasOwnProperty("a"))b=1}();}');
     });
     it('destruct expr obj multi', function() {
       var s = 'for({a,b} of o){}';
@@ -502,13 +502,13 @@ describe('es6', function() {
       var s = 'for({a,b:c,d:{e=1}} of o){}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(e=o.next();!e.done;e=o.next()){e=e.value;a=e["a"];c=e["b"];var _0_=e["d"];e=_0_["e"];if(!_0_.hasOwnProperty("e"))e=1;}');
+      expect(res).to.eql('for(e=o.next();!e.done;e=o.next()){e=e.value;a=e["a"];c=e["b"];var _0=e["d"];e=_0["e"];if(!_0.hasOwnProperty("e"))e=1;}');
     });
     it('destruct complex', function() {
       var s = 'for({a=1,b:c=2,d:{e=3},f:[g=4]} of o){}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('for(g=o.next();!g.done;g=o.next()){g=g.value;a=g["a"];if(!g.hasOwnProperty("a"))a=1;c=g["b"];if(!g.hasOwnProperty("b"))c=2;var _0_=g["d"];e=_0_["e"];if(!_0_.hasOwnProperty("e"))e=3;var _1_=g["f"];g=_1_[0];if(_1_.indexOf(g)!=0)g=4;}');
+      expect(res).to.eql('for(g=o.next();!g.done;g=o.next()){g=g.value;a=g["a"];if(!g.hasOwnProperty("a"))a=1;c=g["b"];if(!g.hasOwnProperty("b"))c=2;var _0=g["d"];e=_0["e"];if(!_0.hasOwnProperty("e"))e=3;var _1=g["f"];g=_1[0];if(_1.indexOf(g)!=0)g=4;}');
     });
   });
   describe('class', function() {
@@ -526,19 +526,19 @@ describe('es6', function() {
       var s = 'class A extends B{\nconstructor(){super()}\na(){}\n}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){var _0_=Object.create(B.prototype);_0_.constructor=A;A.prototype=_0_}();\nfunction A(){B.call(this)}\nA.prototype.a = function(){}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
+      expect(res).to.eql('!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();\nfunction A(){B.call(this)}\nA.prototype.a = function(){}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
     });
     it('super call property', function() {
       var s = 'class A extends B{constructor(){super.a}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){var _0_=Object.create(B.prototype);_0_.constructor=A;A.prototype=_0_}();function A(){B.prototype.a}Object.keys(B).forEach(function(k){A[k]=B[k]});');
+      expect(res).to.eql('!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();function A(){B.prototype.a}Object.keys(B).forEach(function(k){A[k]=B[k]});');
     });
     it('super call method with argments', function() {
       var s = 'class A extends B{constructor(){super.a(1)}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){var _0_=Object.create(B.prototype);_0_.constructor=A;A.prototype=_0_}();function A(){B.prototype.a.call(this,1)}Object.keys(B).forEach(function(k){A[k]=B[k]});');
+      expect(res).to.eql('!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();function A(){B.prototype.a.call(this,1)}Object.keys(B).forEach(function(k){A[k]=B[k]});');
     });
     it('getter/setter', function() {
       var s = 'class A{get b(){}set c(d){}}';
@@ -549,7 +549,7 @@ describe('es6', function() {
       var s = 'class A extends B{\nstatic F(){super.b()}\n}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function A(){B.call(this)}!function(){var _0_=Object.create(B.prototype);_0_.constructor=A;A.prototype=_0_}();\nA.F=function(){B.prototype.b.call(this)}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
+      expect(res).to.eql('function A(){B.call(this)}!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();\nA.F=function(){B.prototype.b.call(this)}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
     });
     it(';', function() {
       var s = 'class A{;}';
@@ -560,7 +560,7 @@ describe('es6', function() {
       var s = '!class {}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){function _0_(){}return _0_}()');
+      expect(res).to.eql('!function(){function _0(){}return _0}()');
     });
     it('classexpr withname', function() {
       var s = '!class A{}';
@@ -572,19 +572,19 @@ describe('es6', function() {
       var s = '!class {a(){}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){function _0_(){}_0_.prototype.a = function(){}return _0_}()');
+      expect(res).to.eql('!function(){function _0(){}_0.prototype.a = function(){}return _0}()');
     });
     it('classexpr extends', function() {
       var s = '!class extends A{}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){function _0_(){A.call(this)}!function(){var _1_=Object.create(A.prototype);_1_.constructor=_0_;_0_.prototype=_1_}();Object.keys(A).forEach(function(k){_0_[k]=A[k]});return _0_}()');
+      expect(res).to.eql('!function(){function _0(){A.call(this)}!function(){var _1=Object.create(A.prototype);_1.constructor=_0;_0.prototype=_1}();Object.keys(A).forEach(function(k){_0[k]=A[k]});return _0}()');
     });
     it('classexpr constructor', function() {
       var s = '!class {constructor(){}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){function _0_(){}return _0_}()');
+      expect(res).to.eql('!function(){function _0(){}return _0}()');
     });
     it('classexpr withname constructor', function() {
       var s = '!class A{constructor(){}}';
@@ -596,19 +596,19 @@ describe('es6', function() {
       var s = '!class A extends B{constructor(){super()}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){!function(){var _0_=Object.create(B.prototype);_0_.constructor=A;A.prototype=_0_}();extends Bfunction A(){B.call(this)}Object.keys(B).forEach(function(k){A[k]=B[k]});return A}()');
+      expect(res).to.eql('!function(){!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();extends Bfunction A(){B.call(this)}Object.keys(B).forEach(function(k){A[k]=B[k]});return A}()');
     });
     it('classexpr super', function() {
       var s = '!class A extends B{constructor(){super()}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){!function(){var _0_=Object.create(B.prototype);_0_.constructor=A;A.prototype=_0_}();extends Bfunction A(){B.call(this)}Object.keys(B).forEach(function(k){A[k]=B[k]});return A}()');
+      expect(res).to.eql('!function(){!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();extends Bfunction A(){B.call(this)}Object.keys(B).forEach(function(k){A[k]=B[k]});return A}()');
     });
     it('classexpr extends', function() {
       var s = '!class extends A{}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){function _0_(){A.call(this)}!function(){var _1_=Object.create(A.prototype);_1_.constructor=_0_;_0_.prototype=_1_}();Object.keys(A).forEach(function(k){_0_[k]=A[k]});return _0_}()');
+      expect(res).to.eql('!function(){function _0(){A.call(this)}!function(){var _1=Object.create(A.prototype);_1.constructor=_0;_0.prototype=_1}();Object.keys(A).forEach(function(k){_0[k]=A[k]});return _0}()');
     });
   });
   describe('number', function() {
@@ -651,31 +651,31 @@ describe('es6', function() {
       var s = 'import a from "a"';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('define(function(require,exports,module){var a=function(){var _0_=require("a");return _0_.hasOwnProperty("a")?_0_.a:_0_.hasOwnProperty("default")?_0_.default:_0_}()});');
+      expect(res).to.eql('define(function(require,exports,module){var a=function(){var _0=require("a");return _0.hasOwnProperty("a")?_0.a:_0.hasOwnProperty("default")?_0.default:_0}()});');
     });
     it('import multi id', function() {
       var s = 'import a,b from "a"';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('define(function(require,exports,module){var a;var b;!function(){var _0_=require("a");a=_0_.a;b=_0_.b;}();});');
+      expect(res).to.eql('define(function(require,exports,module){var a;var b;!function(){var _0=require("a");a=_0.a;b=_0.b;}();});');
     });
     it('import {}', function() {
       var s = 'import {a,b} from "a"';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('define(function(require,exports,module){var a;var b;!function(){var _0_=require("a");a=_0_.a;b=_0_.b;}();});');
+      expect(res).to.eql('define(function(require,exports,module){var a;var b;!function(){var _0=require("a");a=_0.a;b=_0.b;}();});');
     });
     it('import {} as', function() {
       var s = 'import {a,b as c} from "a"';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('define(function(require,exports,module){var a;var c;!function(){var _0_=require("a");a=_0_.a;c=_0_.b;}();});');
+      expect(res).to.eql('define(function(require,exports,module){var a;var c;!function(){var _0=require("a");a=_0.a;c=_0.b;}();});');
     });
     it('export *', function() {
       var s = 'export * from "a"';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('define(function(require,exports,module){!function(){var _0_=require("a");Object.keys(_0_).forEach(function(k){module.exports[k]=_0_[k];});}();});');
+      expect(res).to.eql('define(function(require,exports,module){!function(){var _0=require("a");Object.keys(_0).forEach(function(k){module.exports[k]=_0[k];});}();});');
     });
     it('export var', function() {
       var s = 'export var a';
@@ -714,18 +714,18 @@ describe('es6', function() {
       expect(res).to.eql('define(function(require,exports,module){exports.default=a});');
     });
     it('avoid of id __\d__', function() {
-      var s = 'import {a as _0_} from "a"';
+      var s = 'import {a as _0} from "a"';
       Jsdc.reset();
       Jsdc.define(false);
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var _0_;!function(){var _1_=require("a");_0_=_1_.a;}();');
+      expect(res).to.eql('var _0;!function(){var _1=require("a");_0=_1.a;}();');
     });
     it('set no define', function() {
       var s = 'import {a,b as c} from "a"';
       Jsdc.reset();
       Jsdc.define(false);
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;var c;!function(){var _0_=require("a");a=_0_.a;c=_0_.b;}();');
+      expect(res).to.eql('var a;var c;!function(){var _0=require("a");a=_0.a;c=_0.b;}();');
     });
     it('insert define before blank but not comment', function() {
       var s = '/**/\n//\n\nexport default a';
@@ -740,31 +740,31 @@ describe('es6', function() {
       var s = 'var a = [for(k of o)k]';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a = function(){var k;var _0_=[];for(k in o){k=o[k];_0_.push(k)}return _0_}()');
+      expect(res).to.eql('var a = function(){var k;var _0=[];for(k in o){k=o[k];_0.push(k)}return _0}()');
     });
     it('with cmphif', function() {
       var s = 'var a = [for(k of o)if(k)k]';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a = function(){var k;var _0_=[];for(k in o){k=o[k];if(k)_0_.push(k)}return _0_}()');
+      expect(res).to.eql('var a = function(){var k;var _0=[];for(k in o){k=o[k];if(k)_0.push(k)}return _0}()');
     });
     it('multi cmphfor', function() {
       var s = 'var a = [for(a of b)for(c of a)c]';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a = function(){var a;var c;var _0_=[];for(a in b){a=b[a];for(c in a){c=a[c];_0_.push(c)}}return _0_}()');
+      expect(res).to.eql('var a = function(){var a;var c;var _0=[];for(a in b){a=b[a];for(c in a){c=a[c];_0.push(c)}}return _0}()');
     });
     it('multi cmphfor with cmphif', function() {
       var s = 'var a = [for(a of b)for(c of a)if(c)c]';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a = function(){var a;var c;var _0_=[];for(a in b){a=b[a];for(c in a){c=a[c];if(c)_0_.push(c)}}return _0_}()');
+      expect(res).to.eql('var a = function(){var a;var c;var _0=[];for(a in b){a=b[a];for(c in a){c=a[c];if(c)_0.push(c)}}return _0}()');
     });
     it('multi variable', function() {
       var s = 'var a = [for(k of o)k], b';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a = function(){var k;var _0_=[];for(k in o){k=o[k];_0_.push(k)}return _0_}(), b');
+      expect(res).to.eql('var a = function(){var k;var _0=[];for(k in o){k=o[k];_0.push(k)}return _0}(), b');
     });
   });
   describe('arrow function', function() {
@@ -798,211 +798,211 @@ describe('es6', function() {
       var s = 'function *a(){}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(){return{done:true}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(){return{done:true}}}();');
     });
     it('normal', function() {
       var s = 'function *a(){yield 1}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){while(1){switch(_0_){case 0:_0_=1;return{value:1,done:true};case 1:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(_2){while(1){switch(_0){case 0:_0=1;return{value:1,done:true};case 1:_0=-1;default:return{done:true}}}}}();');
     });
     it('multi yield', function() {
       var s = 'function *a(){yield 1;yield 2}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){while(1){switch(_0_){case 0:_0_=1;return{value:1,done:false};case 1:_0_=2;return{value:2,done:true};case 2:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(_2){while(1){switch(_0){case 0:_0=1;return{value:1,done:false};case 1:_0=2;return{value:2,done:true};case 2:_0=-1;default:return{done:true}}}}}();');
     });
     it('with var state', function() {
       var s = 'function *a(){var a = 1;yield a++;yield a++}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};var a;function _1_(_2_){while(1){switch(_0_){case 0:a = 1;_0_=1;return{value:a++,done:false};case 1:_0_=2;return{value:a++,done:true};case 2:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var a;function _1(_2){while(1){switch(_0){case 0:a = 1;_0=1;return{value:a++,done:false};case 1:_0=2;return{value:a++,done:true};case 2:_0=-1;default:return{done:true}}}}}();');
     });
     it('scope in genaretor', function() {
       var s = 'function *a(){{var a}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};var a;function _1_(){!function(){a}();return{done:true}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var a;function _1(){!function(){a}();return{done:true}}}();');
     });
     it('let scope', function() {
       var s = 'function *a(){{let a}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(){!function(){var a}();return{done:true}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(){!function(){var a}();return{done:true}}}();');
     });
     it('ignore fndecl', function() {
       var s = 'function *a(){function a(){}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(){function a(){}return{done:true}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(){function a(){}return{done:true}}}();');
     });
     it('in block', function() {
       var s = '{function *a(){}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(){return{done:true}}}();}();');
+      expect(res).to.eql('!function(){var a=function(){var _0=0;return function(){return{next:_1}};function _1(){return{done:true}}}();}();');
     });
     it('yield a generator', function() {
       var s = 'function *a(){yield * b}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){while(1){switch(_0_){case 0:_0_=1;var _3_=b.next();return{done:(!_3_.done&&_0_--),value:_3_};case 1:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(_2){while(1){switch(_0){case 0:_0=1;var _3=b.next();return{done:(!_3.done&&_0--),value:_3};case 1:_0=-1;default:return{done:true}}}}}();');
     });
     it('generator expr', function() {
       var s = '~function *(){}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('~function(){var _0_=0;return function(){return{next:_1_}};function _1_(){}}()');
+      expect(res).to.eql('~function(){var _0=0;return function(){return{next:_1}};function _1(){}}()');
     });
     it('generator expr with name', function() {
       var s = '~function * a(){}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('~function(){var _0_=0;return function(){return{next:_1_}};function _1_(){}}()');
+      expect(res).to.eql('~function(){var _0=0;return function(){return{next:_1}};function _1(){}}()');
     });
     it('in ifstmt', function() {
       var s = 'function *a(){if(true){yield 1}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){while(1){switch(_0_){case 0:_0_=true?1:2;break;case 1:_0_=3;return{value:1,done:false};case 3:_0_=2;break;case 2:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(_2){while(1){switch(_0){case 0:_0=true?1:2;break;case 1:_0=3;return{value:1,done:false};case 3:_0=2;break;case 2:_0=-1;default:return{done:true}}}}}();');
     });
     it('in ifstmt no {}', function() {
       var s = 'function *a(){if(true)yield 1}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){while(1){switch(_0_){case 0:_0_=true?1:2;break;case 1:_0_=3;return{value:1,done:false};case 3:_0_=2;break;case 2:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(_2){while(1){switch(_0){case 0:_0=true?1:2;break;case 1:_0=3;return{value:1,done:false};case 3:_0=2;break;case 2:_0=-1;default:return{done:true}}}}}();');
     });
     it('in ifstmt else', function() {
       var s = 'function *a(){if(true)yield 1;else{yield 2}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){while(1){switch(_0_){case 0:_0_=true?1:2;break;case 1:_0_=4;return{value:1,done:false};case 4:_0_=3;break;case 2:_0_=5;return{value:2,done:false};case 5:case 3:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(_2){while(1){switch(_0){case 0:_0=true?1:2;break;case 1:_0=4;return{value:1,done:false};case 4:_0=3;break;case 2:_0=5;return{value:2,done:false};case 5:case 3:_0=-1;default:return{done:true}}}}}();');
     });
     it('in ifstmt else no {}', function() {
       var s = 'function *a(){if(true)yield 1;else yield 2}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){while(1){switch(_0_){case 0:_0_=true?1:2;break;case 1:_0_=4;return{value:1,done:false};case 4:_0_=3;break;case 2:_0_=5;return{value:2,done:false};case 5:case 3:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(_2){while(1){switch(_0){case 0:_0=true?1:2;break;case 1:_0=4;return{value:1,done:false};case 4:_0=3;break;case 2:_0=5;return{value:2,done:false};case 5:case 3:_0=-1;default:return{done:true}}}}}();');
     });
     it('in ifstmt elseif', function() {
       var s = 'function *a(){if(true)yield 1;else if(false)yield 2}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){while(1){switch(_0_){case 0:_0_=true?1:2;break;case 1:_0_=4;return{value:1,done:false};case 4:_0_=3;break;case 2:_0_=false?5:6;break;case 5:_0_=7;return{value:2,done:false};case 7:_0_=6;break;case 6:case 3:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(_2){while(1){switch(_0){case 0:_0=true?1:2;break;case 1:_0=4;return{value:1,done:false};case 4:_0=3;break;case 2:_0=false?5:6;break;case 5:_0=7;return{value:2,done:false};case 7:_0=6;break;case 6:case 3:_0=-1;default:return{done:true}}}}}();');
     });
     it('in ifstmt elseif no {}', function() {
       var s = 'function *a(){if(true)yield 1;else if(false){yield 2}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){while(1){switch(_0_){case 0:_0_=true?1:2;break;case 1:_0_=4;return{value:1,done:false};case 4:_0_=3;break;case 2:_0_=false?5:6;break;case 5:_0_=7;return{value:2,done:false};case 7:_0_=6;break;case 6:case 3:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(_2){while(1){switch(_0){case 0:_0=true?1:2;break;case 1:_0=4;return{value:1,done:false};case 4:_0=3;break;case 2:_0=false?5:6;break;case 5:_0=7;return{value:2,done:false};case 7:_0=6;break;case 6:case 3:_0=-1;default:return{done:true}}}}}();');
     });
     it('in ifstmt elseif else', function() {
       var s = 'function *a(){if(true)yield 1;else if(false)yield 2;else yield 3}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){while(1){switch(_0_){case 0:_0_=true?1:2;break;case 1:_0_=4;return{value:1,done:false};case 4:_0_=3;break;case 2:_0_=false?5:6;break;case 5:_0_=8;return{value:2,done:false};case 8:_0_=7;break;case 6:_0_=9;return{value:3,done:false};case 9:case 7:case 3:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(_2){while(1){switch(_0){case 0:_0=true?1:2;break;case 1:_0=4;return{value:1,done:false};case 4:_0=3;break;case 2:_0=false?5:6;break;case 5:_0=8;return{value:2,done:false};case 8:_0=7;break;case 6:_0=9;return{value:3,done:false};case 9:case 7:case 3:_0=-1;default:return{done:true}}}}}();');
     });
     it('in whilestmt', function() {
       var s = 'function *a(){while(i++<5){yield i}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_3_){while(1){switch(_0_){case 0:var _2_;case 1:_0_=(_2_=i++<5)?2:3;break;case 2:_0_=4;return{value:i,done:_2_&&1};case 4:_0_=1;break;case 3:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(_3){while(1){switch(_0){case 0:var _2;case 1:_0=(_2=i++<5)?2:3;break;case 2:_0=4;return{value:i,done:_2&&1};case 4:_0=1;break;case 3:_0=-1;default:return{done:true}}}}}();');
     });
     it('in whilestmt no {}', function() {
       var s = 'function *a(){while(i++<5)yield i}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_3_){while(1){switch(_0_){case 0:var _2_;case 1:_0_=(_2_=i++<5)?2:3;break;case 2:_0_=4;return{value:i,done:_2_&&1};case 4:_0_=1;break;case 3:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(_3){while(1){switch(_0){case 0:var _2;case 1:_0=(_2=i++<5)?2:3;break;case 2:_0=4;return{value:i,done:_2&&1};case 4:_0=1;break;case 3:_0=-1;default:return{done:true}}}}}();');
     });
     it('in dowhilestmt', function() {
       var s = 'function *a(){do{yield i}while(i++<5)}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_3_){while(1){switch(_0_){case 0:var _2_;case 1:_0_=3;return{value:i,done:_2_&&1};case 3:_0_=2;break;case 2:_0_=(_2_=i++<5)?1:4;break;case 4:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(_3){while(1){switch(_0){case 0:var _2;case 1:_0=3;return{value:i,done:_2&&1};case 3:_0=2;break;case 2:_0=(_2=i++<5)?1:4;break;case 4:_0=-1;default:return{done:true}}}}}();');
     });
     it('in dowhilestmt no {}', function() {
       var s = 'function *a(){do yield i;while(i++<5)}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_3_){while(1){switch(_0_){case 0:var _2_;case 1:_0_=3;return{value:i,done:_2_&&1};case 3:_0_=2;break;case 2:_0_=(_2_=i++<5)?1:4;break;case 4:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(_3){while(1){switch(_0){case 0:var _2;case 1:_0=3;return{value:i,done:_2&&1};case 3:_0=2;break;case 2:_0=(_2=i++<5)?1:4;break;case 4:_0=-1;default:return{done:true}}}}}();');
     });
     it('in forstmt', function() {
       var s = 'function *a(){for(var i = 0; i < 5; i++){yield i}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};var i;function _1_(_2_){while(1){switch(_0_){case 0:i = 0; case 1:_0_=i < 5?2:3;break; case 4:i++;_0_=1;break;case 2:_0_=5;return{value:i,done:i<5&&1};case 5:_0_=4;break;case 3:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var i;function _1(_2){while(1){switch(_0){case 0:i = 0; case 1:_0=i < 5?2:3;break; case 4:i++;_0=1;break;case 2:_0=5;return{value:i,done:i<5&&1};case 5:_0=4;break;case 3:_0=-1;default:return{done:true}}}}}();');
     });
     it('in forstmt no {}', function() {
       var s = 'function *a(){for(var i = 0; i < 5; i++)yield i}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};var i;function _1_(_2_){while(1){switch(_0_){case 0:i = 0; case 1:_0_=i < 5?2:3;break; case 4:i++;_0_=1;break;case 2:_0_=5;return{value:i,done:i<5&&1};case 5:_0_=4;break;case 3:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var i;function _1(_2){while(1){switch(_0){case 0:i = 0; case 1:_0=i < 5?2:3;break; case 4:i++;_0=1;break;case 2:_0=5;return{value:i,done:i<5&&1};case 5:_0=4;break;case 3:_0=-1;default:return{done:true}}}}}();');
     });
     it('in forinstmt', function() {
       var s = 'function *a(){for(var i in o){yield i}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};var i;function _1_(_6_){while(1){switch(_0_){case 0:var _5_=o,_2_=Object.keys(_5_),_3_=_2_.length,_4_=0;case 1:_0_=_4_++<_3_?2:3;break;case 2:i=_2_[_4_];_0_=4;return{value:i,done:_4_<_3_&&1};case 4:_0_=1;break;case 3:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var i;function _1(_6){while(1){switch(_0){case 0:var _5=o,_2=Object.keys(_5),_3=_2.length,_4=0;case 1:_0=_4++<_3?2:3;break;case 2:i=_2[_4];_0=4;return{value:i,done:_4<_3&&1};case 4:_0=1;break;case 3:_0=-1;default:return{done:true}}}}}();');
     });
     it('in forinstmt no {}', function() {
       var s = 'function *a(){for(var i in o)yield i}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};var i;function _1_(_6_){while(1){switch(_0_){case 0:var _5_=o,_2_=Object.keys(_5_),_3_=_2_.length,_4_=0;case 1:_0_=_4_++<_3_?2:3;break;case 2:i=_2_[_4_];_0_=4;return{value:i,done:_4_<_3_&&1};case 4:_0_=1;break;case 3:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var i;function _1(_6){while(1){switch(_0){case 0:var _5=o,_2=Object.keys(_5),_3=_2.length,_4=0;case 1:_0=_4++<_3?2:3;break;case 2:i=_2[_4];_0=4;return{value:i,done:_4<_3&&1};case 4:_0=1;break;case 3:_0=-1;default:return{done:true}}}}}();');
     });
     it('in forofstmt', function() {
       var s = 'function *a(){for(var i of o){yield i}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};var i;function _1_(_4_){while(1){switch(_0_){case 0:var _3_=o,_2_=_3_.next();case 1:_0_=_2_.done?3:4;break;case 2:_2_=_3_.next();_0_=1;break;case 3:i=_2_.value;_0_=5;return{value:i,done:_2_.done&&1};case 5:_0_=1;break;case 4:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var i;function _1(_4){while(1){switch(_0){case 0:var _3=o,_2=_3.next();case 1:_0=_2.done?3:4;break;case 2:_2=_3.next();_0=1;break;case 3:i=_2.value;_0=5;return{value:i,done:_2.done&&1};case 5:_0=1;break;case 4:_0=-1;default:return{done:true}}}}}();');
     });
     it('in forofstmt no {}', function() {
       var s = 'function *a(){for(var i of o)yield i}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};var i;function _1_(_4_){while(1){switch(_0_){case 0:var _3_=o,_2_=_3_.next();case 1:_0_=_2_.done?3:4;break;case 2:_2_=_3_.next();_0_=1;break;case 3:i=_2_.value;_0_=5;return{value:i,done:_2_.done&&1};case 5:_0_=1;break;case 4:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var i;function _1(_4){while(1){switch(_0){case 0:var _3=o,_2=_3.next();case 1:_0=_2.done?3:4;break;case 2:_2=_3.next();_0=1;break;case 3:i=_2.value;_0=5;return{value:i,done:_2.done&&1};case 5:_0=1;break;case 4:_0=-1;default:return{done:true}}}}}();');
     });
     it('with param id', function() {
       var s = 'function *a(b){var c=yield}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};var c;function _1_(b){while(1){switch(_0_){case 0:_0_=1;return{value:void 0,done:true};case 1:c=b;_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var c;function _1(b){while(1){switch(_0){case 0:_0=1;return{value:void 0,done:true};case 1:c=b;_0=-1;default:return{done:true}}}}}();');
     });
     it('with param rest', function() {
       var s = 'function *a(...b){var c=yield}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};var c;function _1_(b){b=[].slice.call(arguments, 0);while(1){switch(_0_){case 0:_0_=1;return{value:void 0,done:true};case 1:c=b[0];_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var c;function _1(b){b=[].slice.call(arguments, 0);while(1){switch(_0){case 0:_0=1;return{value:void 0,done:true};case 1:c=b[0];_0=-1;default:return{done:true}}}}}();');
     });
     it('with assignexpr', function() {
       var s = 'function *a(...b){c=yield}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(b){b=[].slice.call(arguments, 0);while(1){switch(_0_){case 0:_0_=1;return{value:void 0,done:true};case 1:c=b[0];_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(b){b=[].slice.call(arguments, 0);while(1){switch(_0){case 0:_0=1;return{value:void 0,done:true};case 1:c=b[0];_0=-1;default:return{done:true}}}}}();');
     });
     it('with return', function() {
       var s = 'function *a(...b){c\nreturn}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(b){b=[].slice.call(arguments, 0);c;_0_=-1;default:\nreturn{value:void 0,done:true}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(b){b=[].slice.call(arguments, 0);c;_0=-1;default:\nreturn{value:void 0,done:true}}}();');
     });
     it('with return result', function() {
       var s = 'function *a(...b){c;return c}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(b){b=[].slice.call(arguments, 0);c;;_0_=-1;default:return {value:c,done:true}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(b){b=[].slice.call(arguments, 0);c;;_0=-1;default:return {value:c,done:true}}}();');
     });
     it('yield null', function() {
       var s = 'function *a(){yield}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};function _1_(_2_){while(1){switch(_0_){case 0:_0_=1;return{value:void 0,done:true};case 1:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(_2){while(1){switch(_0){case 0:_0=1;return{value:void 0,done:true};case 1:_0=-1;default:return{done:true}}}}}();');
     });
     it('with for of destructor', function() {
       var s = 'function *a(){for(var [a] of o){yield}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0_=0;return function(){return{next:_1_}};var a;function _1_(_4_){while(1){switch(_0_){case 0:var _3_=o,_2_=_3_.next();case 1:_0_=_2_.done?3:4;break;case 2:_2_=_3_.next();_0_=1;break;case 3:a=_2_.value;a=a[0];_0_=5;return{value:void 0,done:_2_.done&&1};case 5:_0_=1;break;case 4:_0_=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var a;function _1(_4){while(1){switch(_0){case 0:var _3=o,_2=_3.next();case 1:_0=_2.done?3:4;break;case 2:_2=_3.next();_0=1;break;case 3:a=_2.value;a=a[0];_0=5;return{value:void 0,done:_2.done&&1};case 5:_0=1;break;case 4:_0=-1;default:return{done:true}}}}}();');
     });
   });
   describe('destructor', function() {
@@ -1010,343 +1010,343 @@ describe('es6', function() {
       var s = 'var [a] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;!function(){var _0_= o;a=_0_[0]}()');
+      expect(res).to.eql('var a;!function(){var _0= o;a=_0[0]}()');
     });
     it('multi in array', function() {
       var s = 'var [a,b] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var _0_= o;a=_0_[0];b=_0_[1]}()');
+      expect(res).to.eql('var b;var a;!function(){var _0= o;a=_0[0];b=_0[1]}()');
     });
     it('comma placeholder in array', function() {
       var s = 'var [a,,b] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var _0_= o;a=_0_[0];b=_0_[2]}()');
+      expect(res).to.eql('var b;var a;!function(){var _0= o;a=_0[0];b=_0[2]}()');
     });
     it('multi var in array', function() {
       var s = 'var [a] = [b] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;!function(){var _0_= o;b=_0_[0];a=_0_[0]}()');
+      expect(res).to.eql('var a;!function(){var _0= o;b=_0[0];a=_0[0]}()');
     });
     it('single in object', function() {
       var s = 'var {a} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;!function(){var _0_= o;a=_0_["a"]}()');
+      expect(res).to.eql('var a;!function(){var _0= o;a=_0["a"]}()');
     });
     it('multi in object', function() {
       var s = 'var {a,b} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var _0_= o;a=_0_["a"];b=_0_["b"]}()');
+      expect(res).to.eql('var b;var a;!function(){var _0= o;a=_0["a"];b=_0["b"]}()');
     });
     it('alias in object', function() {
       var s = 'var {a,b:c} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var c;var a;!function(){var _0_= o;a=_0_["a"];c=_0_["b"]}()');
+      expect(res).to.eql('var c;var a;!function(){var _0= o;a=_0["a"];c=_0["b"]}()');
     });
     it('multi var in object', function() {
       var s = 'var {a} = {b} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;!function(){var _0_= o;b=_0_["b"];a=_0_["a"]}()');
+      expect(res).to.eql('var a;!function(){var _0= o;b=_0["b"];a=_0["a"]}()');
     });
     it('array in array', function() {
       var s = 'var [a,[b]] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var _0_= o;a=_0_[0];var _1_=_0_[1];b=_1_[0]}()');
+      expect(res).to.eql('var b;var a;!function(){var _0= o;a=_0[0];var _1=_0[1];b=_1[0]}()');
     });
     it('array in array 2', function() {
       var s = 'var [a,[b,[c]]] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var c;var b;var a;!function(){var _0_= o;a=_0_[0];var _1_=_0_[1];b=_1_[0];var _2_=_1_[1];c=_2_[0]}()');
+      expect(res).to.eql('var c;var b;var a;!function(){var _0= o;a=_0[0];var _1=_0[1];b=_1[0];var _2=_1[1];c=_2[0]}()');
     });
     it('object in array', function() {
       var s = 'var [a,{b}] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var _0_= o;a=_0_[0];var _1_=_0_[1];b=_1_["b"]}()');
+      expect(res).to.eql('var b;var a;!function(){var _0= o;a=_0[0];var _1=_0[1];b=_1["b"]}()');
     });
     it('array in object', function() {
       var s = 'var {a,b:[c]} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var c;var a;!function(){var _0_= o;a=_0_["a"];var _1_=_0_["b"];c=_1_[0]}()');
+      expect(res).to.eql('var c;var a;!function(){var _0= o;a=_0["a"];var _1=_0["b"];c=_1[0]}()');
     });
     it('object in object', function() {
       var s = 'var {a,b:{c}} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var c;var a;!function(){var _0_= o;a=_0_["a"];var _1_=_0_["b"];c=_1_["c"]}()');
+      expect(res).to.eql('var c;var a;!function(){var _0= o;a=_0["a"];var _1=_0["b"];c=_1["c"]}()');
     });
     it('object in object 2', function() {
       var s = 'var {a,b:{c:{d}}} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var d;var a;!function(){var _0_= o;a=_0_["a"];var _1_=_0_["b"];var _2_=_1_["c"];d=_2_["d"]}()');
+      expect(res).to.eql('var d;var a;!function(){var _0= o;a=_0["a"];var _1=_0["b"];var _2=_1["c"];d=_2["d"]}()');
     });
     it('object in object 3', function() {
       var s = 'var {a,b:{c:d}} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var d;var a;!function(){var _0_= o;a=_0_["a"];var _1_=_0_["b"];d=_1_["c"]}()');
+      expect(res).to.eql('var d;var a;!function(){var _0= o;a=_0["a"];var _1=_0["b"];d=_1["c"]}()');
     });
     it('assingexpr single in array', function() {
       var s = '[a] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function(){var _0_= o;a=_0_[0];return _0_}()');
+      expect(res).to.eql('function(){var _0= o;a=_0[0];return _0}()');
     });
     it('assingexpr multi in array', function() {
       var s = '[a,b] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function(){var _0_= o;a=_0_[0];b=_0_[1];return _0_}()');
+      expect(res).to.eql('function(){var _0= o;a=_0[0];b=_0[1];return _0}()');
     });
     it('multi assingexpr in array', function() {
       var s = '[a] = [b] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function(){var _0_= o;b=_0_[0];a=_0_[0];return _0_}()');
+      expect(res).to.eql('function(){var _0= o;b=_0[0];a=_0[0];return _0}()');
     });
     it('multi assingexpr multi in array', function() {
       var s = '[a,b] = [c,d] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function(){var _0_= o;c=_0_[0];d=_0_[1];a=_0_[0];b=_0_[1];return _0_}()');
+      expect(res).to.eql('function(){var _0= o;c=_0[0];d=_0[1];a=_0[0];b=_0[1];return _0}()');
     });
     it('assingexpr comma placeholder in array', function() {
       var s = '[a,,b] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function(){var _0_= o;a=_0_[0];b=_0_[2];return _0_}()');
+      expect(res).to.eql('function(){var _0= o;a=_0[0];b=_0[2];return _0}()');
     });
     it('assingexpr single in object', function() {
       var s = '({a} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(function(){var _0_= o;a=_0_["a"];return _0_}())');
+      expect(res).to.eql('(function(){var _0= o;a=_0["a"];return _0}())');
     });
     it('assingexpr multi in object', function() {
       var s = '({a,b} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(function(){var _0_= o;a=_0_["a"];b=_0_["b"];return _0_}())');
+      expect(res).to.eql('(function(){var _0= o;a=_0["a"];b=_0["b"];return _0}())');
     });
     it('multi assingexpr in object', function() {
       var s = '({a} = {b} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(function(){var _0_= o;b=_0_["b"];a=_0_["a"];return _0_}())');
+      expect(res).to.eql('(function(){var _0= o;b=_0["b"];a=_0["a"];return _0}())');
     });
     it('multi assingexpr multi in object', function() {
       var s = '({a,b} = {c,d} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(function(){var _0_= o;c=_0_["c"];d=_0_["d"];a=_0_["a"];b=_0_["b"];return _0_}())');
+      expect(res).to.eql('(function(){var _0= o;c=_0["c"];d=_0["d"];a=_0["a"];b=_0["b"];return _0}())');
     });
     it('assingexpr alias in object', function() {
       var s = '({a,b:c} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(function(){var _0_= o;a=_0_["a"];c=_0_["b"];return _0_}())');
+      expect(res).to.eql('(function(){var _0= o;a=_0["a"];c=_0["b"];return _0}())');
     });
     it('assingexpr array in array', function() {
       var s = '([a,[b]] = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(function(){var _0_= o;a=_0_[0];var _1_=_0_[1];b=_1_[0];return _0_}())');
+      expect(res).to.eql('(function(){var _0= o;a=_0[0];var _1=_0[1];b=_1[0];return _0}())');
     });
     it('assingexpr object in array', function() {
       var s = '([a,{b}] = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(function(){var _0_= o;a=_0_[0];var _1_=_0_[1];b=_1_["b"];return _0_}())');
+      expect(res).to.eql('(function(){var _0= o;a=_0[0];var _1=_0[1];b=_1["b"];return _0}())');
     });
     it('assingexpr array in object', function() {
       var s = '({a,b:[c]} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(function(){var _0_= o;a=_0_["a"];var _1_=_0_["b"];c=_1_[0];return _0_}())');
+      expect(res).to.eql('(function(){var _0= o;a=_0["a"];var _1=_0["b"];c=_1[0];return _0}())');
     });
     it('assingexpr object in object', function() {
       var s = '({a,b:{c}} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(function(){var _0_= o;a=_0_["a"];var _1_=_0_["b"];c=_1_["c"];return _0_}())');
+      expect(res).to.eql('(function(){var _0= o;a=_0["a"];var _1=_0["b"];c=_1["c"];return _0}())');
     });
     it('init array', function() {
       var s = 'var [a=1] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;!function(){var _0_= o;a=_0_[0];if(_0_.indexOf(a)!=0)a=1}()');
+      expect(res).to.eql('var a;!function(){var _0= o;a=_0[0];if(_0.indexOf(a)!=0)a=1}()');
     });
     it('init object', function() {
       var s = 'var {x=1} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var x;!function(){var _0_= o;x=_0_["x"];if(!_0_.hasOwnProperty("x"))x=1}()');
+      expect(res).to.eql('var x;!function(){var _0= o;x=_0["x"];if(!_0.hasOwnProperty("x"))x=1}()');
     });
     it('init array in array', function() {
       var s = 'var [a,[b=1]] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var _0_= o;a=_0_[0];var _1_=_0_[1];b=_1_[0];if(_1_.indexOf(b)!=0)b=1}()');
+      expect(res).to.eql('var b;var a;!function(){var _0= o;a=_0[0];var _1=_0[1];b=_1[0];if(_1.indexOf(b)!=0)b=1}()');
     });
     it('init object in array', function() {
       var s = 'var [a,{b=1}] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var _0_= o;a=_0_[0];var _1_=_0_[1];b=_1_["b"];if(!_1_.hasOwnProperty("b"))b=1}()');
+      expect(res).to.eql('var b;var a;!function(){var _0= o;a=_0[0];var _1=_0[1];b=_1["b"];if(!_1.hasOwnProperty("b"))b=1}()');
     });
     it('init array in object', function() {
       var s = 'var {x,y:[z=1]} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var z;var x;!function(){var _0_= o;x=_0_["x"];var _1_=_0_["y"];z=_1_[0];if(_1_.indexOf(z)!=0)z=1}()');
+      expect(res).to.eql('var z;var x;!function(){var _0= o;x=_0["x"];var _1=_0["y"];z=_1[0];if(_1.indexOf(z)!=0)z=1}()');
     });
     it('init object in object', function() {
       var s = 'var {x,y:{z=1}} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var z;var x;!function(){var _0_= o;x=_0_["x"];var _1_=_0_["y"];z=_1_["z"];if(!_1_.hasOwnProperty("z"))z=1}()');
+      expect(res).to.eql('var z;var x;!function(){var _0= o;x=_0["x"];var _1=_0["y"];z=_1["z"];if(!_1.hasOwnProperty("z"))z=1}()');
     });
     it('assingexpr init array', function() {
       var s = '[a=1] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function(){var _0_= o;a=_0_[0];if(_0_.indexOf(a)!=0)a=1;return _0_}()');
+      expect(res).to.eql('function(){var _0= o;a=_0[0];if(_0.indexOf(a)!=0)a=1;return _0}()');
     });
     it('assingexpr init object', function() {
       var s = '({x=1} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(function(){var _0_= o;x=_0_["x"];if(!_0_.hasOwnProperty("x"))x=1;return _0_}())');
+      expect(res).to.eql('(function(){var _0= o;x=_0["x"];if(!_0.hasOwnProperty("x"))x=1;return _0}())');
     });
     it('assingexpr init array in array', function() {
       var s = '[a,[b=1]] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function(){var _0_= o;a=_0_[0];var _1_=_0_[1];b=_1_[0];if(_1_.indexOf(b)!=0)b=1;return _0_}()');
+      expect(res).to.eql('function(){var _0= o;a=_0[0];var _1=_0[1];b=_1[0];if(_1.indexOf(b)!=0)b=1;return _0}()');
     });
     it('assingexpr init object in array', function() {
       var s = '[a,{b=1}] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function(){var _0_= o;a=_0_[0];var _1_=_0_[1];b=_1_["b"];if(!_1_.hasOwnProperty("b"))b=1;return _0_}()');
+      expect(res).to.eql('function(){var _0= o;a=_0[0];var _1=_0[1];b=_1["b"];if(!_1.hasOwnProperty("b"))b=1;return _0}()');
     });
     it('assingexpr init array in object', function() {
       var s = '({x,y:[z=1]} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(function(){var _0_= o;x=_0_["x"];var _1_=_0_["y"];z=_1_[0];if(_1_.indexOf(z)!=0)z=1;return _0_}())');
+      expect(res).to.eql('(function(){var _0= o;x=_0["x"];var _1=_0["y"];z=_1[0];if(_1.indexOf(z)!=0)z=1;return _0}())');
     });
     it('assingexpr init object in object', function() {
       var s = '({x,y:{z=1}} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(function(){var _0_= o;x=_0_["x"];var _1_=_0_["y"];z=_1_["z"];if(!_1_.hasOwnProperty("z"))z=1;return _0_}())');
+      expect(res).to.eql('(function(){var _0= o;x=_0["x"];var _1=_0["y"];z=_1["z"];if(!_1.hasOwnProperty("z"))z=1;return _0}())');
     });
     it('assingexpr init object in object in object', function() {
       var s = '({x,y:{m:{n},o:p}} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(function(){var _0_= o;x=_0_["x"];var _1_=_0_["y"];var _2_=_1_["m"];n=_2_["n"];p=_1_["o"];return _0_}())');
+      expect(res).to.eql('(function(){var _0= o;x=_0["x"];var _1=_0["y"];var _2=_1["m"];n=_2["n"];p=_1["o"];return _0}())');
     });
     it('varstmt arr destruct first start with id', function() {
       var s = 'var a = [b] = [c] = e = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a = function(){var _0_= e = o;c=_0_[0];b=_0_[0];return _0_}()');
+      expect(res).to.eql('var a = function(){var _0= e = o;c=_0[0];b=_0[0];return _0}()');
     });
     it('varstmt obj destruct first start with id', function() {
       var s = 'var a = {b} = {c} = e = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a = function(){var _0_= e = o;c=_0_["c"];b=_0_["b"];return _0_}()');
+      expect(res).to.eql('var a = function(){var _0= e = o;c=_0["c"];b=_0["b"];return _0}()');
     });
     it('array var rest', function() {
       var s = 'var [a, ...b] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var _0_= o;a=_0_[0];b=_0_.slice(1)}()');
+      expect(res).to.eql('var b;var a;!function(){var _0= o;a=_0[0];b=_0.slice(1)}()');
     });
     it('array in array var rest', function() {
       var s = 'var [a, [b, ...c]] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var c;var b;var a;!function(){var _0_= o;a=_0_[0];var _1_=_0_[1];b=_1_[0];c=_1_.slice(1)}()');
+      expect(res).to.eql('var c;var b;var a;!function(){var _0= o;a=_0[0];var _1=_0[1];b=_1[0];c=_1.slice(1)}()');
     });
     it('array expr spread', function() {
       var s = '[a, ...b] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function(){var _0_= o;a=_0_[0];b=_0_.slice(1);return _0_}()');
+      expect(res).to.eql('function(){var _0= o;a=_0[0];b=_0.slice(1);return _0}()');
     });
     it('array in array expr spread', function() {
       var s = '[a, [b, ...c]] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function(){var _0_= o;a=_0_[0];var _1_=_0_[1];b=_1_[0];c=_1_.slice(1);return _0_}()');
+      expect(res).to.eql('function(){var _0= o;a=_0[0];var _1=_0[1];b=_1[0];c=_1.slice(1);return _0}()');
     });
     it('array in array in array expr spread', function() {
       var s = '[a, [b, [...c]]] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function(){var _0_= o;a=_0_[0];var _1_=_0_[1];b=_1_[0];var _2_=_1_[1];c=_2_.slice(0);return _0_}()');
+      expect(res).to.eql('function(){var _0= o;a=_0[0];var _1=_0[1];b=_1[0];var _2=_1[1];c=_2.slice(0);return _0}()');
     });
     it('var id,destruct', function() {
       var s = 'var a,[b]=1';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var _0_=1;b=_0_[0]}()');
+      expect(res).to.eql('var b;var a;!function(){var _0=1;b=_0[0]}()');
     });
     it('var id,destruct,id', function() {
       var s = 'var a,[b]=[1],c';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var _0_=[1];b=_0_[0]}();var c');
+      expect(res).to.eql('var b;var a;!function(){var _0=[1];b=_0[0]}();var c');
     });
     it('var id,destruct,destruct', function() {
       var s = 'var a,[b]=[1],[c]=[2]';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var c;var b;var a;!function(){var _0_=[1];b=_0_[0]}();!function(){var _1_=[2];c=_1_[0]}()');
+      expect(res).to.eql('var c;var b;var a;!function(){var _0=[1];b=_0[0]}();!function(){var _1=[2];c=_1[0]}()');
     });
     it('var destruct,destruct,id', function() {
       var s = 'var [a]=[0],[b]=[1],c';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var b;var a;!function(){var _0_=[0];a=_0_[0]}();!function(){var _1_=[1];b=_1_[0]}();var c');
+      expect(res).to.eql('var b;var a;!function(){var _0=[0];a=_0[0]}();!function(){var _1=[1];b=_1[0]}();var c');
     });
     it('alias obj', function() {
       var s = 'var {x:y=1} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var y;!function(){var _0_= o;y=_0_["x"];if(!_0_.hasOwnProperty("x"))y=1}()');
+      expect(res).to.eql('var y;!function(){var _0= o;y=_0["x"];if(!_0.hasOwnProperty("x"))y=1}()');
     });
     it('alias obj in array', function() {
       var s = 'var [{x:y=1}] = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var y;!function(){var _0_= o;var _1_=_0_[0];y=_1_["x"];if(!_1_.hasOwnProperty("x"))y=1}()');
+      expect(res).to.eql('var y;!function(){var _0= o;var _1=_0[0];y=_1["x"];if(!_1.hasOwnProperty("x"))y=1}()');
     });
     it('alias obj in obj', function() {
       var s = 'var {x:{y:z=1}} = o';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var z;!function(){var _0_= o;var _1_=_0_["x"];z=_1_["y"];if(!_1_.hasOwnProperty("y"))z=1}()');
+      expect(res).to.eql('var z;!function(){var _0= o;var _1=_0["x"];z=_1["y"];if(!_1.hasOwnProperty("y"))z=1}()');
     });
     it('expr alias obj', function() {
       var s = '({x:y=1} = o)';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('(function(){var _0_= o;y=_0_["x"];if(!_0_.hasOwnProperty("x"))y=1;return _0_}())');
+      expect(res).to.eql('(function(){var _0= o;y=_0["x"];if(!_0.hasOwnProperty("x"))y=1;return _0}())');
     });
   });
   describe('Unicode string', function() {
@@ -1401,7 +1401,7 @@ describe('es6', function() {
       var s = 'var o = {[a]:1}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var o = function(){var _0_={_1_:1};_0_[a]=_0_._1_;delete _0_._1_;return _0_}()');
+      expect(res).to.eql('var o = function(){var _0={_1:1};_0[a]=_0._1;delete _0._1;return _0}()');
     });
   });
 });

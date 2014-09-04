@@ -409,7 +409,7 @@ var Jsdc = Class(function(code) {
   },
   uid: function() {
     var temp;
-    while(temp = '_' + uid++ + '_') {
+    while(temp = '_' + uid++) {
       if(!this.ids.hasOwnProperty(temp)) {
         return temp;
       }
