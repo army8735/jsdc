@@ -124,7 +124,7 @@ define(function(require, exports, module) {
         }
         this.jsdc.append(';while(!(' + temp2 + '=' + (isPrm ? v : temp3) + '.next()).done)');
         this.jsdc.append(temp + '.push(' + temp2 + '.value' + ')');
-        this.jsdc.append('return ' + temp + '}())');
+        this.jsdc.append(';return ' + temp + '}())');
         if(o.needTemp) {
           //主表达式中含有生成的对象，不是直接引用
           this.jsdc.append(')}(');

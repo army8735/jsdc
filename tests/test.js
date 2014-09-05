@@ -299,25 +299,25 @@ describe('es6', function() {
       Jsdc.reset();
       var s = 'Math.max(...a)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('Math.max.apply(Math, [].concat(function(){var _0=[],_1;while(!(_1=a.next()).done)_0.push(_1.value)return _0}()))');
+      expect(res).to.eql('Math.max.apply(Math, [].concat(function(){var _0=[],_1;while(!(_1=a.next()).done)_0.push(_1.value);return _0}()))');
     });
     it('callexpr with a fn spread', function() {
       Jsdc.reset();
       var s = 'a(...b())';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('a.apply(this, [].concat(function(){var _0=[],_1,_2=b();while(!(_1=_2.next()).done)_0.push(_1.value)return _0}()))');
+      expect(res).to.eql('a.apply(this, [].concat(function(){var _0=[],_1,_2=b();while(!(_1=_2.next()).done)_0.push(_1.value);return _0}()))');
     });
     it('callexpr mult spread', function() {
       Jsdc.reset();
       var s = 'Math.max(a, ...b)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('Math.max.apply(Math, [a].concat(function(){var _0=[],_1;while(!(_1=b.next()).done)_0.push(_1.value)return _0}()))');
+      expect(res).to.eql('Math.max.apply(Math, [a].concat(function(){var _0=[],_1;while(!(_1=b.next()).done)_0.push(_1.value);return _0}()))');
     });
     it('callexpr with prmrexpr', function() {
       Jsdc.reset();
       var s = 'fn(a, b, ...c)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('fn.apply(this, [a,b].concat(function(){var _0=[],_1;while(!(_1=c.next()).done)_0.push(_1.value)return _0}()))');
+      expect(res).to.eql('fn.apply(this, [a,b].concat(function(){var _0=[],_1;while(!(_1=c.next()).done)_0.push(_1.value);return _0}()))');
     });
     it('arrltr with rest', function() {
       Jsdc.reset();
@@ -335,7 +335,7 @@ describe('es6', function() {
       Jsdc.reset();
       var s = 'new a().b(...c)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function(){var _0=new a();return _0.b.apply(_0, [].concat(function(){var _1=[],_2;while(!(_2=c.next()).done)_1.push(_2.value)return _1}()))}()');
+      expect(res).to.eql('function(){var _0=new a();return _0.b.apply(_0, [].concat(function(){var _1=[],_2;while(!(_2=c.next()).done)_1.push(_2.value);return _1}()))}()');
     });
     it('spread with fn', function() {
       Jsdc.reset();
