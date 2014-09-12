@@ -62,7 +62,8 @@ npm install jsdc
 * 在线地址：http://army8735.me/jsdc/demo/
 
 ## Tools
-* 命令行版工具：[https://github.com/xudafeng/jsdc-cli](https://github.com/xudafeng/jsdc-cli)
+* 命令行版工具：https://github.com/xudafeng/jsdc-cli
+* gulp插件：https://github.com/army8735/gulp-jsdc
 
 ## License
 [MIT License]
