@@ -1,7 +1,7 @@
 Javascript Downcast
 ====
 
-compiler ecmascript6 to ecmascript5
+> compiler ecmascript6 to ecmascript5
 
 [![NPM version](https://badge.fury.io/js/jsdc.png)](https://npmjs.org/package/jsdc)
 [![Build Status](https://travis-ci.org/army8735/jsdc.svg?branch=master)](https://travis-ci.org/army8735/jsdc)
@@ -60,6 +60,9 @@ npm install jsdc
 * demo目录下是一个web端的实时转换例子，本地浏览需要`npm install`安装依赖
 * 依赖的语法解析器来自于`homunculus`：https://github.com/army8735/homunculus
 * 在线地址：http://army8735.me/jsdc/demo/
+
+## Tools
+* 命令行版工具：[https://github.com/xudafeng/jsdc-cli](https://github.com/xudafeng/jsdc-cli)
 
 ## License
 [MIT License]
