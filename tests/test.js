@@ -665,6 +665,12 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('define(function(require,exports,module){var a=function(){var _0=require("a");return _0.hasOwnProperty("a")?_0.a:_0.hasOwnProperty("default")?_0.default:_0}();});');
     });
+    it.only('uid with hasOwnProperty', function() {
+      var s = 'import a from "a";a.hasOwnProperty';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('define(function(require,exports,module){var a=function(){var _0=require("a");return _0.hasOwnProperty("a")?_0.a:_0.hasOwnProperty("default")?_0.default:_0}();a.hasOwnProperty});');
+    });
     it('import from', function() {
       var s = 'import More from "./More";console.log(More);';
       Jsdc.reset();

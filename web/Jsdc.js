@@ -65,7 +65,7 @@ define(function(require, exports, module) {
       var lexer = parser.lexer;
       lexer.tokens().forEach(function(token) {
         if(token.type() == Token.ID) {
-          self.ids[token.content()] = true;
+          self.ids['_' + token.content()] = true;
         }
       });
       self.ts = lexer.tokens();
@@ -411,7 +411,7 @@ define(function(require, exports, module) {
     uid: function() {
       var temp;
       while(temp = '_' + uid++) {
-        if(!this.ids.hasOwnProperty(temp)) {
+        if(!this.ids.hasOwnProperty('_' + temp)) {
           return temp;
         }
       }

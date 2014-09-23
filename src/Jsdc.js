@@ -64,7 +64,8 @@ var Jsdc = Class(function(code) {
     var lexer = parser.lexer;
     lexer.tokens().forEach(function(token) {
       if(token.type() == Token.ID) {
-        self.ids[token.content()] = true;
+        //防止关键字或内置原生方法如hasOwnProperty被设置为true，将所有id前面加_记录
+        self.ids['_' + token.content()] = true;
       }
     });
     self.ts = lexer.tokens();
@@ -410,7 +411,7 @@ var Jsdc = Class(function(code) {
   uid: function() {
     var temp;
     while(temp = '_' + uid++) {
-      if(!this.ids.hasOwnProperty(temp)) {
+      if(!this.ids.hasOwnProperty('_' + temp)) {
         return temp;
       }
     }
