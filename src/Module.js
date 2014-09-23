@@ -46,7 +46,7 @@ var Module = Class(function(jsdc) {
       self.jsdc.append(temp + '.hasOwnProperty("' + id + '")?');
       self.jsdc.append(temp + '.' + id + ':' + temp + '.hasOwnProperty("default")?');
       self.jsdc.append(temp + '.default:' + temp);
-      self.jsdc.append('}()');
+      self.jsdc.append('}();');
     }
     //import ids from "string",import {ids} from "string"
     else {

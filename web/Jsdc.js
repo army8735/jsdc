@@ -172,7 +172,7 @@ define(function(require, exports, module) {
           this.forof.prts(node, true);
         }
         else if(content == ',') {
-          this.rest.comma (node);
+          this.rest.comma(node);
         }
         else if(token.type() == Token.TEMPLATE) {
           this.template.parse(token);
