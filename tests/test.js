@@ -824,7 +824,7 @@ describe('es6', function() {
       var s = 'function *a(){}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(){return{done:true}}}();');
+      expect(res).to.eql('var a=function(){return function(){return{next:_0}};function _0(){return{done:true}}}();');
     });
     it('normal', function() {
       var s = 'function *a(){yield 1}';
@@ -848,25 +848,25 @@ describe('es6', function() {
       var s = 'function *a(){{var a}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var a;function _1(){!function(){a}();return{done:true}}}();');
+      expect(res).to.eql('var a=function(){return function(){return{next:_0}};var a;function _0(){!function(){a}();return{done:true}}}();');
     });
     it('let scope', function() {
       var s = 'function *a(){{let a}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(){!function(){var a}();return{done:true}}}();');
+      expect(res).to.eql('var a=function(){return function(){return{next:_0}};function _0(){!function(){var a}();return{done:true}}}();');
     });
     it('ignore fndecl', function() {
       var s = 'function *a(){function a(){}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(){function a(){}return{done:true}}}();');
+      expect(res).to.eql('var a=function(){return function(){return{next:_0}};function _0(){function a(){}return{done:true}}}();');
     });
     it('in block', function() {
       var s = '{function *a(){}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('!function(){var a=function(){var _0=0;return function(){return{next:_1}};function _1(){return{done:true}}}();}();');
+      expect(res).to.eql('!function(){var a=function(){return function(){return{next:_0}};function _0(){return{done:true}}}();}();');
     });
     it('yield a generator', function() {
       var s = 'function *a(){yield * b}';
@@ -878,13 +878,13 @@ describe('es6', function() {
       var s = '~function *(){}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('~function(){var _0=0;return function(){return{next:_1}};function _1(){}}()');
+      expect(res).to.eql('~function(){return function(){return{next:_0}};function _0(){}}()');
     });
     it('generator expr with name', function() {
       var s = '~function * a(){}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('~function(){var _0=0;return function(){return{next:_1}};function _1(){}}()');
+      expect(res).to.eql('~function(){return function(){return{next:_0}};function _0(){}}()');
     });
     it('in ifstmt', function() {
       var s = 'function *a(){if(true){yield 1}}';
@@ -1010,13 +1010,13 @@ describe('es6', function() {
       var s = 'function *a(...b){c\nreturn}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(b){b=[].slice.call(arguments, 0);c;_0=-1;default:\nreturn{value:void 0,done:true}}}();');
+      expect(res).to.eql('var a=function(){return function(){return{next:_0}};function _0(b){b=[].slice.call(arguments, 0);c\nreturn{value:void 0,done:true}}}();');
     });
     it('with return result', function() {
       var s = 'function *a(...b){c;return c}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};function _1(b){b=[].slice.call(arguments, 0);c;;_0=-1;default:return {value:c,done:true}}}();');
+      expect(res).to.eql('var a=function(){return function(){return{next:_0}};function _0(b){b=[].slice.call(arguments, 0);c;return {value:c,done:true}}}();');
     });
     it('yield null', function() {
       var s = 'function *a(){yield}';
@@ -1373,6 +1373,12 @@ describe('es6', function() {
       Jsdc.reset();
       var res = Jsdc.parse(s);
       expect(res).to.eql('(function(){var _0= o;y=_0["x"];if(!_0.hasOwnProperty("x"))y=1;return _0}())');
+    });
+    it('var multi obj', function() {
+      var s = 'var a = 1, { x } = { "x": 2 }';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var x;var a = 1;!function(){var _0= { "x": 2 };x=_0["x"]}()');
     });
   });
   describe('Unicode string', function() {

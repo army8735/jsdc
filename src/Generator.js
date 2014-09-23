@@ -52,11 +52,14 @@ var Generator = Class(function(jsdc) {
     var self = this;
     if(start) {
       self.jsdc.ignore(node.first(), 'gen6');
-      var state = self.jsdc.uid();
-      var temp = self.jsdc.uid();
-      var param = node.leaf(4).first();
+      var state;
       var res = self.count(node.last().prev(), node);
       var count = res.count;
+      if(count) {
+        state = self.jsdc.uid();
+      }
+      var temp = self.jsdc.uid();
+      var param = node.leaf(4).first();
       var ret = res.return;
       if(res.pre) {
         self.pre(node.last().prev(), node.nid(), node.last().prev().nid());
@@ -92,7 +95,9 @@ var Generator = Class(function(jsdc) {
         pre: res.pre
       };
       self.jsdc.append('function(){');
-      self.jsdc.append('var ' + state + '=0;');
+      if(o.count) {
+        self.jsdc.append('var ' + state + '=0;');
+      }
       self.jsdc.append('return function(){return{next:' + temp + '}};');
       o.pos = self.jsdc.res.length;
       self.jsdc.append('function ' + temp);
@@ -260,7 +265,9 @@ var Generator = Class(function(jsdc) {
           eventbus.on(node.nid(), function(node, start) {
             if(start) {
               var o = self.hash[top.nid()];
-              self.jsdc.appendBefore(';' + o.state + '=-1;default:');
+              if(o.count) {
+                self.jsdc.appendBefore(';' + o.state + '=-1;default:');
+              }
             }
           });
           //无return内容分开侦听
