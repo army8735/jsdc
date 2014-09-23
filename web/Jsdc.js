@@ -65,6 +65,7 @@ define(function(require, exports, module) {
       var lexer = parser.lexer;
       lexer.tokens().forEach(function(token) {
         if(token.type() == Token.ID) {
+          //防止关键字或内置原生方法如hasOwnProperty被设置为true，将所有id前面加_记录
           self.ids['_' + token.content()] = true;
         }
       });
