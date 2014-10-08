@@ -224,10 +224,21 @@ var Generator = Class(function(jsdc) {
     }
   },
   prevar: function(varstmt) {
+    var self = this;
     var top = varstmt.gen;
     if(top) {
-      this.jsdc.ignore(varstmt.first(), 'gen9');
-      this.jsdc.insert('var ' + varstmt.leaf(1).first().first().token().content() + ';', this.hash[top.nid()].pos);
+      self.jsdc.ignore(varstmt.first(), 'gen9');
+//      this.jsdc.insert('var ' + varstmt.leaf(1).first().first().token().content() + ';', this.hash[top.nid()].pos);
+      varstmt.leaves().forEach(function(leaf, i) {
+        if(i % 2 == 1) {
+          var first = leaf.first();
+          switch(first.name()) {
+            case JsNode.BINDID:
+              self.jsdc.insert('var ' + first.first().token().content() + ';', self.hash[top.nid()].pos);
+              break;
+          }
+        }
+      });
     }
   },
   count: function(node, top, res) {

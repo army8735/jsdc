@@ -1030,6 +1030,12 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var a;function _1(_4){while(1){switch(_0){case 0:var _3=o,_2=_3.next();case 1:_0=_2.done?3:4;break;case 2:_2=_3.next();_0=1;break;case 3:a=_2.value;a=a[0];_0=5;return{value:void 0,done:_2.done&&1};case 5:_0=1;break;case 4:_0=-1;default:return{done:true}}}}}();');
     });
+    it('multi var', function() {
+      var s = 'function *a(){var a,b,c;}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a=function(){return function(){return{next:_0}};var c;var b;var a;function _0(){a,b,c;return{done:true}}}();');
+    });
   });
   describe('destructor', function() {
     it('single in array', function() {
