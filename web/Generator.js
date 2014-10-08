@@ -26,10 +26,9 @@ define(function(require, exports, module) {
           self.jsdc.append(node.leaf(2).first().token().content());
           self.jsdc.append('=');
         }
-        self.gen(node, start);
+        self.gen(node);
       }
       else {
-        self.gen(node, start);
         self.jsdc.appendBefore('}();');
       }
   
@@ -42,67 +41,64 @@ define(function(require, exports, module) {
         if(node.leaf(2).name() == JsNode.BINDID) {
           self.jsdc.ignore(node.leaf(2), 'gen5');
         }
-        self.gen(node, start);
+        self.gen(node);
       }
       else {
-        self.gen(node, start);
         self.jsdc.appendBefore('}()');
       }
     },
-    gen: function(node, start) {
+    gen: function(node) {
       var self = this;
-      if(start) {
-        self.jsdc.ignore(node.first(), 'gen6');
-        var state;
-        var res = self.count(node.last().prev(), node);
-        var count = res.count;
-        if(count) {
-          state = self.jsdc.uid();
-        }
-        var temp = self.jsdc.uid();
-        var param = node.leaf(4).first();
-        var ret = res.return;
-        if(res.pre) {
-          self.pre(node.last().prev(), node.nid(), node.last().prev().nid());
-        }
-        if(!param) {
-          if(count) {
-            param = self.jsdc.uid();
-            eventbus.on(node.leaf(4).nid(), function(node, start) {
-              start && self.jsdc.append(param);
-            });
-          }
-          else {
-            param = '';
-          }
-        }
-        else if(param.name() == JsNode.SINGLENAME) {
-          param = param.first().first().token().content();
-        }
-        else if(param.name() == JsNode.BINDREST) {
-          param = param.last().first().token().content() + '[0]';
-        }
-        var o = self.hash[node.nid()] = {
-          state: state,
-          index: 0,
-          index2: 0,
-          count: count,
-          return: ret,
-          if: 0,
-          temp: temp,
-          param: param,
-          last: null,
-          yield: [],
-          pre: res.pre
-        };
-        self.jsdc.append('function(){');
-        if(o.count) {
-          self.jsdc.append('var ' + state + '=0;');
-        }
-        self.jsdc.append('return function(){return{next:' + temp + '}};');
-        o.pos = self.jsdc.res.length;
-        self.jsdc.append('function ' + temp);
+      self.jsdc.ignore(node.first(), 'gen6');
+      var state;
+      var res = self.count(node.last().prev(), node);
+      var count = res.count;
+      if(count) {
+        state = self.jsdc.uid();
       }
+      var temp = self.jsdc.uid();
+      var param = node.leaf(4).first();
+      var ret = res.return;
+      if(res.pre) {
+        self.pre(node.last().prev(), node.nid(), node.last().prev().nid());
+      }
+      if(!param) {
+        if(count) {
+          param = self.jsdc.uid();
+          eventbus.on(node.leaf(4).nid(), function(node, start) {
+            start && self.jsdc.append(param);
+          });
+        }
+        else {
+          param = '';
+        }
+      }
+      else if(param.name() == JsNode.SINGLENAME) {
+        param = param.first().first().token().content();
+      }
+      else if(param.name() == JsNode.BINDREST) {
+        param = param.last().first().token().content() + '[0]';
+      }
+      var o = self.hash[node.nid()] = {
+        state: state,
+        index: 0,
+        index2: 0,
+        count: count,
+        return: ret,
+        if: 0,
+        temp: temp,
+        param: param,
+        last: null,
+        yield: [],
+        pre: res.pre
+      };
+      self.jsdc.append('function(){');
+      if(o.count) {
+        self.jsdc.append('var ' + state + '=0;');
+      }
+      self.jsdc.append('return function(){return{next:' + temp + '}};');
+      o.pos = self.jsdc.res.length;
+      self.jsdc.append('function ' + temp);
     },
     yield: function(node, start) {
       var self = this;
