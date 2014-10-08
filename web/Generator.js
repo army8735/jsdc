@@ -210,7 +210,7 @@ define(function(require, exports, module) {
             this.jsdc.appendBefore(';default:return{done:true}}}');
           }
           else {
-            this.jsdc.appendBefore('return{done:true}');
+            this.jsdc.appendBefore(';return{done:true}');
           }
         }
       }
@@ -229,13 +229,25 @@ define(function(require, exports, module) {
       var top = varstmt.gen;
       if(top) {
         self.jsdc.ignore(varstmt.first(), 'gen9');
-  //      this.jsdc.insert('var ' + varstmt.leaf(1).first().first().token().content() + ';', this.hash[top.nid()].pos);
         varstmt.leaves().forEach(function(leaf, i) {
           if(i % 2 == 1) {
             var first = leaf.first();
             switch(first.name()) {
               case JsNode.BINDID:
                 self.jsdc.insert('var ' + first.first().token().content() + ';', self.hash[top.nid()].pos);
+                break;
+              case JsNode.ARRBINDPAT:
+              case JsNode.OBJBINDPAT:
+                //destruct需忽略前后可能的,再改为; var也需忽略
+                self.jsdc.ignore(leaf.prev(), 'gen40');
+                var next = leaf.next();
+                if(next.token().content() == ',') {
+                  self.jsdc.ignore(next, 'gen41');
+                }
+                var ids = self.jsdc.destruct.getIds(first);
+                ids.forEach(function(id) {
+                  self.jsdc.insert('var ' + id + ';', self.hash[top.nid()].pos);
+                });
                 break;
             }
           }
