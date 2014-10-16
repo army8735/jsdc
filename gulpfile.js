@@ -23,7 +23,7 @@ function cb(file, enc, cb) {
   var target = file.path.replace(path.sep + 'src' + path.sep,  path.sep + 'web' + path.sep);
   util.log(path.relative(file.cwd, file.path), '->', path.relative(file.cwd, target));
   var content = file.contents.toString('utf-8');
-  content = "define(function(require, exports, module) {\n  " + content.replace(/\n/g, '\n  ') + '\n});';
+  content = "define(function(require, exports, module){" + content + '});';
   file.contents = new Buffer(content);
   cb(null, file);
 }
