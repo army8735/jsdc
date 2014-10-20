@@ -23,13 +23,33 @@ var Template = Class(function(jsdc) {
       else if(c == '"') {
         res += '\\';
       }
+      else if(c == '\n') {
+        res += '\\';
+      }
       else if(c == '$') {
         if(s.charAt(i + 1) == '{') {
           has = true;
           res += '" + ';
+          var multi = false;
+          for(var j = i + 2; j < s.length - 1; j++) {
+            c = s.charAt(j);
+            if(c == '}') {
+              break;
+            }
+            else if(!/[a-z_]/i.test(c)) {
+              multi = true;
+              break;
+            }
+          }
+          if(multi) {
+            res += '(';
+          }
           for(i = i + 2; i < s.length - 1; i++) {
             c = s.charAt(i);
             if(c == '}') {
+              if(multi) {
+                res += ')';
+              }
               res += ' + "';
               continue outer;
             }

@@ -378,6 +378,21 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('("a" + b)');
     });
+    it('multi', function() {
+      var s = '`${a}${b}`';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('(a + "" + b)');
+    });
+    it('expression', function() {
+      var s = '`${a+b}`';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('((a+b))');
+    });
+    it('multi-line', function() {
+      var s = '`${a+b}\nc`';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('((a+b) + "\\\nc")');
+    });
     it('escape varable', function() {
       var s = '`\\${b}`';
       var res = Jsdc.parse(s);
