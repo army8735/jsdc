@@ -36,7 +36,7 @@ var Template = Class(function(jsdc) {
             if(c == '}') {
               break;
             }
-            else if(!/[a-z_]/i.test(c)) {
+            else if(!/[a-z_\s]/i.test(c)) {
               multi = true;
               break;
             }

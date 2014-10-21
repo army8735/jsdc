@@ -383,6 +383,11 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('(a + "" + b)');
     });
+    it('blank', function() {
+      var s = '`${ a}`';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('( a)');
+    });
     it('expression', function() {
       var s = '`${a+b}`';
       var res = Jsdc.parse(s);
