@@ -55,6 +55,7 @@ npm install jsdc
 * define(d:Boolean):Boolean 读取/设置转换module为CommonJS时是否包裹define（即转为AMD/CMD），默认false
 * ast():Object 返回解析后的语法树
 * tokens():Array<Object> 返回解析后的词法单元序列
+* runtime(flag:Boolean):void 开启/关闭运行时支持，仅限NodeJs。开启后改写require机制，获取module前尝试预编译
 
 ## Demo
 * demo目录下是一个web端的实时转换例子，本地浏览需要`npm install`安装依赖

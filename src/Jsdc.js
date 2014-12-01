@@ -21,6 +21,8 @@ var Destruct = require('./Destruct');
 var Str = require('./Str');
 var Obj = require('./Obj');
 
+var patch = require('./patch');
+
 var Jsdc = Class(function(code) {
   this.code = (code + '') || '';
   this.index = 0;
@@ -438,9 +440,14 @@ var Jsdc = Class(function(code) {
       def = d;
     }
     return def;
+  },
+  runtime: function(flag) {
+    patch(Jsdc, flag);
   }
 });
+
 var jsdc = null;
 var uid = 0;
 var def = false;
+
 module.exports = Jsdc;

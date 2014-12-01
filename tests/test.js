@@ -692,11 +692,11 @@ describe('es6', function() {
       expect(res).to.eql('define(function(require,exports,module){var a=function(){var _0=require("a");return _0.hasOwnProperty("a")?_0.a:_0.hasOwnProperty("default")?_0.default:_0}();a.hasOwnProperty});');
     });
     it('import from', function() {
-      var s = 'import More from "./More";console.log(More);';
+      var s = 'import More from "./More";';
       Jsdc.reset();
       Jsdc.define(false);
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var More=function(){var _0=require(\"./More\");return _0.hasOwnProperty(\"More\")?_0.More:_0.hasOwnProperty(\"default\")?_0.default:_0}();console.log(More);');
+      expect(res).to.eql('var More=function(){var _0=require(\"./More\");return _0.hasOwnProperty(\"More\")?_0.More:_0.hasOwnProperty(\"default\")?_0.default:_0}();');
     });
     it('import multi id', function() {
       var s = 'import a,b from "a"';
@@ -1472,6 +1472,34 @@ describe('es6', function() {
       Jsdc.reset();
       var res = Jsdc.parse(s);
       expect(res).to.eql('var o = function(){var _0={_1:1};_0[a]=_0._1;delete _0._1;return _0}()');
+    });
+  });
+  describe.only('runntime', function() {
+    it('open', function() {
+      Jsdc.runtime(true);
+      var res = require('./runtime');
+      expect(res).to.eql(1);
+    });
+    it('close', function() {
+      Jsdc.runtime(false);
+      var filename = path.resolve(__dirname, './runtime.js');
+      delete require.cache[filename];
+      expect(function() {
+        require('./runtime');
+      }).to.throwError();
+    });
+    it('openAgain', function() {
+      Jsdc.runtime(true);
+      var res = require('./runtime');
+      expect(res).to.eql(1);
+    });
+    it('closeAgain', function() {
+      Jsdc.runtime(false);
+      var filename = path.resolve(__dirname, './runtime.js');
+      delete require.cache[filename];
+      expect(function() {
+        require('./runtime');
+      }).to.throwError();
     });
   });
 });
