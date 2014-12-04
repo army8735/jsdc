@@ -128,6 +128,8 @@ seajs.config({
     return url.replace('demo/lexer/', 'node_modules/homunculus/web/lexer/');
   }]
 });
+define('fs', {});
+define('path', {});
 seajs.use(['../index', './jssc'], function(jsdc, jssc) {
   jsdc.define(true);
   function init() {

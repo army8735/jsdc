@@ -23,7 +23,7 @@ function isPatched () {
   return 'JsdcJsExtensionCompiler' == require.extensions['.js'].name;
 }
 
-var origin = require.extensions['.js'];
+var origin = require.extensions && require.extensions['.js'];
 
 module.exports = function(Jsdc, flag) {
   function JsdcJsExtensionCompiler(module, filename) {
