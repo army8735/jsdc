@@ -1474,7 +1474,7 @@ describe('es6', function() {
       expect(res).to.eql('var o = function(){var _0={_1:1};_0[a]=_0._1;delete _0._1;return _0}()');
     });
   });
-  describe.only('runntime', function() {
+  describe('runntime', function() {
     it('open', function() {
       Jsdc.runtime(true);
       var res = require('./runtime');
