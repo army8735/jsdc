@@ -11,6 +11,7 @@ var Rest = Class(function(jsdc) {
   this.hash = {};
   this.hash2 = {};
   this.hash3 = {};
+  this.hash4 = {};
 }).methods({
   param: function(fmparams) {
     if(fmparams.name() == JsNode.FMPARAMS && fmparams.size()) {
@@ -65,9 +66,37 @@ var Rest = Class(function(jsdc) {
       }
     }
   },
+  newc: function(node, start) {
+    var self = this;
+    if(start) {
+      var args = node.last();
+      var arglist = args.leaf(1);
+      if(arglist.size() > 1) {
+        var last = arglist.last();
+        var spread = last.prev();
+        if(spread.name() == JsNode.TOKEN && spread.token().content() == '...') {
+          var cnameNode = node.leaf(1);
+          var cname = join(cnameNode);
+          var first = node.first();
+          var needTemp = self.needTemp(first).ret;
+          var temp = needTemp ? self.jsdc.uid() : '';
+          self.hash4[node.nid()] = {
+            node: first,
+            needTemp: needTemp,
+            temp: needTemp ? temp : '',
+            cname: cname
+          };
+          self.jsdc.ignore(cnameNode, 'rest3');
+          self.jsdc.ignore(arglist, 'rest4');
+        }
+      }
+    }
+    else if(self.hash4.hasOwnProperty(node.nid())) {
+      self.jsdc.appendBefore('()');
+    }
+  },
   needTemp: function(node, res) {
     res = res || { ret: false };
-    var self = this;
     if(res.ret) {
       return res;
     }
@@ -79,10 +108,13 @@ var Rest = Class(function(jsdc) {
     }
     return res;
   },
-  args: function(node) {
+  args: function(node, start) {
     var parent = node.parent();
     if(parent.name() == JsNode.CALLEXPR && this.hash2.hasOwnProperty(parent.nid())) {
-      this.jsdc.append('.apply');
+      start && this.jsdc.append('.apply');
+    }
+    else if(parent.name() == JsNode.NEWEXPR && this.hash4.hasOwnProperty(parent.nid())) {
+      start ? this.jsdc.append('(Function.prototype.bind.apply') : this.jsdc.appendBefore(')');
     }
   },
   arglist: function(node) {
@@ -98,6 +130,7 @@ var Rest = Class(function(jsdc) {
         var mmb = this.hash2[parent.nid()].node;
         this.jsdc.append(mmb.name() == JsNode.MMBEXPR ? join(mmb.first()) : 'this');
       }
+      //用数组来concat可变参数，注意前面可能存在的固定参数需带上
       this.jsdc.append(', [');
       var leaves = node.leaves();
       for(var i = 0; i < leaves.length - 3; i++) {
@@ -128,6 +161,37 @@ var Rest = Class(function(jsdc) {
         //主表达式中含有生成的对象，不是直接引用
         this.jsdc.append(')}(');
       }
+    }
+    else if(parent.name() == JsNode.NEWEXPR && this.hash4.hasOwnProperty(parent.nid())) {
+      var o = this.hash4[parent.nid()];
+      this.jsdc.append(o.cname);
+      //用数组来concat可变参数，注意前面可能存在的固定参数需带上
+      this.jsdc.append(', [');
+      var leaves = node.leaves();
+      for(var i = 0; i < leaves.length - 3; i++) {
+        this.jsdc.append(join(leaves[i]));
+      }
+      this.jsdc.append(']');
+      this.jsdc.append('.concat(function(){');
+      var last = node.last();
+      var isPrm = last.name() == JsNode.PRMREXPR;
+      var v;
+      if(isPrm) {
+        v = last.first().token().content();
+      }
+      else {
+        v = join(last);
+      }
+      var temp = this.jsdc.uid();
+      var temp2 = this.jsdc.uid();
+      this.jsdc.append('var ' + temp + '=[],' + temp2);
+      if(!isPrm) {
+        var temp3 = this.jsdc.uid();
+        this.jsdc.append(',' + temp3 + '=' + v);
+      }
+      this.jsdc.append(';while(!(' + temp2 + '=' + (isPrm ? v : temp3) + '.next()).done)');
+      this.jsdc.append(temp + '.push(' + temp2 + '.value' + ')');
+      this.jsdc.append(';return ' + temp + '}())');
     }
   },
   comma: function(node) {

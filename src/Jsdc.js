@@ -252,8 +252,11 @@ var Jsdc = Class(function(code) {
       case JsNode.CALLEXPR:
         this.rest.expr(node);
         break;
+      case JsNode.NEWEXPR:
+        this.rest.newc(node, true);
+        break;
       case JsNode.ARGS:
-        this.rest.args(node);
+        this.rest.args(node, true);
         break;
       case JsNode.ARGLIST:
         this.klass.arglist(node);
@@ -380,6 +383,12 @@ var Jsdc = Class(function(code) {
         break;
       case JsNode.SPREAD:
         this.rest.spread(node);
+        break;
+      case JsNode.NEWEXPR:
+        this.rest.newc(node);
+        break;
+      case JsNode.ARGS:
+        this.rest.args(node);
         break;
     }
     eventbus.emit(node.nid(), [node]);
