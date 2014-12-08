@@ -57,7 +57,7 @@ var Rest = Class(function(jsdc) {
           var first = first.first();
           eventbus.on(first.nid(), function(node2, start) {
             if(!start) {
-              self.jsdc.append(';return ' + temp);
+              self.jsdc.appendBefore(';return ' + temp);
             }
           });
 
@@ -78,12 +78,8 @@ var Rest = Class(function(jsdc) {
           var cnameNode = node.leaf(1);
           var cname = join(cnameNode);
           var first = node.first();
-          var needTemp = self.needTemp(first).ret;
-          var temp = needTemp ? self.jsdc.uid() : '';
           self.hash4[node.nid()] = {
             node: first,
-            needTemp: needTemp,
-            temp: needTemp ? temp : '',
             cname: cname
           };
           self.jsdc.ignore(cnameNode, 'rest3');

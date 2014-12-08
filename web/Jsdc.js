@@ -443,6 +443,7 @@ var Jsdc = Class(function(code) {
   },
   reset: function() {
     uid = 0;
+    homunculus.reset();
   },
   define: function(d) {
     if(!character.isUndefined(d)) {

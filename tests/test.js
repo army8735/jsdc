@@ -361,6 +361,24 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('[].concat(function(){var _0=[],_1;while(!(_1=a.next()).done)_0.push(_1.value);return _0}()).concat("b".split(""))');
     });
+    it('new class', function() {
+      Jsdc.reset();
+      var s = 'new Cls(...args)';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('new (Function.prototype.bind.apply(Cls, [].concat(function(){var _0=[],_1;while(!(_1=args.next()).done)_0.push(_1.value);return _0}())))()');
+    });
+    it('new class multi', function() {
+      Jsdc.reset();
+      var s = 'new Cls(a, ...args)';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('new (Function.prototype.bind.apply(Cls, [a].concat(function(){var _0=[],_1;while(!(_1=args.next()).done)_0.push(_1.value);return _0}())))()');
+    });
+    it('new class with a fn spread', function() {
+      Jsdc.reset();
+      var s = 'new Cls(...a())';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('new (Function.prototype.bind.apply(Cls, [].concat(function(){var _0=[],_1,_2=a();while(!(_1=_2.next()).done)_0.push(_1.value);return _0}())))()');
+    });
   });
   describe('template', function() {
     it('normal', function() {
