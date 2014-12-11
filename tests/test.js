@@ -379,6 +379,18 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('new (Function.prototype.bind.apply(Cls, [].concat(function(){var _0=[],_1,_2=a();while(!(_1=_2.next()).done)_0.push(_1.value);return _0}())))()');
     });
+    it('arrow fn no {}', function() {
+      Jsdc.reset();
+      var s = 'var fn = (...arg) => console.log(arg);';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var fn = function(arg) {arg=[].slice.call(arguments, 0);return console.log(arg)};');
+    });
+    it('arrow fn with multi params no {}', function() {
+      Jsdc.reset();
+      var s = 'var fn = (a, b, c, d, ...arg) => console.log(arg);';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var fn = function(a, b, c, d, arg) {arg=[].slice.call(arguments, 4);return console.log(arg)};');
+    });
   });
   describe('template', function() {
     it('normal', function() {

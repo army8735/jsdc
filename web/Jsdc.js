@@ -249,6 +249,9 @@ var Jsdc = Class(function(code) {
         this.defaultValue.param(node);
         this.rest.param(node);
         break;
+      case JsNode.ARROWPARAMS:
+        this.rest.arrowParam(node);
+        break;
       case JsNode.CALLEXPR:
         this.rest.expr(node);
         break;
@@ -303,6 +306,7 @@ var Jsdc = Class(function(code) {
         this.arrowFn.params(node, true);
         break;
       case JsNode.CNCSBODY:
+        this.rest.cncsbody(node);
         this.arrowFn.body(node, true);
         break;
       case JsNode.YIELDEXPR:

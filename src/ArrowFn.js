@@ -26,8 +26,11 @@ var ArrowFn = Class(function(jsdc) {
   body: function(node, start) {
     //表达式只有1个需要加{return }
     if(node.size() == 1) {
+      //可能被rest补齐参数加过了
       if(start) {
-        this.jsdc.append('{return ');
+        if(!node.rest) {
+          this.jsdc.append('{return ');
+        }
       }
       else {
         this.jsdc.appendBefore('}');
