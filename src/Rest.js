@@ -35,6 +35,20 @@ var Rest = Class(function(jsdc) {
       var id = o.token.content();
       this.jsdc.append(id + '=[].slice.call(arguments, ' + index + ');');
     }
+    else {
+      var cncsbody = fnbody.parent();
+      if(cncsbody.name() == JsNode.CNCSBODY) {
+        var arrowFn = cncsbody.parent();
+        if(arrowFn.name() == JsNode.ARROWFN) {
+          if(this.hash5.hasOwnProperty(arrowFn.nid())) {
+            var o = this.hash5[arrowFn.nid()];
+            var index = o.index;
+            var id = o.token.content();
+            this.jsdc.append(id + '=[].slice.call(arguments, ' + index + ');');
+          }
+        }
+      }
+    }
   },
   arrowParam: function(arparam) {
     var arrowFn = arparam.parent();
@@ -48,7 +62,7 @@ var Rest = Class(function(jsdc) {
         if(cpeapl.leaf(1).name() == JsNode.EXPR) {
           index = Math.floor(cpeapl.leaf(1).size() / 2) + 1;
         }
-        this.hash[arrowFn.nid()] = {
+        this.hash5[arrowFn.nid()] = {
           index: index,
           token: last.first().token()
         };
@@ -57,9 +71,9 @@ var Rest = Class(function(jsdc) {
   },
   cncsbody: function(node) {
     var arrowFn = node.parent();
-    if(this.hash.hasOwnProperty(arrowFn.nid())) {
+    if(this.hash5.hasOwnProperty(arrowFn.nid())) {
       if(node.size() == 1) {
-        var o = this.hash[arrowFn.nid()];
+        var o = this.hash5[arrowFn.nid()];
         var index = o.index;
         var id = o.token.content();
         this.jsdc.append('{' + id + '=[].slice.call(arguments, ' + index + ');');

@@ -391,6 +391,18 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('var fn = function(a, b, c, d, arg) {arg=[].slice.call(arguments, 4);return console.log(arg)};');
     });
+    it('arrow fn {}', function() {
+      Jsdc.reset();
+      var s = 'var fn = (...arg) => {console.log(arg)};';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var fn = function(arg) {arg=[].slice.call(arguments, 0);console.log(arg)};');
+    });
+    it('arrow fn with multi params', function() {
+      Jsdc.reset();
+      var s = 'var fn = (a, b, c, ...arg) => {console.log(arg)};';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var fn = function(a, b, c, arg) {arg=[].slice.call(arguments, 3);console.log(arg)};');
+    });
   });
   describe('template', function() {
     it('normal', function() {
