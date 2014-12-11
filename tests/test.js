@@ -295,6 +295,21 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('function a(b){b=[].slice.call(arguments, 0);}');
     });
+    it('fmparams 2', function() {
+      var s = 'function a(a, ...b){}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function a(a, b){b=[].slice.call(arguments, 1);}');
+    });
+    it('fmparams 3', function() {
+      var s = 'function a(a, b, ...c){}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function a(a, b, c){c=[].slice.call(arguments, 2);}');
+    });
+    it('fmparams 4', function() {
+      var s = 'function a(a, b, c, ...d){}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function a(a, b, c, d){d=[].slice.call(arguments, 3);}');
+    });
     it('callexpr single spread', function() {
       Jsdc.reset();
       var s = 'Math.max(...a)';

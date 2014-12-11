@@ -22,7 +22,7 @@ var Rest = Class(function(jsdc) {
         var rest = last.first();
         this.jsdc.ignore(rest, 'rest1');
         this.hash[fnbody.nid()] = {
-          index: fmparams.size() - 1,
+          index: Math.floor(fmparams.size() / 2),
           token: last.last().first().token()
         };
       }
