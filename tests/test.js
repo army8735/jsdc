@@ -1480,12 +1480,12 @@ describe('es6', function() {
     it('normal', function() {
       var s = '"\\u{10000}"';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('"\\uFFFF\\u0001"');
+      expect(res).to.eql('"\\ud800\\udc00"');
     });
     it('multi', function() {
       var s = '"\\u{10000}\\u{10000}"';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('"\\uFFFF\\u0001\\uFFFF\\u0001"');
+      expect(res).to.eql('"\\ud800\\udc00\\ud800\\udc00"');
     });
     it('ignore', function() {
       var s = '"\\\\u{10000}"';
@@ -1495,22 +1495,27 @@ describe('es6', function() {
     it('not ignore', function() {
       var s = '"\\\\\\u{10000}"';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('"\\\\\\uFFFF\\u0001"');
+      expect(res).to.eql('"\\\\\\ud800\\udc00"');
     });
     it('prefix 2', function() {
       var s = '"\\u{10010}"';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('"\\uFFFF\\u0011"');
+      expect(res).to.eql('"\\ud800\\udc10"');
     });
     it('prefix 1', function() {
       var s = '"\\u{10110}"';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('"\\uFFFF\\u0111"');
+      expect(res).to.eql('"\\ud800\\udd10"');
     });
     it('prefix 0', function() {
       var s = '"\\u{11110}"';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('"\\uFFFF\\u1111"');
+      expect(res).to.eql('"\\ud804\\udd10"');
+    });
+    it('only remove {}', function() {
+      var s = '"\\u{8888}"';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('"\\u8888"');
     });
   });
   describe('object property', function() {

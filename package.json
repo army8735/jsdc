@@ -1,6 +1,6 @@
 {
   "name": "jsdc",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "compiler ecmascript6 to ecmascript5",
   "maintainers": [
     {
@@ -52,7 +52,7 @@
     "main": "./index.js"
   },
   "dependencies": {
-    "homunculus": "^0.7.1"
+    "homunculus": "^0.7.5"
   },
   "devDependencies": {
     "blanket": "^1.1.6",

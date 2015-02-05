@@ -18,17 +18,19 @@ var String = Class(function(jsdc) {
           break;
         }
       }
+      //u之前\被转义
       if(count % 2 == 1) {
         return m;
       }
-      var arr = [];
-      n = parseInt(n, 16);
-      while(n > 0xFFFF) {
-        arr.push('FFFF');
-        n -= 0xFFFF;
+      //可能小于10000
+      var c = parseInt(n, 16);
+      if(c < 0x10000) {
+        return '\\u' + n;
       }
-      arr.push(fix(n.toString(16)));
-      return '\\u' + arr.join('\\u');
+      //根据公式转成双字节
+      var h = Math.floor((c - 0x10000) / 0x400) + 0xD800;
+      var l = (c - 0x10000) % 0x400 + 0xDC00;
+      return '\\u' + fix(h.toString(16)) + '\\u' + fix(l.toString(16));
     });
     if(res != s) {
       this.jsdc.ignore(t, 'str1');

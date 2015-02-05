@@ -96,7 +96,7 @@ var i = parseInt("0o456", 8), j = parseInt("0O777", 8)
 '\u{10000}'
 ```
 ```js
-'\uFFFF\u0001'
+'\ud800\udc00'
 ```
 转义符也能正确识别：
 ```js
