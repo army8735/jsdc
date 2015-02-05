@@ -290,6 +290,11 @@ describe('es6', function() {
     });
   });
   describe('rest params', function() {
+    it('no params', function() {
+      var s = 'new A';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql(s);
+    });
     it('fmparams', function() {
       var s = 'function a(...b){}';
       var res = Jsdc.parse(s);

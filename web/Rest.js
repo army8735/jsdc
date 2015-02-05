@@ -118,7 +118,7 @@ var Rest = Class(function(jsdc) {
     if(start) {
       var args = node.last();
       var arglist = args.leaf(1);
-      if(arglist.size() > 1) {
+      if(arglist && arglist.size() > 1) {
         var last = arglist.last();
         var spread = last.prev();
         if(spread.name() == JsNode.TOKEN && spread.token().content() == '...') {

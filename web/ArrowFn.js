@@ -5,8 +5,21 @@ var Class = require('./util/Class');
 
 var ArrowFn = Class(function(jsdc) {
   this.jsdc = jsdc;
+  this.hash = {};
 }).methods({
   parse: function(node) {
+    //var nid = node.nid();
+    ////遍历查看是否有调用this和arguments，存储引用实现lexical绑定
+    //this.recursion(node.last(), nid);
+    //if(this.hash.hasOwnProperty(nid)) {
+    //  var o = this.hash[nid];
+    //  if(o.this) {
+    //    this.jsdc.append('var ' + o.this + '=this;');
+    //  }
+    //  if(o.arguments) {
+    //    this.jsdc.append('var ' + o.arguments + '=arguments;');
+    //  }
+    //}
     this.jsdc.append('function');
   },
   params: function(node, start) {
@@ -35,6 +48,37 @@ var ArrowFn = Class(function(jsdc) {
       else {
         this.jsdc.appendBefore('}');
       }
+    }
+  },
+  recursion: function(node, nid) {
+    var self = this;
+    if(node.isToken()) {
+      var token = node.token();
+      if(!token.isVirtual()) {
+        var s = token.content();
+        if(s == 'this' || s == 'arguments') {
+          this.hash[nid] = this.hash[nid] || {};
+          this.hash[nid][s] = this.jsdc.uid();
+        }
+      }
+    }
+    else {
+      node.leaves().forEach(function(leaf) {
+        switch(leaf.name()) {
+          case JsNode.CLASSDECL:
+          case JsNode.CLASSEXPR:
+          case JsNode.FNDECL:
+          case JsNode.FNEXPR:
+          case JsNode.ARROWFN:
+          case JsNode.GENDECL:
+          case JsNode.GENEXPR:
+          case JsNode.OBJLTR:
+          case JsNode.WITHSTMT:
+            return;
+          default:
+            self.recursion(leaf, nid);
+        }
+      });
     }
   }
 });
