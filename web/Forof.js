@@ -18,13 +18,31 @@ var Forof = Class(function(jsdc) {
     }
     if(start) {
       if(node.first().token().content() == 'for') {
-        var of = node.leaf(3);
+        //of只会出现在3或4位
+        var index = 0;
+        if(node.leaf(3).name() == JsNode.TOKEN
+          && node.leaf(3).token().content() == 'of') {
+          index = 3;
+        }
+        else if(node.leaf(4).name() == JsNode.TOKEN
+          && node.leaf(4).token().content() == 'of') {
+          index = 4;
+        }
+        if(index == 0) {
+          return;
+        }
+        var of = node.leaf(index);
         if(of.name() == JsNode.TOKEN
           && of.token().content() == 'of') {
-          this.pos[node.nid()] = 3;
-          //存放临时id供block首改写引用
-          var leaf = node.leaf(2);
-          if(leaf.name() == JsNode.PRMREXPR
+          var leaf = node.leaf(index - 1);
+          //如果是var解构
+          if([JsNode.OBJBINDPAT, JsNode.ARRBINDPAT].indexOf(leaf.name()) > -1) {
+            this.destruct[node.nid()] = leaf;
+            this.hash[node.nid()] = this.getLast(leaf);
+            this.jsdc.ignore(leaf, 'forof1');
+          }
+          //prmrexpr解构
+          else if(leaf.name() == JsNode.PRMREXPR
             && leaf.size() == 1
             && [JsNode.OBJLTR, JsNode.ARRLTR].indexOf(leaf.first().name()) > -1) {
             this.destruct[node.nid()] = leaf.first();
@@ -33,21 +51,10 @@ var Forof = Class(function(jsdc) {
           }
           else {
             this.hash[node.nid()] = true;
+            this.hash[node.nid()] = this.getLast(leaf.first());
           }
+          this.pos[node.nid()] = index;
           this.jsdc.ignore(of, 'forof2');
-        }
-        //for(var forbind of中为4
-        else {
-          of = node.leaf(4);
-          if(of.name() == JsNode.TOKEN
-            && of.token().content() == 'of') {
-            this.pos[node.nid()] = 4;
-            this.destruct[node.nid()] = node.leaf(3);
-            //存放临时id供block首改写引用
-            this.hash[node.nid()] = this.getLast(node.leaf(3));
-            this.jsdc.ignore(of, 'forof3');
-            this.jsdc.ignore(node.leaf(3), 'forof4');
-          }
         }
       }
     }
@@ -75,21 +82,18 @@ var Forof = Class(function(jsdc) {
       && this.hash.hasOwnProperty(parent.nid())) {
       if(start) {
         this.jsdc.append('.next();!');
+        var index = this.pos[parent.nid()];
         var k;
+        //解构
         if(typeof this.hash[parent.nid()] == 'string') {
           k = this.hash[parent.nid()];
         }
         else {
-          k = parent.leaf(2);
-          //forof的varstmt只能有一个id，其它为mmbexpr或destruct
-          if(k.name() == JsNode.VARSTMT) {
-            k = k.last().first().first().token().content();
-          }
-          else {
-            k = join(k);
-          }
+          k = parent.leaf(index - 1);
+          //forof的var后只能是bindid或者解构
+          k = k.first().token().content();
         }
-        var v = join(parent.leaf(this.pos[parent.nid()]+1));
+        var v = join(parent.leaf(index + 1));
         this.jsdc.append(k + '.done;');
         this.jsdc.append(k + '=' + v + '.next()');
       }
@@ -125,10 +129,11 @@ var Forof = Class(function(jsdc) {
       k = this.hash[node.nid()];
     }
     else {
-      k = node.leaf(2);
-      //forof的varstmt只能有一个id，其它为mmbexpr或destruct
-      if(k.name() == JsNode.VARSTMT) {
-        k = k.last().first().first().token().content();
+      var index = this.pos[node.nid()];
+      k = node.leaf(index - 1);
+      //只会是bindid或解构
+      if(k.name() == JsNode.BINDID) {
+        k = k.first().token().content();
       }
       else {
         k = join(k);
