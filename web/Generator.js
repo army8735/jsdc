@@ -587,7 +587,7 @@ var Generator = Class(function(jsdc) {
                 }
                 eventbus.on(itstmt.nid(), function(node, start) {
                   if(start) {
-                    self.jsdc.append('var ' + loopTemp + ';');
+                    self.jsdc.insert('var ' + loopTemp + ';', self.hash[nid].pos);
                     top = self.hash[nid];
                     endTemp = ++top.index2;
                     itTemp = ++top.index2;
@@ -634,10 +634,9 @@ var Generator = Class(function(jsdc) {
               }
               eventbus.on(itstmt.nid(), function(node, start) {
                 if(start) {
-                  self.jsdc.append('var ' + loopTemp + ';');
+                  self.jsdc.insert('var ' + loopTemp + ';', self.hash[nid].pos);
                   top = self.hash[nid];
-                  endTemp = ++top.index2;
-                  self.jsdc.append('case ' + endTemp + ':');
+                  endTemp = top.index2;
                   self.jsdc.append(top.state + '=');
                 }
               });
@@ -674,7 +673,7 @@ var Generator = Class(function(jsdc) {
               }
               eventbus.on(itstmt.nid(), function(node, start) {
                 if(start) {
-                  self.jsdc.append('var ' + loopTemp + ';');
+                  self.jsdc.insert('var ' + loopTemp + ';', self.hash[nid].pos);
                 }
                 else {
                   self.jsdc.appendBefore('?' + itTemp + ':' + itEndTemp);
