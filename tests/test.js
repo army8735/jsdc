@@ -1014,55 +1014,55 @@ describe('es6', function() {
       var s = 'function *a(){while(i++<5){yield i}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var _2;function _1(_3){while(1){switch(_0){case 0:_0=(_2=i++<5)?1:2;break;case 1:_0=3;return{value:i,done:_2&&1};case 3:_0=0;break;case 2:_0=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var _2;function _1(_3){while(1){switch(_0){case 0:_0=(_2=i++<5)?1:2;break;case 1:_0=3;return{value:i,done:!_2&&1};case 3:_0=0;break;case 2:_0=-1;default:return{done:true}}}}}();');
     });
     it('in whilestmt no {}', function() {
       var s = 'function *a(){while(i++<5)yield i}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var _2;function _1(_3){while(1){switch(_0){case 0:_0=(_2=i++<5)?1:2;break;case 1:_0=3;return{value:i,done:_2&&1};case 3:_0=0;break;case 2:_0=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var _2;function _1(_3){while(1){switch(_0){case 0:_0=(_2=i++<5)?1:2;break;case 1:_0=3;return{value:i,done:!_2&&1};case 3:_0=0;break;case 2:_0=-1;default:return{done:true}}}}}();');
     });
     it('in dowhilestmt', function() {
       var s = 'function *a(){do{yield i}while(i++<5)}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var _2;function _1(_3){while(1){switch(_0){case 0:case 1:_0=3;return{value:i,done:_2&&1};case 3:_0=2;break;case 2:_0=(_2=i++<5)?1:4;break;case 4:_0=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var _2;function _1(_3){while(1){switch(_0){case 0:case 1:_0=3;return{value:i,done:!_2&&1};case 3:_0=2;break;case 2:_0=(_2=i++<5)?1:4;break;case 4:_0=-1;default:return{done:true}}}}}();');
     });
     it('in dowhilestmt no {}', function() {
       var s = 'function *a(){do yield i;while(i++<5)}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var _2;function _1(_3){while(1){switch(_0){case 0:case 1:_0=3;return{value:i,done:_2&&1};case 3:_0=2;break;case 2:_0=(_2=i++<5)?1:4;break;case 4:_0=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var _2;function _1(_3){while(1){switch(_0){case 0:case 1:_0=3;return{value:i,done:!_2&&1};case 3:_0=2;break;case 2:_0=(_2=i++<5)?1:4;break;case 4:_0=-1;default:return{done:true}}}}}();');
     });
     it('in forstmt', function() {
       var s = 'function *a(){for(var i = 0; i < 5; i++){yield i}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var i;var _2;function _1(_3){while(1){switch(_0){case 0:i = 0; case 1:_0=(_2=i < 5)?2:3; case 2:i++;_0=4;return{value:i,done:_2&&1};case 4:_0=1;break;case 3:_0=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var i;var _2;function _1(_3){while(1){switch(_0){case 0:i = 0; case 1:_0=(_2=i < 5)?2:3; case 2:i++;_0=4;return{value:i,done:!_2&&1};case 4:_0=1;break;case 3:_0=-1;default:return{done:true}}}}}();');
     });
     it('in forstmt no {}', function() {
       var s = 'function *a(){for(var i = 0; i < 5; i++)yield i}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var i;var _2;function _1(_3){while(1){switch(_0){case 0:i = 0; case 1:_0=(_2=i < 5)?2:3; case 2:i++;_0=4;return{value:i,done:_2&&1};case 4:_0=1;break;case 3:_0=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var i;var _2;function _1(_3){while(1){switch(_0){case 0:i = 0; case 1:_0=(_2=i < 5)?2:3; case 2:i++;_0=4;return{value:i,done:!_2&&1};case 4:_0=1;break;case 3:_0=-1;default:return{done:true}}}}}();');
     });
     it('in forstmt no expr1', function() {
       var s = 'function *a(){for(; i < 5; i++)yield i}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var _2;function _1(_3){while(1){switch(_0){case 0:; case 1:_0=(_2=i < 5)?2:3; case 2:i++;_0=4;return{value:i,done:_2&&1};case 4:_0=1;break;case 3:_0=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var _2;function _1(_3){while(1){switch(_0){case 0:; case 1:_0=(_2=i < 5)?2:3; case 2:i++;_0=4;return{value:i,done:!_2&&1};case 4:_0=1;break;case 3:_0=-1;default:return{done:true}}}}}();');
     });
     it('in forstmt no expr2', function() {
       var s = 'function *a(){for(;; i++)yield i}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var _2;function _1(_3){while(1){switch(_0){case 0:case 1:;; case 2:i++;_0=4;return{value:i,done:_2&&1};case 4:_0=1;break;case 3:_0=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var _2;function _1(_3){while(1){switch(_0){case 0:case 1:;; case 2:i++;_0=4;return{value:i,done:!_2&&1};case 4:_0=1;break;case 3:_0=-1;default:return{done:true}}}}}();');
     });
     it('in forstmt no expr3', function() {
       var s = 'function *a(){for(;;)yield i}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var _2;function _1(_3){while(1){switch(_0){case 0:case 1:;;_0=4;return{value:i,done:_2&&1};case 4:_0=1;break;case 3:;case 2:_0=-1;default:return{done:true}}}}}();');
+      expect(res).to.eql('var a=function(){var _0=0;return function(){return{next:_1}};var _2;function _1(_3){while(1){switch(_0){case 0:case 1:;;_0=4;return{value:i,done:!_2&&1};case 4:_0=1;break;case 3:;case 2:_0=-1;default:return{done:true}}}}}();');
     });
     it('in forinstmt', function() {
       var s = 'function *a(){for(var i in o){yield i}}';

@@ -659,7 +659,7 @@ var Generator = Class(function(jsdc) {
                 eventbus.on(block.nid(), function(node, start) {
                   if(start) {
                     //供yield判断
-                    itstmt.done = loopTemp;
+                    itstmt.done = '!' + loopTemp;
                   }
                   else {
                     self.jsdc.appendBefore(top.state + '=' + endTemp);
@@ -696,7 +696,7 @@ var Generator = Class(function(jsdc) {
                   self.jsdc.append('?' + itTemp + ':' + itEndTemp);
                   self.jsdc.append(';break;case ' + itTemp + ':');
                   //供yield判断
-                  itstmt.done = loopTemp;
+                  itstmt.done = '!' + loopTemp;
                 }
                 else {
                   self.jsdc.appendBefore(top.state + '=' + endTemp);
@@ -707,7 +707,7 @@ var Generator = Class(function(jsdc) {
             case 'do':
               loopTemp = self.jsdc.uid();
               //供yield判断
-              itstmt.done = loopTemp;
+              itstmt.done = '!' + loopTemp;
               self.jsdc.ignore(itstmt.first());
               self.jsdc.ignore(itstmt.leaf(2));
               var block = itstmt.leaf(1);
