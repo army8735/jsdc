@@ -105,7 +105,6 @@ var Generator = Class(function(jsdc) {
     var o = self.hash[top.nid()];
     if(start) {
       self.jsdc.ignore(node.first(), 'gen7');
-      var parent = node.parent();
       //赋值语句需要添加上参数，先默认undefined，并记录在变量中为下次添加做标记
       var parent = node.parent();
       switch(parent.name()) {
@@ -252,10 +251,6 @@ var Generator = Class(function(jsdc) {
         }
       });
     }
-  },
-  preFor: function(forstmt) {
-    var self = this;
-    var top = varstmt.gen;
   },
   count: function(node, top, res) {
     res = res || { count: 0, return: false, pre: false };
@@ -582,10 +577,52 @@ var Generator = Class(function(jsdc) {
                     break;
                 }
               }
+              //普通for语句
               else {
-                //普通for语句
+                loopTemp = self.jsdc.uid();
+                var block = itstmt.last();
+                if(block.name() == JsNode.BLOCKSTMT) {
+                  self.jsdc.ignore(block.first().first(), 'gen32');
+                  self.jsdc.ignore(block.first().last(), 'gen33');
+                }
+                eventbus.on(itstmt.nid(), function(node, start) {
+                  if(start) {
+                    self.jsdc.append('var ' + loopTemp + ';');
+                    top = self.hash[nid];
+                    endTemp = ++top.index2;
+                    itTemp = ++top.index2;
+                    itEndTemp = ++top.index2;
+                  }
+                });
+                eventbus.on(itstmt.leaf(4).nid(), function(node, start) {
+                  if(start) {
+                    self.jsdc.append('case ' + endTemp + ':');
+                    self.jsdc.append(top.state + '=');
+                    self.jsdc.append('(' + loopTemp + '=');
+                  }
+                  else {
+                    self.jsdc.appendBefore(')?' + itTemp + ':' + itEndTemp);
+                  }
+                });
+                eventbus.on(itstmt.leaf(6).nid(), function(node, start) {
+                  if(start) {
+                    self.jsdc.append('case ' + itTemp + ':');
+                  }
+                  else {
+                    self.jsdc.appendBefore(';');
+                  }
+                });
+                eventbus.on(block.nid(), function(node, start) {
+                  if(start) {
+                    //供yield判断
+                    itstmt.done = loopTemp;
+                  }
+                  else {
+                    self.jsdc.appendBefore(top.state + '=' + endTemp);
+                    self.jsdc.appendBefore(';break;case ' +  itEndTemp + ':');
+                  }
+                });
               }
-              return;
               break;
             case 'while':
               self.jsdc.ignore(itstmt.first());
