@@ -594,24 +594,68 @@ var Generator = Class(function(jsdc) {
                     itEndTemp = ++top.index2;
                   }
                 });
-                eventbus.on(itstmt.leaf(4).nid(), function(node, start) {
-                  if(start) {
-                    self.jsdc.append('case ' + endTemp + ':');
-                    self.jsdc.append(top.state + '=');
-                    self.jsdc.append('(' + loopTemp + '=');
+                var expr1 = 0;
+                //for(;expr1
+                if(itstmt.leaf(2).name() == JsNode.TOKEN
+                  && itstmt.leaf(2).token().content() == ';') {
+                  if(itstmt.leaf(3).name() != JsNode.TOKEN
+                    || itstmt.leaf(3).token().content() != ';') {
+                    expr1 = 3;
                   }
-                  else {
-                    self.jsdc.appendBefore(')?' + itTemp + ':' + itEndTemp);
-                  }
-                });
-                eventbus.on(itstmt.leaf(6).nid(), function(node, start) {
-                  if(start) {
-                    self.jsdc.append('case ' + itTemp + ':');
-                  }
-                  else {
-                    self.jsdc.appendBefore(';');
-                  }
-                });
+                }
+                //for(expr0;expr1
+                else if(itstmt.leaf(4).name() != JsNode.TOKEN
+                  || itstmt.leaf(4).token().content() != ';') {
+                  expr1 = 4;
+                }
+                if(expr1) {
+                  eventbus.on(itstmt.leaf(expr1).nid(), function(node, start) {
+                    if(start) {
+                      self.jsdc.append('case ' + endTemp + ':');
+                      self.jsdc.append(top.state + '=');
+                      self.jsdc.append('(' + loopTemp + '=');
+                    }
+                    else {
+                      self.jsdc.appendBefore(')?' + itTemp + ':' + itEndTemp);
+                    }
+                  });
+                }
+                else {
+                  eventbus.on(itstmt.nid(), function(node, start) {
+                    if(start) {
+                      self.jsdc.append('case ' + endTemp + ':');
+                    }
+                  });
+                }
+                var expr2 = 0;
+                if(expr1
+                  && (itstmt.leaf(expr1 + 2).name() != JsNode.TOKEN
+                    || itstmt.leaf(expr1 + 2).token().content() != ')')) {
+                  expr2 = expr1 + 2;
+                }
+                else if(
+                  !expr1
+                  && (itstmt.leaf(4).name() != JsNode.TOKEN
+                    || itstmt.leaf(4).token().content() != ')')) {
+                  expr2 = 4;
+                }
+                if(expr2) {
+                  eventbus.on(itstmt.leaf(expr2).nid(), function(node, start) {
+                    if(start) {
+                      self.jsdc.append('case ' + itTemp + ':');
+                    }
+                    else {
+                      self.jsdc.appendBefore(';');
+                    }
+                  });
+                }
+                else {
+                  eventbus.on(expr1 ? itstmt.leaf(expr1).nid() : itstmt.nid(), function(node, start) {
+                    if(!start) {
+                      self.jsdc.append(';case ' + itTemp + ':');
+                    }
+                  });
+                }
                 eventbus.on(block.nid(), function(node, start) {
                   if(start) {
                     //供yield判断
