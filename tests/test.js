@@ -900,6 +900,24 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('var a = function(b, c) {return b - c}');
     });
+    it('lexical 1', function() {
+      var s = 'var a = (b, c) => console.log(this, arguments)';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var _0=this;var _1=arguments;var a = function(b, c) {return console.log(_0, _1)}');
+    });
+    it('lexical 2', function() {
+      var s = 'function x(){ var a = (b, c) => console.log(this, arguments) }';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function x(){ var _0=this;var _1=arguments;var a = function(b, c) {return console.log(_0, _1)} }');
+    });
+    it('lexical with', function() {
+      var s = 'with(o){ var a = (b, c) => console.log(this, arguments) }';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var a;with(o)!function(){ var _0=this;var _1=arguments;a = function(b, c) {return console.log(_0, _1)} }();');
+    });
   });
   describe('generator function', function() {
     it('empty', function() {

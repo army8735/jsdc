@@ -185,6 +185,9 @@ var Jsdc = Class(function(code) {
       else if(!token.ignore && token.type() == Token.NUMBER) {
         this.num.parse(token);
       }
+      else if(content == 'this' || content == 'arguments') {
+        eventbus.emit(node.nid(), [node, true]);
+      }
       //替换操作会设置ignore属性将其忽略
       if(!token.ignore) {
         this.append(content);

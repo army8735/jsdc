@@ -14,8 +14,10 @@ var Scope = Class(function(jsdc) {
   this.hash = {};
   this.history = {};
   this.index = [jsdc.res.length];
+  this.hash2 = {};
 }).methods({
   parse: function(node) {
+    this.hash2[node.nid()] = true;
     this.recursion(node);
   },
   recursion: function(node) {
@@ -37,6 +39,21 @@ var Scope = Class(function(jsdc) {
       else if(name == JsNode.BLOCKSTMT
         && !NOT_ABS_BLOCK.hasOwnProperty(node.parent().name())) {
         self.hash[node.first().nid()] = true;
+      }
+      //记录lexical绑定的作用域，为arrowFn中的this和arguments替换
+      if(name == JsNode.FNBODY) {
+        self.hash2[node.nid()] = true;
+      }
+      else if(name == JsNode.WITHSTMT) {
+        var block = node.leaf(4).first();
+        if(block.size() > 2) {
+          var node2 = block.leaf(1);
+          self.hash2[node2.nid()] = true;
+        }
+      }
+      else if(name == JsNode.ARROWFN) {
+        var parent = self.closest2(node);
+        self.jsdc.arrowFn.lexical(parent);
       }
       node.leaves().forEach(function(leaf) {
         self.recursion(leaf);
@@ -146,6 +163,14 @@ var Scope = Class(function(jsdc) {
     var parent = node;
     while(parent = parent.parent()) {
       if(SCOPE.hasOwnProperty(parent.name())) {
+        return parent;
+      }
+    }
+  },
+  closest2: function(node) {
+    var parent = node;
+    while(parent = parent.parent()) {
+      if(this.hash2.hasOwnProperty(parent.nid())) {
         return parent;
       }
     }
