@@ -47,6 +47,22 @@ var Obj = Class(function(jsdc) {
           }
         }
       }
+      else if(prmr.name() == JsNode.PRMREXPR
+        && (parent.name() == JsNode.RETSTMT
+          || parent.name() == JsNode.ARGLIST)) {
+        if(node.size() == 1) {
+          var first = node.first();
+          if(first.name() == JsNode.TOKEN) {
+            if(!start) {
+              this.jsdc.appendBefore(':' + first.token().content());
+            }
+          }
+          else if(first.name() == JsNode.METHOD) {
+            first = first.first();
+            this.method[first.nid()] = true;
+          }
+        }
+      }
     }
   },
   name: function(node, start) {

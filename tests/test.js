@@ -1576,6 +1576,16 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('var o = function(){var _0={_1:1};_0[a]=_0._1;delete _0._1;return _0}()');
     });
+    it('in retstmt', function() {
+      var s = 'return{a,b(){}}';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('return{a:a,b:function(){}}');
+    });
+    it('in arglist', function() {
+      var s = 'fn({a,b(){}})';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('fn({a:a,b:function(){}})');
+    });
   });
   describe('runntime', function() {
     it('open', function() {
