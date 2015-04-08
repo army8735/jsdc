@@ -160,6 +160,7 @@ seajs.use(['../index', './jssc'], function(jsdc, jssc) {
   var input = document.getElementById('btn');
   input.onclick = function() {
       var s = ta.value;
+			location.hash = encodeURIComponent(s);
       Array.prototype.slice.call(document.getElementsByTagName('div'), 0).forEach(function(o) {
           o.parentNode.removeChild(o);
       });
@@ -168,7 +169,6 @@ seajs.use(['../index', './jssc'], function(jsdc, jssc) {
       document.getElementsByTagName('code')[0].innerHTML = s;
       pre[0].style.display = 'block';
       init();
-      location.hash = encodeURIComponent(s);
   }
   function hashChange() {
     var s = location.hash.replace(/^#/, '');
