@@ -300,22 +300,31 @@ var codeUnits = [].concat(Object.prototype.toString.call(a)=="[object String]"?a
 ```
 
 ### for of循环
+存储被循环体到临时引用：
+```js
+for(a of b){
+}
+```
+```js
+var _0=b;for(a of b){
+}
+```
 将`of`改为`=`并添加`;`补完循环：
 ```js
 for(a of b){
 }
 ```
 ```js
-for(a =b;;){
+var _0=b;for(a =_0;;){
 }
 ```
-将赋值添加`.next()`并添加`.done`结束判断：
+将赋值添加`[Symbol.iterator]().next()`并添加`.done`结束判断：
 ```js
 for(a of b){
 }
 ```
 ```js
-for(a =b.next();!a.done;a=b.next()){
+var _0=b;for(a =_0[Symbol.iterator]().next();!a.done;a=_0.next()){
 }
 ```
 循环体内先赋值`.value`：
@@ -324,7 +333,7 @@ for(a of b){
 }
 ```
 ```js
-for(a =b.next();!a.done;a=b.next()){a=a.value;
+var _0=b;for(a =_0[Symbol.iterator]().next();!a.done;a=_0.next()){a=a.value;
 }
 ```
 `var`语句同样处理：
@@ -333,7 +342,7 @@ for(var a of b){
 }
 ```
 ```js
-for(var a =b.next();!a.done;a=b.next()){a=a.value;
+var _0=b;for(var a =_0[Symbol.iterator]().next();!a.done;a=_0.next()){a=a.value;
 }
 ```
 
@@ -687,7 +696,7 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var _1=0;return function(){return{next:_0}};function _0(){
+var a=function(){var _1;return function(){_1=0;return{next:_0}};function _0(){
   return{value:1,done:false}
   return{value:2,done:true}
 }}();
@@ -700,7 +709,7 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var _1=0;return function(){return{next:_0}};function _0(){
+var a=function(){var _1;return function(){_1=0;return{next:_0}};function _0(){
   while(1){switch(_1){case 0:_1=1;return{value:1,done:false}
   case 1:_1=-1;return{value:1,done:true}}}
 }}();
@@ -716,7 +725,7 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var _1=0;return function(){return{next:_0}};var a;function _0(){
+var a=function(){var _1;return function(){_1=0;return{next:_0}};var a;function _0(){
   while(1){switch(_1){case 0:a = 1;
   _1=1;return{value:a++,done:false};
   case 1:_1=-1;return{value:a++,done:true;}}}
@@ -735,7 +744,7 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var _0=0;return function(){return{next:_1}};var a;function _1(_2){
+var a=function(){var _0;return function(){_0=0;return{next:_1}};var a;function _1(_2){
   while(1){switch(_0){case 0:a = 1;
   _0=1;return{value:a++,done:false};case 1:
   _0=-1;return{value:a++,done:true};default:return{done:true}}}
@@ -748,7 +757,7 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var _0=0;return function(){return{next:_1}};function _1(_2){
+var a=function(){var _0;return function(){_0=0;return{next:_1}};function _1(_2){
   while(1){switch(_0){case 0:_0=1;var _3=b();if(!_3.done)_0=0;return _3;default:return{done:true}}}
 }}();
 ```
@@ -758,7 +767,7 @@ var a=function(){var _0=0;return function(){return{next:_1}};function _1(_2){
 }
 ```
 ```js
-~function(){var _0=0;return function(){return{next:_1}};function _1(){
+~function(){var _0;return function(){_0=0；return{next:_1}};function _1(){
 }}()
 ```
 
