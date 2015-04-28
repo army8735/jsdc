@@ -81,7 +81,7 @@ var Forof = Class(function(jsdc) {
     if(parent.name() == JsNode.ITERSTMT
       && this.hash.hasOwnProperty(parent.nid())) {
       if(start) {
-        this.jsdc.append('.next();!');
+        this.jsdc.append('[Symbol.iterator]().next();!');
         var index = this.pos[parent.nid()];
         var k;
         //解构
