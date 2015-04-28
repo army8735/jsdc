@@ -93,9 +93,12 @@ var Generator = Class(function(jsdc) {
     };
     self.jsdc.append('function(){');
     if(o.count) {
-      self.jsdc.append('var ' + state + '=0;');
+      self.jsdc.append('var ' + state + ';');
+      self.jsdc.append('return function(){' + state + '=0;return{next:' + temp + '}};');
     }
-    self.jsdc.append('return function(){return{next:' + temp + '}};');
+    else {
+      self.jsdc.append('return function(){return{next:' + temp + '}};');
+    }
     o.pos = self.jsdc.res.length;
     self.jsdc.append('function ' + temp);
   },
