@@ -8,6 +8,7 @@ var join = require('./join');
 var Forof = Class(function(jsdc) {
   this.jsdc = jsdc;
   this.hash = {};
+  this.hash2 = {};
   this.pos = {};
   this.destruct = {};
 }).methods({
@@ -32,30 +33,32 @@ var Forof = Class(function(jsdc) {
           return;
         }
         var of = node.leaf(index);
-        if(of.name() == JsNode.TOKEN
-          && of.token().content() == 'of') {
-          var leaf = node.leaf(index - 1);
-          //如果是var解构
-          if([JsNode.OBJBINDPAT, JsNode.ARRBINDPAT].indexOf(leaf.name()) > -1) {
-            this.destruct[node.nid()] = leaf;
-            this.hash[node.nid()] = this.getLast(leaf);
-            this.jsdc.ignore(leaf, 'forof1');
-          }
-          //prmrexpr解构
-          else if(leaf.name() == JsNode.PRMREXPR
-            && leaf.size() == 1
-            && [JsNode.OBJLTR, JsNode.ARRLTR].indexOf(leaf.first().name()) > -1) {
-            this.destruct[node.nid()] = leaf.first();
-            this.hash[node.nid()] = this.getLast(leaf.first());
-            this.jsdc.ignore(leaf, 'forof1');
-          }
-          else {
-            this.hash[node.nid()] = true;
-            this.hash[node.nid()] = this.getLast(leaf.first());
-          }
-          this.pos[node.nid()] = index;
-          this.jsdc.ignore(of, 'forof2');
+        var leaf = node.leaf(index - 1);
+        var temp = this.jsdc.uid();
+        var ref = join(node.leaf(index + 1));
+        this.jsdc.append('var ' + temp + '=' + ref);
+        this.hash2[node.nid()] = temp;
+        //如果是var解构
+        if([JsNode.OBJBINDPAT, JsNode.ARRBINDPAT].indexOf(leaf.name()) > -1) {
+          this.destruct[node.nid()] = leaf;
+          this.hash[node.nid()] = this.getLast(leaf);
+          this.jsdc.ignore(leaf, 'forof1');
         }
+        //prmrexpr解构
+        else if(leaf.name() == JsNode.PRMREXPR
+          && leaf.size() == 1
+          && [JsNode.OBJLTR, JsNode.ARRLTR].indexOf(leaf.first().name()) > -1) {
+          this.destruct[node.nid()] = leaf.first();
+          this.hash[node.nid()] = this.getLast(leaf.first());
+          this.jsdc.ignore(leaf, 'forof1');
+        }
+        else {
+          this.hash[node.nid()] = true;
+        }
+        this.pos[node.nid()] = index;
+        this.jsdc.ignore(of, 'forof2');
+        this.jsdc.ignore(node.leaf(index + 1), 'forof3');
+        this.jsdc.append(';');
       }
     }
     else if(this.hash.hasOwnProperty(node.nid())) {
@@ -81,7 +84,7 @@ var Forof = Class(function(jsdc) {
     if(parent.name() == JsNode.ITERSTMT
       && this.hash.hasOwnProperty(parent.nid())) {
       if(start) {
-        this.jsdc.append('[Symbol.iterator]().next();!');
+        this.jsdc.append(this.hash2[parent.nid()] + '[Symbol.iterator]().next();!');
         var index = this.pos[parent.nid()];
         var k;
         //解构
@@ -93,9 +96,8 @@ var Forof = Class(function(jsdc) {
           //forof的var后只能是bindid或者解构
           k = k.first().token().content();
         }
-        var v = join(parent.leaf(index + 1));
         this.jsdc.append(k + '.done;');
-        this.jsdc.append(k + '=' + v + '.next()');
+        this.jsdc.append(k + '=' + this.hash2[parent.nid()] + '.next()');
       }
       else {
         //for of的语句如果省略{}则加上
