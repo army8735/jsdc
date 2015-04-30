@@ -645,6 +645,12 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('function A(){B.call(this)}!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();\nA.F=function(){B.prototype.b.call(this)}\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
     });
+    it('static getter/setter', function() {
+      var s = 'class A extends B{\nstatic get F(){super.b()}\n}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function A(){B.call(this)}!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();\nObject.defineProperty(A, "F", {get :function(){B.prototype.b.call(this)}});\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
+    });
     it(';', function() {
       var s = 'class A{;}';
       var res = Jsdc.parse(s);

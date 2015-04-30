@@ -116,9 +116,10 @@ var Klass = Class(function(jsdc) {
           }
         }
       }
+      //get/set
       else {
-        var token = first.token();
         if(start) {
+          var token = first.token();
           var prptn = first.next();
           this.gs[prptn.nid()] = true;
           this.jsdc.ignore(prptn, 'klass14');
@@ -144,9 +145,39 @@ var Klass = Class(function(jsdc) {
     }
     else if(first.name() == JsNode.TOKEN
       && first.token().content() == 'static') {
-      if(start) {
-        this.jsdc.ignore(first.token(), 'klass15');
-        this.jsdc.append(o.name + '.');
+      var token = first.token();
+      first = first.next().first();
+      if(first.name() == JsNode.PROPTNAME) {
+        if(start) {
+          this.jsdc.ignore(token, 'klass15');
+          this.jsdc.append(o.name + '.');
+        }
+      }
+      else {
+        if(start) {
+          this.jsdc.ignore(token, 'klass17');
+          token = first.token();
+          var prptn = first.next();
+          this.gs[prptn.nid()] = true;
+          this.jsdc.ignore(prptn, 'klass18');
+          this.jsdc.append('Object.defineProperty(');
+          this.jsdc.append(o.name);
+          this.jsdc.append(', "');
+          if(token.content() == 'get') {
+            var n = first.next().first().first().token();
+            o.g = n.content();
+            this.jsdc.append(o.g);
+          }
+          else {
+            var n = first.next().first().first().token();
+            o.s = n.content();
+            this.jsdc.append(o.s);
+          }
+          this.jsdc.append('", {');
+        }
+        else {
+          this.jsdc.appendBefore('});');
+        }
       }
     }
   },
@@ -200,6 +231,10 @@ var Klass = Class(function(jsdc) {
         && parent.prev()
         && parent.prev().name() == JsNode.TOKEN
         && parent.prev().token().content() == 'static') {
+        if(parent.first().name() == JsNode.TOKEN
+          && ['get', 'set'].indexOf(parent.first().token().content()) > -1) {
+          return;
+        }
         parent = parent.parent();
         if(parent.name() == JsNode.CLASSELEM) {
           this.jsdc.appendBefore('=function');
