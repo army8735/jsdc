@@ -193,11 +193,9 @@ var Rest = Class(function(jsdc) {
       var temp = this.jsdc.uid();
       var temp2 = this.jsdc.uid();
       this.jsdc.append('var ' + temp + '=[],' + temp2);
-      if(!isPrm) {
-        var temp3 = this.jsdc.uid();
-        this.jsdc.append(',' + temp3 + '=' + v);
-      }
-      this.jsdc.append(';while(!(' + temp2 + '=' + (isPrm ? v : temp3) + '.next()).done)');
+      var temp3 = this.jsdc.uid();
+      this.jsdc.append(',' + temp3 + '=' + v + '[Symbol.iterator]()');
+      this.jsdc.append(';while(!(' + temp2 + '=' + temp3 + '.next()).done)');
       this.jsdc.append(temp + '.push(' + temp2 + '.value' + ')');
       this.jsdc.append(';return ' + temp + '}())');
       if(o.needTemp) {
@@ -228,11 +226,9 @@ var Rest = Class(function(jsdc) {
       var temp = this.jsdc.uid();
       var temp2 = this.jsdc.uid();
       this.jsdc.append('var ' + temp + '=[],' + temp2);
-      if(!isPrm) {
-        var temp3 = this.jsdc.uid();
-        this.jsdc.append(',' + temp3 + '=' + v);
-      }
-      this.jsdc.append(';while(!(' + temp2 + '=' + (isPrm ? v : temp3) + '.next()).done)');
+      var temp3 = this.jsdc.uid();
+      this.jsdc.append(',' + temp3 + '=' + v + '[Symbol.iterator]()');
+      this.jsdc.append(';while(!(' + temp2 + '=' + temp3 + '.next()).done)');
       this.jsdc.append(temp + '.push(' + temp2 + '.value' + ')');
       this.jsdc.append(';return ' + temp + '}())');
     }
@@ -293,11 +289,9 @@ var Rest = Class(function(jsdc) {
         this.jsdc.appendBefore(temp);
         this.jsdc.appendBefore('=[],' + temp2);
         var temp3;
-        if(!o.isPrm) {
-          temp3 = this.jsdc.uid();
-          this.jsdc.appendBefore(',' + temp3 + '=' + o.value);
-        }
-        this.jsdc.appendBefore(';while(!(' + temp2 + '=' + (o.isPrm ? o.value : temp3) + '.next()).done)');
+        temp3 = this.jsdc.uid();
+        this.jsdc.appendBefore(',' + temp3 + '=' + o.value + '[Symbol.iterator]()');
+        this.jsdc.appendBefore(';while(!(' + temp2 + '=' + temp3 + '.next()).done)');
         this.jsdc.appendBefore(temp + '.push(' + temp2 + '.value);return ' + temp + '}()');
       }
       this.jsdc.appendBefore(')');

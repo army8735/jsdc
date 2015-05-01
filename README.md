@@ -250,14 +250,14 @@ function method(a, args) {args = [].slice.call(arguments, 1);
 fn(a, b, ...c)
 ```
 ```js
-fn.apply(this, [a,b].concat(function(){var _0=[],_1;while(!(_1=c.next()).done)_0.push(_1.value)return _0}()))
+fn.apply(this, [a,b].concat(function(){var _0=[],_1,_2=c[Symbol.iterator]();while(!(_1=_2.next()).done)_0.push(_1.value)return _0}()))
 ```
 如果调用者是成员表达式，context将从`this`变为主表达式：
 ```js
 Math.max(...a)
 ```
 ```js
-Math.max.apply(Math, [].concat(function(){var _0=[],_1;while(!(_1=a.next()).done)_0.push(_1.value)return _0}()))
+Math.max.apply(Math, [].concat(function(){var _0=[],_1,_2=c[Symbol.iterator]();while(!(_1=_2.next()).done)_0.push(_1.value)return _0}()))
 ```
 在数组中则会自动展开，支持string预判断：
 ```js
