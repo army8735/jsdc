@@ -207,9 +207,12 @@ var Rest = Class(function(jsdc) {
       var o = this.hash4[parent.nid()];
       this.jsdc.append(o.cname);
       //用数组来concat可变参数，注意前面可能存在的固定参数需带上
-      this.jsdc.append(', [');
+      this.jsdc.append(', [null');
       var leaves = node.leaves();
       for(var i = 0; i < leaves.length - 3; i++) {
+        if(i == 0) {
+          this.jsdc.append(',');
+        }
         this.jsdc.append(join(leaves[i]));
       }
       this.jsdc.append(']');
