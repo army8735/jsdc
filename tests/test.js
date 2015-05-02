@@ -678,8 +678,15 @@ describe('es6', function() {
     });
     it('getter/setter', function() {
       var s = 'class A{get b(){}set c(d){}}';
+      Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function A(){}Object.defineProperty(A.prototype, "b", {get :function(){}});Object.defineProperty(A.prototype, "c", {set :function(d){}});');
+      expect(res).to.eql('function A(){}var _0={};_0.b={};_0.b.get =function(){}_0.c={};_0.c.set =function(d){}Object.keys(_0).forEach(function(k){Object.defineProperty(A.prototype,k,_0[k])});');
+    });
+    it('getter/setter multi', function() {
+      var s = 'class A{get b(){}set c(d){}get c(){}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function A(){}var _0={};_0.b={};_0.b.get =function(){}_0.c={};_0.c.set =function(d){}_0.c.get =function(){}Object.keys(_0).forEach(function(k){Object.defineProperty(A.prototype,k,_0[k])});');
     });
     it('static', function() {
       var s = 'class A extends B{\nstatic F(){super.b()}\n}';
@@ -691,7 +698,7 @@ describe('es6', function() {
       var s = 'class A extends B{\nstatic get F(){super.b()}\n}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function A(){B.call(this)}!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();\nObject.defineProperty(A, "F", {get :function(){B.prototype.b.call(this)}});\nObject.keys(B).forEach(function(k){A[k]=B[k]});');
+      expect(res).to.eql('function A(){B.call(this)}!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();\nvar _1={};_1.F={};_1.F.get =function(){B.prototype.b.call(this)}\nObject.keys(_1).forEach(function(k){Object.defineProperty(A,k,_1[k])});Object.keys(B).forEach(function(k){A[k]=B[k]});');
     });
     it(';', function() {
       var s = 'class A{;}';

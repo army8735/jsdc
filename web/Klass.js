@@ -10,7 +10,10 @@ var Klass = Class(function(jsdc) {
   this.hash = {};
   this.hash2 = {};
   this.sup = {};
+  this.gsh = {};
+  this.gssh = {};
   this.gs = {};
+  this.gss = {};
 }).methods({
   parse: function(node, start) {
     if(node.name() == JsNode.CLASSDECL) {
@@ -40,6 +43,12 @@ var Klass = Class(function(jsdc) {
       }
       else {
         var o = this.hash[node.nid()];
+        if(o.gs) {
+          this.jsdc.appendBefore('Object.keys(' + o.gs + ').forEach(function(k){Object.defineProperty(' + o.name + '.prototype,k,' + o.gs + '[k])});');
+        }
+        if(o.gss) {
+          this.jsdc.appendBefore('Object.keys(' + o.gss + ').forEach(function(k){Object.defineProperty(' + o.name + ',k,' + o.gss + '[k])});');
+        }
         if(o.extend) {
           this.jsdc.appendBefore('Object.keys(' + o.extend + ').forEach(function(k){' + o.name + '[k]=' + o.extend + '[k]});');
         }
@@ -120,27 +129,41 @@ var Klass = Class(function(jsdc) {
       //get/set
       else {
         if(start) {
+          if(!o.gs) {
+            o.gs = this.jsdc.uid();
+            this.jsdc.append('var ' + o.gs + '={};');
+          }
           var token = first.token();
           var prptn = first.next();
           this.gs[prptn.nid()] = true;
           this.jsdc.ignore(prptn, 'klass14');
-          this.jsdc.append('Object.defineProperty(');
-          this.jsdc.append(o.name);
-          this.jsdc.append('.prototype, "');
+          //this.jsdc.append('Object.defineProperty(');
+          //this.jsdc.append(o.name);
+          //this.jsdc.append('.prototype, "');
           if(token.content() == 'get') {
             var n = first.next().first().first().token();
             o.g = n.content();
-            this.jsdc.append(o.g);
+            //this.jsdc.append(o.g);
+            if(!this.gsh.hasOwnProperty(o.g)) {
+              this.gsh[o.g] = true;
+              this.jsdc.append(o.gs + '.' + o.g + '={};');
+            }
+            this.jsdc.append(o.gs + '.' + o.g + '.');
           }
           else {
             var n = first.next().first().first().token();
             o.s = n.content();
-            this.jsdc.append(o.s);
+            //this.jsdc.append(o.s);
+            if(!this.gsh.hasOwnProperty(o.s)) {
+              this.gsh[o.s] = true;
+              this.jsdc.append(o.gs + '.' + o.s + '={};');
+            }
+            this.jsdc.append(o.gs + '.' + o.s + '.');
           }
-          this.jsdc.append('", {');
+          //this.jsdc.append('", {');
         }
         else {
-          this.jsdc.appendBefore('});');
+          //this.jsdc.appendBefore('});');
         }
       }
     }
@@ -156,35 +179,49 @@ var Klass = Class(function(jsdc) {
       }
       else {
         if(start) {
+          if(!o.gss) {
+            o.gss = this.jsdc.uid();
+            this.jsdc.append('var ' + o.gss + '={};');
+          }
           this.jsdc.ignore(token, 'klass17');
           token = first.token();
           var prptn = first.next();
-          this.gs[prptn.nid()] = true;
+          this.gss[prptn.nid()] = true;
           this.jsdc.ignore(prptn, 'klass18');
-          this.jsdc.append('Object.defineProperty(');
-          this.jsdc.append(o.name);
-          this.jsdc.append(', "');
+          //this.jsdc.append('Object.defineProperty(');
+          //this.jsdc.append(o.name);
+          //this.jsdc.append(', "');
           if(token.content() == 'get') {
             var n = first.next().first().first().token();
             o.g = n.content();
-            this.jsdc.append(o.g);
+            //this.jsdc.append(o.g);
+            if(!this.gssh.hasOwnProperty(o.g)) {
+              this.gssh[o.g] = true;
+              this.jsdc.append(o.gss + '.' + o.g + '={};');
+            }
+            this.jsdc.append(o.gss + '.' + o.g + '.');
           }
           else {
             var n = first.next().first().first().token();
             o.s = n.content();
-            this.jsdc.append(o.s);
+            //this.jsdc.append(o.s);
+            if(!this.gssh.hasOwnProperty(o.s)) {
+              this.gssh[o.s] = true;
+              this.jsdc.append(o.gss + '.' + o.s + '={};');
+            }
+            this.jsdc.append(o.gss + '.' + o.s + '.');
           }
-          this.jsdc.append('", {');
+          //this.jsdc.append('", {');
         }
         else {
-          this.jsdc.appendBefore('});');
+          //this.jsdc.appendBefore('});');
         }
       }
     }
   },
   prptn: function(node) {
-    if(this.gs.hasOwnProperty(node.nid())) {
-      this.jsdc.append(':function');
+    if(this.gs.hasOwnProperty(node.nid()) || this.gss.hasOwnProperty(node.nid())) {
+      this.jsdc.append('=function');
     }
   },
   super: function(node) {
