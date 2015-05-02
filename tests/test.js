@@ -319,25 +319,25 @@ describe('es6', function() {
       Jsdc.reset();
       var s = 'Math.max(...a)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('Math.max.apply(Math, [].concat(function(){var _0=[],_1,_2=a[Symbol.iterator]();while(!(_1=_2.next()).done)_0.push(_1.value);return _0}()))');
+      expect(res).to.eql('Math.max.apply(Math,[].concat(function(){var _0=[],_1,_2=a[Symbol.iterator]();while(!(_1=_2.next()).done)_0.push(_1.value);return _0}()))');
     });
     it('callexpr with a fn spread', function() {
       Jsdc.reset();
       var s = 'a(...b())';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('a.apply(this, [].concat(function(){var _0=[],_1,_2=b()[Symbol.iterator]();while(!(_1=_2.next()).done)_0.push(_1.value);return _0}()))');
+      expect(res).to.eql('a.apply(this,[].concat(function(){var _0=[],_1,_2=b()[Symbol.iterator]();while(!(_1=_2.next()).done)_0.push(_1.value);return _0}()))');
     });
     it('callexpr mult spread', function() {
       Jsdc.reset();
       var s = 'Math.max(a, ...b)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('Math.max.apply(Math, [a].concat(function(){var _0=[],_1,_2=b[Symbol.iterator]();while(!(_1=_2.next()).done)_0.push(_1.value);return _0}()))');
+      expect(res).to.eql('Math.max.apply(Math,[a].concat(function(){var _0=[],_1,_2=b[Symbol.iterator]();while(!(_1=_2.next()).done)_0.push(_1.value);return _0}()))');
     });
     it('callexpr with prmrexpr', function() {
       Jsdc.reset();
       var s = 'fn(a, b, ...c)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('fn.apply(this, [a,b].concat(function(){var _0=[],_1,_2=c[Symbol.iterator]();while(!(_1=_2.next()).done)_0.push(_1.value);return _0}()))');
+      expect(res).to.eql('fn.apply(this,[a,b].concat(function(){var _0=[],_1,_2=c[Symbol.iterator]();while(!(_1=_2.next()).done)_0.push(_1.value);return _0}()))');
     });
     it('arrltr with rest', function() {
       Jsdc.reset();
@@ -355,7 +355,7 @@ describe('es6', function() {
       Jsdc.reset();
       var s = 'new a().b(...c)';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('function(){var _0=new a();return _0.b.apply(_0, [].concat(function(){var _1=[],_2,_3=c[Symbol.iterator]();while(!(_2=_3.next()).done)_1.push(_2.value);return _1}()))}()');
+      expect(res).to.eql('function(){var _0=new a();return _0.b.apply(_0,[].concat(function(){var _1=[],_2,_3=c[Symbol.iterator]();while(!(_2=_3.next()).done)_1.push(_2.value);return _1}()))}()');
     });
     it('spread with fn', function() {
       Jsdc.reset();
@@ -634,11 +634,47 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();function A(){B.prototype.a}Object.keys(B).forEach(function(k){A[k]=B[k]});');
     });
+    it('super call multi', function() {
+      var s = 'class A extends B{constructor(){super(a,b)}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();function A(){B.call(this,a,b)}Object.keys(B).forEach(function(k){A[k]=B[k]});');
+    });
+    it('super call spread', function() {
+      var s = 'class A extends B{constructor(){super(...d)}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();function A(){B.apply(this,[].concat(function(){var _1=[],_2,_3=d[Symbol.iterator]();while(!(_2=_3.next()).done)_1.push(_2.value);return _1}()))}Object.keys(B).forEach(function(k){A[k]=B[k]});');
+    });
+    it('super call multi spread', function() {
+      var s = 'class A extends B{constructor(){super(a,b,...c)}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();function A(){B.apply(this,[a,b].concat(function(){var _1=[],_2,_3=c[Symbol.iterator]();while(!(_2=_3.next()).done)_1.push(_2.value);return _1}()))}Object.keys(B).forEach(function(k){A[k]=B[k]});');
+    });
     it('super call method with argments', function() {
       var s = 'class A extends B{constructor(){super.a(1)}}';
       Jsdc.reset();
       var res = Jsdc.parse(s);
       expect(res).to.eql('!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();function A(){B.prototype.a.call(this,1)}Object.keys(B).forEach(function(k){A[k]=B[k]});');
+    });
+    it('super call method with multi argments', function() {
+      var s = 'class A extends B{constructor(){super.a(1,2)}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();function A(){B.prototype.a.call(this,1,2)}Object.keys(B).forEach(function(k){A[k]=B[k]});');
+    });
+    it('super call method with spread', function() {
+      var s = 'class A extends B{constructor(){super.a(...d)}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();function A(){B.prototype.a.apply(this,[].concat(function(){var _1=[],_2,_3=d[Symbol.iterator]();while(!(_2=_3.next()).done)_1.push(_2.value);return _1}()))}Object.keys(B).forEach(function(k){A[k]=B[k]});');
+    });
+    it('super call method multi spread', function() {
+      var s = 'class A extends B{constructor(){super.a(b,...d)}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();function A(){B.prototype.a.apply(this,[b].concat(function(){var _1=[],_2,_3=d[Symbol.iterator]();while(!(_2=_3.next()).done)_1.push(_2.value);return _1}()))}Object.keys(B).forEach(function(k){A[k]=B[k]});');
     });
     it('getter/setter', function() {
       var s = 'class A{get b(){}set c(d){}}';

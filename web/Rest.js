@@ -164,6 +164,7 @@ var Rest = Class(function(jsdc) {
     var parent = node.parent().parent();
     if(parent.name() == JsNode.CALLEXPR && this.hash2.hasOwnProperty(parent.nid())) {
       var o = this.hash2[parent.nid()];
+      var isSuper = false;
       if(o.needTemp) {
         //主表达式中含有生成的对象，不是直接引用，使用临时变量引用
         this.jsdc.append(o.temp);
@@ -171,10 +172,17 @@ var Rest = Class(function(jsdc) {
       else {
         //主表达式无需设置apply的context，成员需设
         var mmb = this.hash2[parent.nid()].node;
-        this.jsdc.append(mmb.name() == JsNode.MMBEXPR ? join(mmb.first()) : 'this');
+        if(mmb.name() == JsNode.MMBEXPR) {
+          var s = join(mmb.first());
+          isSuper = s == 'super';
+          this.jsdc.append(isSuper ? '' : s);
+        }
+        else {
+          this.jsdc.append('this');
+        }
       }
       //用数组来concat可变参数，注意前面可能存在的固定参数需带上
-      this.jsdc.append(', [');
+      this.jsdc.append(isSuper ? '[' : ',[');
       var leaves = node.leaves();
       for(var i = 0; i < leaves.length - 3; i++) {
         this.jsdc.append(join(leaves[i]));

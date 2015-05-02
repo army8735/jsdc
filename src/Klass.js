@@ -8,6 +8,7 @@ var join = require('./join');
 var Klass = Class(function(jsdc) {
   this.jsdc = jsdc;
   this.hash = {};
+  this.hash2 = {};
   this.sup = {};
   this.gs = {};
 }).methods({
@@ -193,6 +194,14 @@ var Klass = Class(function(jsdc) {
       this.jsdc.append(this.hash[top.nid()].extend);
       if(node.next()) {
         if(node.next().name() == JsNode.ARGS) {
+          var list = node.next().leaf(1);
+          if(list.size() > 1) {
+            var rest = list.last().prev();
+            //待被rest改写apply
+            if(rest.isToken() && rest.token().content() == '...') {
+              return;
+            }
+          }
           this.jsdc.append('.call');
         }
         else {
@@ -215,11 +224,21 @@ var Klass = Class(function(jsdc) {
     if(this.sup.hasOwnProperty(node.nid())) {
       var ex = this.sup[node.nid()];
       var i = this.jsdc.res.lastIndexOf('(');
-      this.jsdc.insert('.call', i);
       if(node.size()) {
+        var hasRest = false;
+        if(node.size() > 1) {
+          var rest = node.last().prev();
+          if(rest.isToken() && rest.token().content() == '...') {
+            hasRest = true;
+          }
+        }
+        if(!hasRest) {
+          this.jsdc.insert('.call', i);
+        }
         this.jsdc.append('this,');
       }
       else {
+        this.jsdc.insert('.call', i);
         this.jsdc.append('this');
       }
     }
@@ -245,7 +264,20 @@ var Klass = Class(function(jsdc) {
       if(parent.name() == JsNode.ARGS
         && parent.prev().name() == JsNode.TOKEN
         && parent.prev().token().content() == 'super') {
-        this.jsdc.appendBefore('this');
+        var list = parent.leaf(1);
+        var hasRest = false;
+        if(list.size() > 1) {
+          var rest = list.last().prev();
+          if(rest.isToken() && rest.token().content() == '...') {
+            hasRest = true;
+          }
+        }
+        if(!hasRest) {
+          this.jsdc.appendBefore('this');
+        }
+        if(!hasRest && list.size()) {
+          this.jsdc.appendBefore(',');
+        }
       }
     }
   },
