@@ -2,6 +2,16 @@ var expect = require('expect.js');
 var fs = require('fs');
 var path = require('path');
 
+var originEs6 = function hasNativeGenerators () {
+  var has = false;
+  try {
+    eval('(function*(){})');
+    has = true;
+  } catch (e) {
+  }
+  return has;
+}()
+
 var Jsdc = require('../');
 
 describe('api', function() {
@@ -1642,7 +1652,7 @@ describe('es6', function() {
       expect(res).to.eql('fn({a:a,b:function(){}})');
     });
   });
-  describe('runntime', function() {
+  describe.only('runntime', function() {
     it('open', function() {
       Jsdc.runtime(true);
       var res = require('./runtime');
@@ -1652,9 +1662,11 @@ describe('es6', function() {
       Jsdc.runtime(false);
       var filename = path.resolve(__dirname, './runtime.js');
       delete require.cache[filename];
-      expect(function() {
-        require('./runtime');
-      }).to.throwError();
+      if(!originEs6) {
+        expect(function() {
+          require('./runtime');
+        }).to.throwError();
+      }
     });
     it('openAgain', function() {
       Jsdc.runtime(true);
@@ -1665,9 +1677,11 @@ describe('es6', function() {
       Jsdc.runtime(false);
       var filename = path.resolve(__dirname, './runtime.js');
       delete require.cache[filename];
-      expect(function() {
-        require('./runtime');
-      }).to.throwError();
+      if(!originEs6) {
+        expect(function() {
+          require('./runtime');
+        }).to.throwError();
+      }
     });
   });
 });
