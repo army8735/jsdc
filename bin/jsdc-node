@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+
+process.title = 'jsdc-node';
+
+var jsdc = require('../');
+
+jsdc.runtime(true);
+
+var program = require('commander');
+
+program
+  .option('-v, --version', 'show version info')
+  .on('version', function() {
+    console.log('\n  ' + require('../package').version + '\n')
+  })
+  .usage('<command> [options]')
+  .parse(process.argv);
