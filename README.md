@@ -1,7 +1,6 @@
-Javascript Downcast
-====
+# Javascript Downcast
 
-> compiler ecmascript6 to ecmascript5
+`jsdc`取自Java多态特性向下转型，意指ES6代码向下转换为ES5兼容代码。
 
 [![NPM version](https://badge.fury.io/js/jsdc.png)](https://npmjs.org/package/jsdc)
 [![Build Status](https://travis-ci.org/army8735/jsdc.svg?branch=master)](https://travis-ci.org/army8735/jsdc)
