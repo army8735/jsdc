@@ -1,3 +1,6 @@
-let a = 1;
+var a = 1;
+{
+  let a = 0;
+}
 
 module.exports = a;
