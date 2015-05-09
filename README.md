@@ -695,10 +695,10 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var _1;return function(){_1=0;return{next:_0}};function _0(){
+var a=function(){return function(){var _1=0;return{next:_0};function _0(){
   return{value:1,done:false}
   return{value:2,done:true}
-}}();
+}}}();
 ```
 当出现`yield`语句时，添加`while`和`switch`语句来模拟顺序执行：
 ```js
@@ -708,10 +708,10 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var _1;return function(){_1=0;return{next:_0}};function _0(){
+var a=function(){return function(){var _1=0;return{next:_0};function _0(){
   while(1){switch(_1){case 0:_1=1;return{value:1,done:false}
   case 1:_1=-1;return{value:1,done:true}}}
-}}();
+}}}();
 ```
 > 注意状态在`switch`各分支语句之间的跳转
 
@@ -724,11 +724,11 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var _1;return function(){_1=0;return{next:_0}};var a;function _0(){
+var a=function(){return function(){var _1=0;return{next:_0};var a;function _0(){
   while(1){switch(_1){case 0:a = 1;
   _1=1;return{value:a++,done:false};
   case 1:_1=-1;return{value:a++,done:true;}}}
-}}();
+}}}();
 ```
 > 函数则不需要前置。
 
@@ -743,11 +743,11 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var _0;return function(){_0=0;return{next:_1}};var a;function _1(_2){
+var a=function(){return function(){var _0=0;return{next:_1};var a;function _1(_2){
   while(1){switch(_0){case 0:a = 1;
   _0=1;return{value:a++,done:false};case 1:
   _0=-1;return{value:a++,done:true};default:return{done:true}}}
-}}();
+}}}();
 ```
 `yield`还支持返回一个`Generator`，这就是一个递归：
 ```js
@@ -756,9 +756,9 @@ function *a(){
 }
 ```
 ```js
-var a=function(){var _0;return function(){_0=0;return{next:_1}};function _1(_2){
+var a=function(){return function(){var _0=0;return{next:_1};function _1(_2){
   while(1){switch(_0){case 0:_0=1;var _3=b();if(!_3.done)_0=0;return _3;default:return{done:true}}}
-}}();
+}}}();
 ```
 表达式也一样，没有`yield`则不会添加`while`和`switch`语句：
 ```js
@@ -766,8 +766,8 @@ var a=function(){var _0;return function(){_0=0;return{next:_1}};function _1(_2){
 }
 ```
 ```js
-~function(){var _0;return function(){_0=0；return{next:_1}};function _1(){
-}}()
+~function(){return function(){var _0=0；return{next:_1};function _1(){
+}}}()
 ```
 
 ### destructure解构
