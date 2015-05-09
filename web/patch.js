@@ -36,6 +36,7 @@ module.exports = function(Jsdc, flag) {
   }
   if(flag) {
     if(!hasNativeGenerators() && !isPatched()) {
+      require('es6-shim');
       require.extensions['.js'] = JsdcJsExtensionCompiler;
     }
   }
