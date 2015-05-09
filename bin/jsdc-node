@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+var path = require('path');
+
 process.title = 'jsdc-node';
 
 var jsdc = require('../');
@@ -14,4 +16,8 @@ program
     console.log('\n  ' + require('../package').version + '\n')
   })
   .usage('<command> [options]')
+  .action(function(file) {
+    var f = require.resolve(path.resolve(file));
+    require(f);
+  })
   .parse(process.argv);
