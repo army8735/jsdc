@@ -415,6 +415,24 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('new (Function.prototype.bind.apply(Cls, [null].concat(function(){var _0=[],_1,_2=a()[Symbol.iterator]();while(!(_1=_2.next()).done)_0.push(_1.value);return _0}())))()');
     });
+    it('lexical 1', function() {
+      var s = 'new Cls(...this.a)';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var _0=this;new (Function.prototype.bind.apply(Cls, [null].concat(function(){var _1=[],_2,_3=_0.a[Symbol.iterator]();while(!(_2=_3.next()).done)_1.push(_2.value);return _1}())))()');
+    });
+    it('lexical 2', function() {
+      var s = 'function a(){new Cls(...this.a)}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function a(){var _0=this;new (Function.prototype.bind.apply(Cls, [null].concat(function(){var _1=[],_2,_3=_0.a[Symbol.iterator]();while(!(_2=_3.next()).done)_1.push(_2.value);return _1}())))()}');
+    });
+    it('lexical 3', function() {
+      var s = 'new Cls(...this.a())';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('var _0=this;new (Function.prototype.bind.apply(Cls, [null].concat(function(){var _1=[],_2,_3=_0.a()[Symbol.iterator]();while(!(_2=_3.next()).done)_1.push(_2.value);return _1}())))()');
+    });
     it('arrow fn no {}', function() {
       Jsdc.reset();
       var s = 'var fn = (...arg) => console.log(arg);';

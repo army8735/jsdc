@@ -16,9 +16,9 @@ var ArrowFn = Class(function(jsdc) {
     var self = this;
     var nid = node.nid();
     //遍历查看是否有调用this和arguments，存储引用实现lexical绑定
-    this.find(node, nid);
-    if(this.hash.hasOwnProperty(nid)) {
-      var o = this.hash[nid];
+    self.find(node, nid);
+    if(self.hash.hasOwnProperty(nid)) {
+      var o = self.hash[nid];
       eventbus.on(nid, function(node, start) {
         if(start) {
           if(o.hasOwnProperty('_this')) {
@@ -79,8 +79,8 @@ var ArrowFn = Class(function(jsdc) {
       if(!token.isVirtual()) {
         var s = token.content();
         if(s == 'this' || s == 'arguments') {
-          this.hash[pid] = this.hash[pid] || {};
-          this.hash[pid]['_' + s] = this.hash[pid]['_' + s] || this.jsdc.uid();
+          self.hash[pid] = self.hash[pid] || {};
+          self.hash[pid]['_' + s] = self.hash[pid]['_' + s] || self.jsdc.uid();
           self.jsdc.ignore(node, 'arrow1');
           eventbus.on(node.nid(), function(node, start) {
             if(start) {

@@ -55,6 +55,10 @@ var Scope = Class(function(jsdc) {
         var parent = self.closest2(node);
         self.jsdc.arrowFn.lexical(parent);
       }
+      else if(name == JsNode.NEWEXPR) {
+        var parent = self.closest2(node);
+        self.jsdc.rest.lexical(parent);
+      }
       node.leaves().forEach(function(leaf) {
         self.recursion(leaf);
       });
