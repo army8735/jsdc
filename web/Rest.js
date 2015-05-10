@@ -135,9 +135,6 @@ var Rest = Class(function(jsdc) {
         }
       }
     }
-    else if(self.hash4.hasOwnProperty(node.nid())) {
-      self.jsdc.appendBefore('()');
-    }
   },
   needTemp: function(node, res) {
     res = res || { ret: false };
@@ -189,7 +186,7 @@ var Rest = Class(function(jsdc) {
         this.jsdc.append(join(leaves[i]));
       }
       this.jsdc.append(']');
-      this.jsdc.append('.concat(function(){');
+      this.jsdc.append('.concat(');
       var last = node.last();
       var isPrm = last.name() == JsNode.PRMREXPR;
       var v;
@@ -199,14 +196,8 @@ var Rest = Class(function(jsdc) {
       else {
         v = join(last);
       }
-      var temp = this.jsdc.uid();
-      var temp2 = this.jsdc.uid();
-      this.jsdc.append('var ' + temp + '=[],' + temp2);
-      var temp3 = this.jsdc.uid();
-      this.jsdc.append(',' + temp3 + '=' + v + '[Symbol.iterator]()');
-      this.jsdc.append(';while(!(' + temp2 + '=' + temp3 + '.next()).done)');
-      this.jsdc.append(temp + '.push(' + temp2 + '.value' + ')');
-      this.jsdc.append(';return ' + temp + '}())');
+      this.jsdc.append('Array.from(' + v + ')');
+      this.jsdc.append(')');
       if(o.needTemp) {
         //主表达式中含有生成的对象，不是直接引用
         this.jsdc.append(')}(');
@@ -225,7 +216,7 @@ var Rest = Class(function(jsdc) {
         this.jsdc.append(join(leaves[i]));
       }
       this.jsdc.append(']');
-      this.jsdc.append('.concat(function(){');
+      this.jsdc.append('.concat(');
       var last = node.last();
       var isPrm = last.name() == JsNode.PRMREXPR;
       var v;
@@ -238,14 +229,8 @@ var Rest = Class(function(jsdc) {
       if(this.hash6.hasOwnProperty(parent.nid()) && /^this\b/.test(v)) {
         v = v.replace(/^this\b/, this.hash6[parent.nid()]._this);
       }
-      var temp = this.jsdc.uid();
-      var temp2 = this.jsdc.uid();
-      this.jsdc.append('var ' + temp + '=[],' + temp2);
-      var temp3 = this.jsdc.uid();
-      this.jsdc.append(',' + temp3 + '=' + v + '[Symbol.iterator]()');
-      this.jsdc.append(';while(!(' + temp2 + '=' + temp3 + '.next()).done)');
-      this.jsdc.append(temp + '.push(' + temp2 + '.value' + ')');
-      this.jsdc.append(';return ' + temp + '}())');
+      this.jsdc.append('Array.from(' + v + ')');
+      this.jsdc.append(')');
     }
   },
   comma: function(node) {
@@ -298,16 +283,7 @@ var Rest = Class(function(jsdc) {
         this.jsdc.appendBefore('.split("")');
       }
       else {
-        this.jsdc.appendBefore('function(){var ');
-        var temp = this.jsdc.uid();
-        var temp2 = this.jsdc.uid();
-        this.jsdc.appendBefore(temp);
-        this.jsdc.appendBefore('=[],' + temp2);
-        var temp3;
-        temp3 = this.jsdc.uid();
-        this.jsdc.appendBefore(',' + temp3 + '=' + o.value + '[Symbol.iterator]()');
-        this.jsdc.appendBefore(';while(!(' + temp2 + '=' + temp3 + '.next()).done)');
-        this.jsdc.appendBefore(temp + '.push(' + temp2 + '.value);return ' + temp + '}()');
+        this.jsdc.appendBefore('Array.from(' + o.value + ')');
       }
       this.jsdc.appendBefore(')');
       var next = node.next();
@@ -321,69 +297,6 @@ var Rest = Class(function(jsdc) {
           this.jsdc.appendBefore('.concat([');
         }
       }
-    }
-  },
-  lexical: function(node) {
-    var self = this;
-    var nid = node.nid();
-    //遍历查看是否有调用this，存储引用实现lexical绑定
-    self.find(node, nid);
-    if(self.hash6.hasOwnProperty(nid)) {
-      var o = self.hash6[nid];
-      eventbus.on(nid, function(node, start) {
-        if(start) {
-          if(o.hasOwnProperty('_this')) {
-            self.jsdc.append('var ' + o._this + '=this;');
-          }
-        }
-      });
-    }
-  },
-  find: function(node, pid) {
-    var self = this;
-    if(!node.isToken()) {
-      if(node.name() == JsNode.NEWEXPR) {
-        self.recursion(node, node.nid(), pid);
-      }
-      else {
-        node.leaves().forEach(function(leaf) {
-          self.find(leaf, pid);
-        });
-      }
-    }
-  },
-  recursion: function(node, nid, pid) {
-    var self = this;
-    if(node.isToken()) {
-      var token = node.token();
-      if(!token.isVirtual()) {
-        var s = token.content();
-        if(s == 'this') {
-          self.hash6[pid] = self.hash6[pid] || {};
-          self.hash6[pid]['_' + s] = self.hash6[pid]['_' + s] || self.jsdc.uid();
-          //和arrowFn类似，但因为被迭代器逻辑改写，因此处理方式不同，不能直接侦听append
-          self.hash6[nid] = self.hash6[nid] || {};
-          self.hash6[nid]['_' + s] = self.hash6[pid]['_' + s];
-        }
-      }
-    }
-    else {
-      node.leaves().forEach(function(leaf) {
-        switch(leaf.name()) {
-          case JsNode.CLASSDECL:
-          case JsNode.CLASSEXPR:
-          case JsNode.FNDECL:
-          case JsNode.FNEXPR:
-          case JsNode.ARROWFN:
-          case JsNode.GENDECL:
-          case JsNode.GENEXPR:
-          case JsNode.OBJLTR:
-          case JsNode.WITHSTMT:
-            return;
-          default:
-            self.recursion(leaf, nid, pid);
-        }
-      });
     }
   }
 });
