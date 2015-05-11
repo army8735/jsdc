@@ -47,13 +47,13 @@ npm install jsdc
 * parse(code:String = null):String 转换code，可以为空，否则会覆盖构造函数里传入的code
 * define(d:Boolean):Boolean 读取/设置转换module为CommonJS时是否包裹define（即转为AMD/CMD），默认false
 * ast():Object 返回解析后的语法树
-* tokens():Array<Object> 返回解析后的词法单元序列
+* tokens():Array\<Object> 返回解析后的词法单元序列
 
 ### 静态属性
 * parse(code:String):String 可以直接调用静态方法转换，以省略new一个对象的步骤
 * define(d:Boolean):Boolean 读取/设置转换module为CommonJS时是否包裹define（即转为AMD/CMD），默认false
 * ast():Object 返回解析后的语法树
-* tokens():Array<Object> 返回解析后的词法单元序列
+* tokens():Array\<Object> 返回解析后的词法单元序列
 * runtime(flag:Boolean):void 开启/关闭运行时支持，仅限NodeJs。开启后改写require机制，获取module前尝试预编译
 
 ## Demo
