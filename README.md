@@ -161,12 +161,12 @@ function() {
 ```
 > 示例中`let`和块级作用域尚未处理，后面会提到。
 
-函数和var的性质一样，除了迁移还会改写为var形式：
+函数和var的性质一样：
 ```js
 {function a(){}}
 ```
 ```js
-var a;{a=function (){}}
+!function(){function a(){}}();
 ```
 
 ### {}块级作用域
@@ -265,7 +265,7 @@ var codeUnits = [...a];
 ```
 ```js
 var codeUnits = [].concat("this is a string".split(""));
-var codeUnits = [].concat(Object.prototype.toString.call(a)=="[object String]"?a.split(""):a);
+var codeUnits = [].concat(Array.from(a));
 ```
 
 ### template模板
