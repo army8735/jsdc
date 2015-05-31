@@ -45,7 +45,7 @@ var Module = Class(function(jsdc) {
       self.jsdc.append(');return ');
       self.jsdc.append(temp + '.hasOwnProperty("' + id + '")?');
       self.jsdc.append(temp + '.' + id + ':' + temp + '.hasOwnProperty("default")?');
-      self.jsdc.append(temp + '.default:' + temp);
+      self.jsdc.append(temp + '["default"]:' + temp);
       self.jsdc.append('}();');
     }
     //import ids from "string",import {ids} from "string"
@@ -89,7 +89,7 @@ var Module = Class(function(jsdc) {
           this.jsdc.ignore(node, 'module3');
         }
         else if(s == 'default') {
-          this.jsdc.append('exports.default=');
+          this.jsdc.append('exports["default"]=');
           this.jsdc.ignore(node.leaf(0), 'module4');
           this.jsdc.ignore(node.leaf(1), 'module5');
         }
