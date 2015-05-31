@@ -17,7 +17,7 @@ var Module = Class(function(jsdc) {
     this.jsdc.append(node.leaf(2).last().token().content());
     this.jsdc.append(');');
   },
-  import: function(node) {
+  imports: function(node) {
     var self = this;
     self.jsdc.ignore(node, 'module2');
     var one = node.leaf(1);
@@ -72,7 +72,7 @@ var Module = Class(function(jsdc) {
       self.jsdc.append('}();');
     }
   },
-  export: function(node) {
+  exports: function(node) {
     var s = node.leaf(1).name();
     switch(s) {
       case JsNode.TOKEN:

@@ -224,7 +224,7 @@ var Klass = Class(function(jsdc) {
       this.jsdc.append('=function');
     }
   },
-  super: function(node) {
+  supers: function(node) {
     this.jsdc.ignore(node, 'klass16');
     var top = this.closest(node);
     if(this.hash.hasOwnProperty(top.nid())) {

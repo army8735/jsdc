@@ -57,7 +57,7 @@ var Generator = Class(function(jsdc) {
     }
     var temp = self.jsdc.uid();
     var param = node.leaf(4).first();
-    var ret = res.return;
+    var ret = res.returns;
     if(res.pre) {
       self.pre(node.last().prev(), node.nid(), node.last().prev().nid());
     }
@@ -83,8 +83,7 @@ var Generator = Class(function(jsdc) {
       index: 0,
       index2: 0,
       count: count,
-      return: ret,
-      if: 0,
+      returns: ret,
       temp: temp,
       param: param,
       last: null,
@@ -155,7 +154,7 @@ var Generator = Class(function(jsdc) {
             return o.done || 0;
           });
           done.push((o.index == o.count) ? 1 : 0);
-          done.push((o.return) ? 0 : 1);
+          done.push((o.returns) ? 0 : 1);
           if(done.indexOf(0) > -1) {
             done = [false];
           }
@@ -168,7 +167,7 @@ var Generator = Class(function(jsdc) {
           self.jsdc.appendBefore(',done:' + done.join('&&') + '}');
         }
         else {
-          self.jsdc.appendBefore(',done:' + (o.index == o.count && !o.return) + '}');
+          self.jsdc.appendBefore(',done:' + (o.index == o.count && !o.returns) + '}');
         }
         o.yield.push({
           i: self.jsdc.i
@@ -197,7 +196,7 @@ var Generator = Class(function(jsdc) {
           this.jsdc.append('while(1){switch(' + o.state + '){case 0:');
         }
       }
-      else if(!o.return) {
+      else if(!o.returns) {
         if(o.count) {
           if(!this.jsdc.endsWith(';')
             && !this.jsdc.endsWith(':')
@@ -255,7 +254,7 @@ var Generator = Class(function(jsdc) {
     }
   },
   count: function(node, top, res) {
-    res = res || { count: 0, return: false, pre: false };
+    res = res || { count: 0, returns: false, pre: false };
     var self = this;
     var isToken = node.name() == JsNode.TOKEN;
     if(!isToken) {
@@ -281,7 +280,7 @@ var Generator = Class(function(jsdc) {
           });
           break;
         case JsNode.RETSTMT:
-          res.return = node;
+          res.returns = node;
           eventbus.on(node.nid(), function(node, start) {
             if(start) {
               var o = self.hash[top.nid()];

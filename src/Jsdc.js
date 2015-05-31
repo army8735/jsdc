@@ -168,7 +168,7 @@ var Jsdc = Class(function(code) {
       }
       else if(token.type() == Token.KEYWORD
         && content == 'super'){
-        this.klass.super(node);
+        this.klass.supers(node);
       }
       else if(content == ')') {
         this.forof.prts(node, true);
@@ -285,19 +285,19 @@ var Jsdc = Class(function(code) {
         this.module.module(node);
         break;
       case JsNode.IMPORTDECL:
-        this.module.import(node);
+        this.module.imports(node);
         break;
       case JsNode.EXPORTDECL:
-        this.module.export(node);
+        this.module.exports(node);
         break;
       case JsNode.ARRCMPH:
         this.arrCmph.parse(node, true);
         break;
       case JsNode.CMPHFOR:
-        this.arrCmph.for(node, true);
+        this.arrCmph.fors(node, true);
         break;
       case JsNode.CMPHIF:
-        this.arrCmph.if(node, true);
+        this.arrCmph.ifs(node, true);
         break;
       case JsNode.ARROWFN:
         this.arrowFn.parse(node);
@@ -357,10 +357,10 @@ var Jsdc = Class(function(code) {
         this.arrCmph.parse(node);
         break;
       case JsNode.CMPHFOR:
-        this.arrCmph.for(node);
+        this.arrCmph.fors(node);
         break;
       case JsNode.CMPHIF:
-        this.arrCmph.if(node);
+        this.arrCmph.ifs(node);
         break;
       case JsNode.ARROWPARAMS:
         this.arrowFn.params(node);

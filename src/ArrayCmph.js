@@ -43,7 +43,7 @@ var ArrayCmph = Class(function(jsdc) {
       self.jsdc.appendBefore('return ' + self.hash[node.nid()].id + '}()');
     }
   },
-  for: function(node, start) {
+  fors: function(node, start) {
     var top = node.parent().parent();
     if(top.name() == JsNode.ARRCMPH) {
       if(!start) {
@@ -63,7 +63,7 @@ var ArrayCmph = Class(function(jsdc) {
       }
     }
   },
-  if: function(node, start) {
+  ifs: function(node, start) {
     var top = node.parent().parent();
     if(top.name() == JsNode.ARRCMPH) {
       if(!start) {
