@@ -816,20 +816,20 @@ describe('es6', function() {
       var s = 'import a from "a"';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('define(function(require,exports,module){var a=function(){var _0=require("a");return _0.hasOwnProperty("a")?_0.a:_0.hasOwnProperty("default")?_0["default"]:_0}();});');
+      expect(res).to.eql('define(function(require,exports,module){var a=function(){var _0=require("a");return _0.hasOwnProperty("default")?_0["default"]:_0}();});');
     });
     it('uid with hasOwnProperty', function() {
       var s = 'import a from "a";a.hasOwnProperty';
       Jsdc.reset();
       var res = Jsdc.parse(s);
-      expect(res).to.eql('define(function(require,exports,module){var a=function(){var _0=require("a");return _0.hasOwnProperty("a")?_0.a:_0.hasOwnProperty("default")?_0["default"]:_0}();a.hasOwnProperty});');
+      expect(res).to.eql('define(function(require,exports,module){var a=function(){var _0=require("a");return _0.hasOwnProperty("default")?_0["default"]:_0}();a.hasOwnProperty});');
     });
     it('import from', function() {
       var s = 'import More from "./More";';
       Jsdc.reset();
       Jsdc.define(false);
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var More=function(){var _0=require(\"./More\");return _0.hasOwnProperty(\"More\")?_0.More:_0.hasOwnProperty(\"default\")?_0["default"]:_0}();');
+      expect(res).to.eql('var More=function(){var _0=require("./More");return _0.hasOwnProperty("default")?_0["default"]:_0}();');
     });
     it('import multi id', function() {
       var s = 'import a,b from "a"';

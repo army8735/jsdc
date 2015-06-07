@@ -43,8 +43,7 @@ var Module = Class(function(jsdc) {
       self.jsdc.append('=require(');
       self.jsdc.append(last.last().token().content());
       self.jsdc.append(');return ');
-      self.jsdc.append(temp + '.hasOwnProperty("' + id + '")?');
-      self.jsdc.append(temp + '.' + id + ':' + temp + '.hasOwnProperty("default")?');
+      self.jsdc.append(temp + '.hasOwnProperty("default")?');
       self.jsdc.append(temp + '["default"]:' + temp);
       self.jsdc.append('}();');
     }
