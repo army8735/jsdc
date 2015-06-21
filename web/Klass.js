@@ -109,7 +109,8 @@ var Klass = Class(function(jsdc) {
   elem: function(node, start) {
     var first = node.first();
     var top = node.parent().parent();
-    var o = this.hash[top.nid()];
+    var tid = top.nid();
+    var o = this.hash[tid];
     if(first.name() == JsNode.METHOD) {
       first = first.first();
       if(first.name() == JsNode.PROPTNAME) {
@@ -137,15 +138,13 @@ var Klass = Class(function(jsdc) {
           var prptn = first.next();
           this.gs[prptn.nid()] = true;
           this.jsdc.ignore(prptn, 'klass14');
-          //this.jsdc.append('Object.defineProperty(');
-          //this.jsdc.append(o.name);
-          //this.jsdc.append('.prototype, "');
+          this.gsh[tid] = this.gsh[tid] || {};
+          var gsh = this.gsh[tid];
           if(token.content() == 'get') {
             var n = first.next().first().first().token();
             o.g = n.content();
-            //this.jsdc.append(o.g);
-            if(!this.gsh.hasOwnProperty(o.g)) {
-              this.gsh[o.g] = true;
+            if(!gsh.hasOwnProperty(o.g)) {
+              gsh[o.g] = true;
               this.jsdc.append(o.gs + '.' + o.g + '={};');
             }
             this.jsdc.append(o.gs + '.' + o.g + '.');
@@ -154,16 +153,12 @@ var Klass = Class(function(jsdc) {
             var n = first.next().first().first().token();
             o.s = n.content();
             //this.jsdc.append(o.s);
-            if(!this.gsh.hasOwnProperty(o.s)) {
-              this.gsh[o.s] = true;
+            if(!gsh.hasOwnProperty(o.s)) {
+              gsh[o.s] = true;
               this.jsdc.append(o.gs + '.' + o.s + '={};');
             }
             this.jsdc.append(o.gs + '.' + o.s + '.');
           }
-          //this.jsdc.append('", {');
-        }
-        else {
-          //this.jsdc.appendBefore('});');
         }
       }
     }
@@ -188,15 +183,13 @@ var Klass = Class(function(jsdc) {
           var prptn = first.next();
           this.gss[prptn.nid()] = true;
           this.jsdc.ignore(prptn, 'klass18');
-          //this.jsdc.append('Object.defineProperty(');
-          //this.jsdc.append(o.name);
-          //this.jsdc.append(', "');
+          this.gssh[tid] = this.gssh[tid] || {};
+          var gssh = this.gssh[tid];
           if(token.content() == 'get') {
             var n = first.next().first().first().token();
             o.g = n.content();
-            //this.jsdc.append(o.g);
-            if(!this.gssh.hasOwnProperty(o.g)) {
-              this.gssh[o.g] = true;
+            if(!gssh.hasOwnProperty(o.g)) {
+              gssh[o.g] = true;
               this.jsdc.append(o.gss + '.' + o.g + '={};');
             }
             this.jsdc.append(o.gss + '.' + o.g + '.');
@@ -204,17 +197,12 @@ var Klass = Class(function(jsdc) {
           else {
             var n = first.next().first().first().token();
             o.s = n.content();
-            //this.jsdc.append(o.s);
-            if(!this.gssh.hasOwnProperty(o.s)) {
-              this.gssh[o.s] = true;
+            if(!gssh.hasOwnProperty(o.s)) {
+              gssh[o.s] = true;
               this.jsdc.append(o.gss + '.' + o.s + '={};');
             }
             this.jsdc.append(o.gss + '.' + o.s + '.');
           }
-          //this.jsdc.append('", {');
-        }
-        else {
-          //this.jsdc.appendBefore('});');
         }
       }
     }
