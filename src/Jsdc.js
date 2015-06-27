@@ -244,6 +244,7 @@ var Jsdc = Class(function(code) {
         this.defaultValue.enter(node);
         this.rest.enter(node);
         this.gen.body(node, true);
+        this.klass.fnbody(node);
         break;
       case JsNode.BLOCK:
         this.scope.block(node, true);

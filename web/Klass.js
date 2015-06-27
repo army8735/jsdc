@@ -14,6 +14,7 @@ var Klass = Class(function(jsdc) {
   this.gssh = {};
   this.gs = {};
   this.gss = {};
+  this.supCtx = {};
 }).methods({
   parse: function(node, start) {
     if(node.name() == JsNode.CLASSDECL) {
@@ -247,7 +248,8 @@ var Klass = Class(function(jsdc) {
   },
   arglist: function(node) {
     if(this.sup.hasOwnProperty(node.nid())) {
-      var ex = this.sup[node.nid()];
+      var fnbody = this.closestBody(node);
+      //var ex = this.sup[node.nid()];
       var i = this.jsdc.res.lastIndexOf('(');
       if(node.size()) {
         var hasRest = false;
@@ -260,10 +262,24 @@ var Klass = Class(function(jsdc) {
         if(!hasRest) {
           this.jsdc.insert('.call', i);
         }
+        if(fnbody) {
+          var nid = fnbody.nid();
+          if(this.supCtx.hasOwnProperty(nid)) {
+            this.jsdc.append(this.supCtx[nid] + ',');
+            return;
+          }
+        }
         this.jsdc.append('this,');
       }
       else {
         this.jsdc.insert('.call', i);
+        if(fnbody) {
+          var nid = fnbody.nid();
+          if(this.supCtx.hasOwnProperty(nid)) {
+            this.jsdc.append(this.supCtx[nid]);
+            return;
+          }
+        }
         this.jsdc.append('this');
       }
     }
@@ -323,11 +339,62 @@ var Klass = Class(function(jsdc) {
       this.jsdc.append('function ' + id + '(){' + (extend ? (extend + '.call(this)') : '') + '}');
     }
   },
+  fnbody: function(node) {
+    if(node.parent().name() != JsNode.METHOD) {
+      return;
+    }
+    if(node.parent().prev()) {
+      return;
+    }
+    this.findCtx(node, node.nid());
+  },
+  findCtx: function(node, tid) {
+    var self = this;
+    if(!node.isToken()) {
+      node.leaves().forEach(function(leaf) {
+        switch(leaf.name()) {
+          case JsNode.CLASSDECL:
+          case JsNode.CLASSEXPR:
+          case JsNode.FNDECL:
+          case JsNode.FNEXPR:
+          case JsNode.ARROWFN:
+          case JsNode.GENDECL:
+          case JsNode.GENEXPR:
+          case JsNode.OBJLTR:
+          case JsNode.WITHSTMT:
+            return;
+          case JsNode.CALLEXPR:
+            if(leaf.first().name() == JsNode.PRMREXPR) {
+              var first = leaf.first().first();
+              if(first.isToken() && ['setTimeout', 'setInterval'].indexOf(first.token().content()) > -1) {
+                if(!self.supCtx.hasOwnProperty(tid)) {
+                  //只要有setTimeout，就追加ctx
+                  var ctx = self.jsdc.uid();
+                  self.supCtx[tid] = ctx;
+                  self.jsdc.append('var ' + ctx + '=this;');
+                }
+                return;
+              }
+            }
+          default:
+            self.findCtx(leaf, tid);
+        }
+      });
+    }
+  },
   closest: function(node) {
     var parent = node;
     while(parent = parent.parent()) {
       if(parent.name() == JsNode.CLASSDECL
         || parent.name() == JsNode.CLASSEXPR) {
+        return parent;
+      }
+    }
+  },
+  closestBody: function(node) {
+    var parent = node;
+    while(parent = parent.parent()) {
+      if(parent.name() == JsNode.FNBODY && parent.parent().name() == JsNode.METHOD) {
         return parent;
       }
     }

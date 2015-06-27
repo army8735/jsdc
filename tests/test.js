@@ -692,6 +692,12 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();function A(){B.prototype.a.apply(this,[b].concat(Array.from(d)))}Object.keys(B).forEach(function(k){A[k]=B[k]});');
     });
+    it('super call method with setTimeout', function() {
+      var s = 'class A extends B{f(){super.f();super.f(1);setTimeout(function(){super.f();super.f(1);})}}';
+      Jsdc.reset();
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('function A(){B.call(this)}!function(){var _0=Object.create(B.prototype);_0.constructor=A;A.prototype=_0}();A.prototype.f = function(){var _1=this;B.prototype.f.call(_1);B.prototype.f.call(_1,1);setTimeout(function(){B.prototype.f.call(_1);B.prototype.f.call(_1,1);})}Object.keys(B).forEach(function(k){A[k]=B[k]});');
+    });
     it('getter/setter', function() {
       var s = 'class A{get b(){}set c(d){}}';
       Jsdc.reset();
