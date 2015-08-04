@@ -1678,7 +1678,7 @@ describe('es6', function() {
     it('export', function() {
       var s = 'export default {a};';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('exports["default"]={a:a};');
+      expect(res).to.eql('define(function(require,exports,module){exports["default"]={a:a};});');
     });
   });
   describe('runntime', function() {

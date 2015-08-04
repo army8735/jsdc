@@ -15,7 +15,7 @@ var Obj = Class(function(jsdc) {
     var objltr = node.parent();
     if(objltr.name() == JsNode.OBJLTR) {
       var prmr = objltr.parent();
-      var parent = prmr.parent();console.log(prmr.name(), prmr.next(), parent.name())
+      var parent = prmr.parent();
       if(prmr.name() == JsNode.PRMREXPR
         && !prmr.next()
         && (parent.name() == JsNode.ASSIGNEXPR
