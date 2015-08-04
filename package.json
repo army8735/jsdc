@@ -1,6 +1,6 @@
 {
   "name": "jsdc",
-  "version": "0.6.7",
+  "version": "0.6.8",
   "description": "compiler ecmascript6 to ecmascript5",
   "maintainers": [
     {
@@ -52,7 +52,7 @@
     "main": "./index.js"
   },
   "dependencies": {
-    "homunculus": "~0.9.6",
+    "homunculus": "~0.10.0",
     "commander": "~2.8.1",
     "es5-shim": "*",
     "es6-shim": "*"
@@ -61,7 +61,7 @@
     "blanket": "^1.1.6",
     "coveralls": "^2.10.0",
     "expect.js": "^0.3.1",
-    "gulp": "^3.8.11",
+    "gulp": "^3.9.0",
     "gulp-clean": "^0.3.1",
     "gulp-util": "^3.0.4",
     "mocha": "^2.2.4",
