@@ -1675,6 +1675,11 @@ describe('es6', function() {
       var res = Jsdc.parse(s);
       expect(res).to.eql('fn({a:a,b:function(){}})');
     });
+    it('export', function() {
+      var s = 'export default {a};';
+      var res = Jsdc.parse(s);
+      expect(res).to.eql('exports["default"]={a:a};');
+    });
   });
   describe('runntime', function() {
     it('open', function() {

@@ -15,11 +15,13 @@ var Obj = Class(function(jsdc) {
     var objltr = node.parent();
     if(objltr.name() == JsNode.OBJLTR) {
       var prmr = objltr.parent();
-      var parent = prmr.parent();
+      var parent = prmr.parent();console.log(prmr.name(), prmr.next(), parent.name())
       if(prmr.name() == JsNode.PRMREXPR
         && !prmr.next()
         && (parent.name() == JsNode.ASSIGNEXPR
-          || parent.name() == JsNode.INITLZ)) {
+          || parent.name() == JsNode.INITLZ)
+        || prmr.name() == JsNode.PRMREXPR
+          && parent.name() == JsNode.EXPORTDECL) {
         if(node.size() == 1) {
           var first = node.first();
           if(first.name() == JsNode.TOKEN) {
