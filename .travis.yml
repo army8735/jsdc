@@ -11,3 +11,5 @@ script:
 
 after_success:
   - make coveralls
+
+sudo: false
