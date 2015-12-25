@@ -99,7 +99,7 @@ var Destruct = Class(function(jsdc) {
             if(prev.token().content() == ',') {
               self.jsdc.append(';');
             }
-            self.jsdc.append('!function(){var ');
+            self.jsdc.append('(function(){var ');
           }
           var temp;
           if(ret) {
@@ -123,11 +123,11 @@ var Destruct = Class(function(jsdc) {
                 //在forof中由于最后一个默认值变量冲突需特殊对待
                 if(ret && end && leaf.size() == 2) {
                   var temp2 = self.jsdc.uid();
-                  ret.append('!function(){var ' + temp2 + '=' + id + ';');
+                  ret.append('(function(){var ' + temp2 + '=' + id + ';');
                   ret.append(id + '=' + temp + '[' + i + '];');
                   var init = leaf.last();
                   ret.append('if(' + temp2 + '.indexOf(' + id + ')!=' + i + ')');
-                  ret.append(id + join(init) + '}();');
+                  ret.append(id + join(init) + '}).call(this);');
                 }
                 else {
                   (ret || self.jsdc).appendBefore(id + '=' + temp + '[' + i + ']' + (!ret && end ? '' : ';'));
@@ -152,7 +152,7 @@ var Destruct = Class(function(jsdc) {
             }
           });
           if(!ret) {
-            (ret || self.jsdc).appendBefore('}()');
+            (ret || self.jsdc).appendBefore('}).call(this)');
             //忽略后面的,改为;
             var next = node.next();
             if(next.token().content() == ',') {
@@ -172,7 +172,7 @@ var Destruct = Class(function(jsdc) {
             if(prev.token().content() == ',') {
               self.jsdc.append(';');
             }
-            self.jsdc.append('!function(){var ');
+            self.jsdc.append('(function(){var ');
           }
           var temp;
           if(ret) {
@@ -197,11 +197,11 @@ var Destruct = Class(function(jsdc) {
                 //在forof中由于最后一个默认值变量冲突需特殊对待
                 if(ret && end && leaf.size() == 2) {
                   var temp2 = self.jsdc.uid();
-                  ret.append('!function(){var ' + temp2 + '=' + id + ';');
+                  ret.append('(function(){var ' + temp2 + '=' + id + ';');
                   ret.append(id + '=' + temp + '["' + id + '"];');
                   var init = leaf.last();
                   ret.append('if(!' + temp2 + '.hasOwnProperty("' + id + '"))');
-                  ret.append(id + join(init) + '}();');
+                  ret.append(id + join(init) + '}).call(this);');
                 }
                 else {
                   (ret || self.jsdc).appendBefore(id + '=' + temp + '["' + id + '"]' + (!ret && end ? '' : ';'));
@@ -222,11 +222,11 @@ var Destruct = Class(function(jsdc) {
                     //在forof中由于最后一个默认值变量冲突需特殊对待
                     if(ret && end && last.size() == 2) {
                       var temp2 = this.jsdc.uid();
-                      ret.append('!function(){var ' + temp2 + ';');
+                      ret.append('(function(){var ' + temp2 + ';');
                       ret.appendBefore(id + '=' + temp + '["' + name + '"]' + (!ret && end ? '' : ';'));
                       var init = last.last();
                       ret.appendBefore('if(!' + temp2 + '.hasOwnProperty("' + name + '"))');
-                      ret.appendBefore(id + join(init) + '}();');
+                      ret.appendBefore(id + join(init) + '}).call(this);');
                     }
                     else {
                       (ret || self.jsdc).appendBefore(id + '=' + temp + '["' + name + '"]' + (!ret && end ? '' : ';'));
@@ -251,7 +251,7 @@ var Destruct = Class(function(jsdc) {
             }
           });
           if(!ret) {
-            self.jsdc.appendBefore('}()');
+            self.jsdc.appendBefore('}).call(this)');
             //忽略后面的,改为;
             var next = node.next();
             if(next.token().content() == ',') {
@@ -286,11 +286,11 @@ var Destruct = Class(function(jsdc) {
               //在forof中由于最后一个默认值变量冲突需特殊对待
               if(ret && end && leaf.size() == 2) {
                 var temp2 = self.jsdc.uid();
-                ret.append('!function(){var ' + temp2 + '=' + id + ';');
+                ret.append('(function(){var ' + temp2 + '=' + id + ';');
                 ret.append(id + '=' + temp + '[' + i + '];');
                 var init = leaf.last();
                 ret.append('if(' + temp2 + '.indexOf(' + id + ')!=' + i + ')');
-                ret.append(id + join(init) + '}();');
+                ret.append(id + join(init) + '}).call(this);');
               }
               else {
                 (ret || self.jsdc).appendBefore(id + '=' + temp + '[' + i + ']' + (!ret && end ? '' : ';'));
@@ -334,11 +334,11 @@ var Destruct = Class(function(jsdc) {
               //在forof中由于最后一个默认值变量冲突需特殊对待
               if(ret && end && leaf.size() == 2) {
                 var temp2 = self.jsdc.uid();
-                ret.append('!function(){var ' + temp2 + '=' + id + ';');
+                ret.append('(function(){var ' + temp2 + '=' + id + ';');
                 ret.append(id + '=' + temp + '["' + id + '"];');
                 var init = leaf.last();
                 ret.append('if(!' + temp2 + '.hasOwnProperty("' + id + '"))');
-                ret.append(id + join(init) + '}();');
+                ret.append(id + join(init) + '}).call(this);');
               }
               else {
                 (ret || self.jsdc).appendBefore(id + '=' + temp + '["' + id + '"]' + (!ret && end ? '' : ';'));
@@ -359,11 +359,11 @@ var Destruct = Class(function(jsdc) {
                   //在forof中由于最后一个默认值变量冲突需特殊对待
                   if(ret && end && last.size() == 2) {
                     var temp2 = this.jsdc.uid();
-                    ret.append('!function(){var ' + temp2 + ';');
+                    ret.append('(function(){var ' + temp2 + ';');
                     ret.appendBefore(id + '=' + temp + '["' + name + '"]' + (!ret && end ? '' : ';'));
                     var init = last.last();
                     ret.appendBefore('if(!' + temp2 + '.hasOwnProperty("' + name + '"))');
-                    ret.appendBefore(id + join(init) + '}();');
+                    ret.appendBefore(id + join(init) + '}).call(this);');
                   }
                   else {
                     (ret || self.jsdc).appendBefore(id + '=' + temp + '["' + name + '"]' + (!ret && end ? '' : ';'));
@@ -417,7 +417,7 @@ var Destruct = Class(function(jsdc) {
               !ret && this.jsdc.ignore(assignexpr.leaf(1), 'destruct4');
             }
             else {
-              !ret && self.jsdc.append('function(){var ');
+              !ret && self.jsdc.append('(function(){var ');
               var temp;
               if(ret) {
                 temp = ret.o;
@@ -439,7 +439,7 @@ var Destruct = Class(function(jsdc) {
               temp = self.jsdc.uid();
             }
             self.hash[first.nid()] = temp;
-            !ret && self.jsdc.append('function(){var ');
+            !ret && self.jsdc.append('(function(){var ');
             !ret && self.jsdc.append(temp);
           }
           self.getArray(first.leaves()).forEach(function(leaf) {
@@ -478,10 +478,10 @@ var Destruct = Class(function(jsdc) {
                 //在forof中由于最后一个默认值变量冲突需特殊对待
                 if(ret && end) {
                   var temp2 = self.jsdc.uid();
-                  ret.append('!function(){var ' + temp2 + '=' + id + ';');
+                  ret.append('(function(){var ' + temp2 + '=' + id + ';');
                   ret.append(id + '=' + temp + '[' + i + '];');
                   ret.append('if(' + temp2 + '.indexOf(' + id + ')!=' + i + ')');
-                  ret.append(id + '=' + join(leaf.next().next()) + '}();');
+                  ret.append(id + '=' + join(leaf.next().next()) + '}).call(this);');
                 }
                 else {
                   (ret || self.jsdc).appendBefore(id + '=' + temp + '[' + i + '];');
@@ -504,7 +504,7 @@ var Destruct = Class(function(jsdc) {
             return;
           }
           ret || (self.jsdc.appendBefore(';return ' + temp));
-          ret || (self.jsdc.appendBefore('}()'));
+          ret || (self.jsdc.appendBefore('}).call(this)'));
         }
         break;
       case JsNode.OBJLTR:
@@ -523,7 +523,7 @@ var Destruct = Class(function(jsdc) {
               this.jsdc.ignore(assignexpr.leaf(1), 'destruct7');
             }
             else {
-              !ret && self.jsdc.append('function(){var ');
+              !ret && self.jsdc.append('(function(){var ');
               var temp;
               if(ret) {
                 temp = ret.o;
@@ -537,7 +537,7 @@ var Destruct = Class(function(jsdc) {
             }
           }
           else {
-            !ret && self.jsdc.append('function(){var ');
+            !ret && self.jsdc.append('(function(){var ');
             var temp;
             if(ret) {
               temp = ret.o;
@@ -562,11 +562,11 @@ var Destruct = Class(function(jsdc) {
                 //在forof中由于最后一个默认值变量冲突需特殊对待
                 if(ret && end && leaf.next()) {
                   var temp2 = self.jsdc.uid();
-                  ret.append('!function(){var ' + temp2 + '=' + id + ';');
+                  ret.append('(function(){var ' + temp2 + '=' + id + ';');
                   ret.append(id + '=' + temp + '["' + id + '"];');
                   var init = leaf.next();
                   ret.append('if(!' + temp2 + '.hasOwnProperty("' + id + '"))');
-                  ret.append(id + join(init) + '}();');
+                  ret.append(id + join(init) + '}).call(this);');
                 }
                 else {
                   (ret || self.jsdc).appendBefore(id + '=' + temp + '["' + id + '"]' + (!ret && end ? '' : ';'));
@@ -586,11 +586,11 @@ var Destruct = Class(function(jsdc) {
                     //在forof中由于最后一个默认值变量冲突需特殊对待
                     if(ret && end && last.size() == 2) {
                       var temp2 = self.jsdc.uid();
-                      ret.append('!function(){var ' + temp2 + '=' + id + ';');
+                      ret.append('(function(){var ' + temp2 + '=' + id + ';');
                       ret.append(id + '=' + temp + '["' + name + '"];');
                       var init = last.last();
                       ret.append('if(!' + temp2 + '.hasOwnProperty("' + name + '"))');
-                      ret.append(id + join(init) + '}();');
+                      ret.append(id + join(init) + '}).call(this);');
                     }
                     else {
                       (ret || self.jsdc).appendBefore(id + '=' + temp + '["' + name + '"]' + (!ret && end ? '' : ';'));
@@ -607,10 +607,10 @@ var Destruct = Class(function(jsdc) {
                     //在forof中由于最后一个默认值变量冲突需特殊对待
                     if(ret && end && last.next()) {
                       var temp2 = self.jsdc.uid();
-                      ret.append('!function(){var ' + temp2 + '=' + id + ';');
+                      ret.append('(function(){var ' + temp2 + '=' + id + ';');
                       ret.append(id + '=' + temp + '["' + name + '"];');
                       ret.append('if(!' + temp2 + '.hasOwnProperty("' + name + '"))');
-                      ret.append(join(last.parent()) + '}();');
+                      ret.append(join(last.parent()) + '}).call(this);');
                     }
                     else {
                       (ret || self.jsdc).appendBefore(id + '=' + temp + '["' + name + '"]' + (!ret && end ? '' : ';'));
@@ -640,7 +640,7 @@ var Destruct = Class(function(jsdc) {
             return;
           }
           !ret && self.jsdc.appendBefore(';return ' + temp);
-          !ret && self.jsdc.appendBefore('}()');
+          !ret && self.jsdc.appendBefore('}).call(this)');
         }
         break;
     }

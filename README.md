@@ -776,7 +776,7 @@ var a=function(){return function(){var _0=0;return{next:_1};function _1(_2){
 var [a] = [1]
 ```
 ```js
-var a;!function(){var _0= [1];a=_0[0];}()
+var a;(function(){var _0= [1];a=_0[0];}).call(this)
 ```
 > 变量名会被前置，同时包裹执行一个匿名函数，将变量名赋值对应到正确的索引。
 
@@ -785,14 +785,14 @@ var a;!function(){var _0= [1];a=_0[0];}()
 var [a,b,,c] = [1]
 ```
 ```js
-var c;var b;var a;!function(){var _1= [1];a=_1[0];b=_1[1];c=_1[3]}()
+var c;var b;var a;(function(){var _1= [1];a=_1[0];b=_1[1];c=_1[3]}).call(this)
 ```
 也可以是对象：
 ```js
 var {a} = {"a":1}
 ```
 ```js
-var a;!function(){var _0= {"a":1};a=_0["a"]}()
+var a;(function(){var _0= {"a":1};a=_0["a"]}).call(this)
 ```
 > 注意变量名和键名要一致。
 
@@ -801,33 +801,33 @@ var a;!function(){var _0= {"a":1};a=_0["a"]}()
 var {a,b:c} = {"a":1,"b":2}
 ```
 ```js
-var a;!function(){var _0= {"a":1,"b":2};a=_0["a"];c=_0["b"]}()
+var a;(function(){var _0= {"a":1,"b":2};a=_0["a"];c=_0["b"]}).call(this)
 ```
 它们甚至可以互相嵌套递归：
 ```js
 var [a,{b},{c:[d]}] = [1,{"b":2},{"c":[3]}]
 ```
 ```js
-var d;var b;var a;!function(){var _0= [1,{"b":2},{"c":[3]}];a=_0[0];var _1=_0[1];b=_1["b"];var _2=_0[2];var _3=_2["c"];d=_3[0]}()
+var d;var b;var a;(function(){var _0= [1,{"b":2},{"c":[3]}];a=_0[0];var _1=_0[1];b=_1["b"];var _2=_0[2];var _3=_2["c"];d=_3[0]}).call(this)
 ```
 解构还允许在未定义的情况下默认赋值：
 ```js
 var [a=1] = []
 ```
 ```js
-var a;!function(){var _0= [];a=_0[0];if(_0.indexOf(a)!=0)a=1}()
+var a;(function(){var _0= [];a=_0[0];if(_0.indexOf(a)!=0)a=1}).call(this)
 ```
 表达式赋值也可以：
 ```js
 ({a=1} = {})
 ```
 ```js
-(!function(){var _0= {};a=_0["a"];if(!_0.hasOwnProperty('a'))a=1;return _0}())
+((function(){var _0= {};a=_0["a"];if(!_0.hasOwnProperty('a'))a=1;return _0}).call(this))
 ```
 数组解构最后允许`rest`运算符：
 ```js
 var [a, ...b] = [1, 2, 3]
 ```
 ```js
-var b;var a;!function(){var _0= [1, 2, 3];a=_0[0];b=_0.slice(1)}()
+var b;var a;(function(){var _0= [1, 2, 3];a=_0[0];b=_0.slice(1)}).call(this)
 ```
