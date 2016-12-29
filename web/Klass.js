@@ -161,6 +161,9 @@ var Klass = Class(function(jsdc) {
             this.jsdc.append(o.gs + '.' + o.s + '.');
           }
         }
+        else {
+          this.jsdc.appendBefore(';');
+        }
       }
     }
     else if(first.name() == JsNode.TOKEN
@@ -204,6 +207,9 @@ var Klass = Class(function(jsdc) {
             }
             this.jsdc.append(o.gss + '.' + o.s + '.');
           }
+        }
+        else {
+          this.jsdc.appendBefore(';');
         }
       }
     }
