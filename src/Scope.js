@@ -152,7 +152,7 @@ var Scope = Class(function(jsdc) {
               this.jsdc.append('!function(){');
             }
             else {
-              this.jsdc.appendBefore('}();');
+              this.jsdc.appendBefore('}.call(this);');
             }
           }
         }

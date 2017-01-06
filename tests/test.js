@@ -164,22 +164,22 @@ describe('es6', function() {
     it('let and var in ifstmt', function() {
       var s = 'if(true){var a;let b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;if(true){!function(){a;var b;}();}');
+      expect(res).to.eql('var a;if(true){!function(){a;var b;}.call(this);}');
     });
     it('const and var in forstmt', function() {
       var s = 'for(;;){var a;const b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;for(;;){!function(){a;var b;}();}');
+      expect(res).to.eql('var a;for(;;){!function(){a;var b;}.call(this);}');
     });
     it('const and var in whilestmt', function() {
       var s = 'while(false){var a;const b;}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;while(false){!function(){a;var b;}();}');
+      expect(res).to.eql('var a;while(false){!function(){a;var b;}.call(this);}');
     });
     it('let and var in trystmt', function() {
       var s = 'try{var a;let b}catch(e){var a;let b}finally{var a;let b}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;try{!function(){a;var b}();}catch(e){!function(){a;var b}();}finally{!function(){a;var b}();}');
+      expect(res).to.eql('var a;try{!function(){a;var b}.call(this);}catch(e){!function(){a;var b}.call(this);}finally{!function(){a;var b}.call(this);}');
     });
     it('let and var in function', function() {
       var s = 'function a(){var b;let c;{var d;let e}}';
@@ -224,7 +224,7 @@ describe('es6', function() {
     it('if with classdecl and varstmt', function() {
       var s = 'if(true){class A{}var a = 1}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('var a;if(true){!function(){function A(){}a = 1}();}');
+      expect(res).to.eql('var a;if(true){!function(){function A(){}a = 1}.call(this);}');
     });
     it('var in method', function() {
       var s = 'class A{m(){var a}}';
@@ -254,12 +254,12 @@ describe('es6', function() {
     it('ifstmt append comment', function() {
       var s = 'if(true){let a}//';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('if(true){!function(){var a}();}//');
+      expect(res).to.eql('if(true){!function(){var a}.call(this);}//');
     });
     it('trystmt append comment', function() {
       var s = 'try{let a}catch(e){const a}//';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('try{!function(){var a}();}catch(e){!function(){var a}();}//');
+      expect(res).to.eql('try{!function(){var a}.call(this);}catch(e){!function(){var a}.call(this);}//');
     });
     it('use new', function() {
       var s = '{const a}';
@@ -274,7 +274,7 @@ describe('es6', function() {
     it('function in ifstmt', function() {
       var s = 'if(true){function a(){}}';
       var res = Jsdc.parse(s);
-      expect(res).to.eql('if(true){!function(){function a(){}}();}');
+      expect(res).to.eql('if(true){!function(){function a(){}}.call(this);}');
     });
   });
   describe('init params', function() {
